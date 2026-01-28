@@ -47,4 +47,7 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-
+.env
+__pycache__
+.pytest_cache
+.vscode
