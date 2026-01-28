@@ -1,0 +1,35 @@
+# ============================================
+# AI Research Assistant - Dependencies
+# ============================================
+# Multi-agent research system built with Google ADK
+# Supports 20+ file formats with sequential agent pipeline
+
+# Core Framework & LLM
+google-adk>=0.5.0                    # Google Agent Development Kit (ADK)
+google-generativeai>=0.3.0           # Google Gemini API
+
+# Web Server & API
+fastapi>=0.109.0                     # High-performance web framework
+uvicorn>=0.27.0                      # ASGI server for FastAPI
+pydantic>=2.0.0                      # Data validation and settings
+python-multipart>=0.0.6              # File upload support
+
+# Configuration
+python-dotenv>=1.0.0                 # Environment variable management
+
+# Document Parsing
+PyPDF2>=3.0.0                        # PDF file parsing
+python-docx>=0.8.11                  # Microsoft Word (.docx) parsing
+openpyxl>=3.1.0                      # Microsoft Excel (.xlsx) parsing
+
+# Web Search & URL Fetching
+aiohttp>=3.9.0                       # Async HTTP client
+beautifulsoup4>=4.12.0               # HTML parsing for web scraping
+lxml>=4.9.0                          # XML/HTML parser (faster than html.parser)
+
+# Optional: Additional utilities (uncomment if needed)
+# requests>=2.31.0                   # HTTP library (alternative to aiohttp)
+# markdown>=3.5.0                    # Markdown rendering
+# Pillow>=10.0.0                     # Image processing
+# numpy>=1.24.0                      # Numerical operations
+# pandas>=2.0.0                      # Data analysis (for CSV/Excel)
