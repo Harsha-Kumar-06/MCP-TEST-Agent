@@ -1,0 +1,201 @@
+{
+  "info": {
+    "name": "DRAVYN Research Assistant - Location Tracking",
+    "description": "API collection for testing the research assistant with location tracking feature",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/api/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "health"]
+        },
+        "description": "Check if the service is running and configured correctly"
+      }
+    },
+    {
+      "name": "Upload Document",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "test_document.txt",
+              "description": "Upload any document (PDF, Word, Text, etc.)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/upload",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "upload"]
+        },
+        "description": "Upload a document and extract text. Copy the 'text' field from response for next request."
+      }
+    },
+    {
+      "name": "Research with Location Tracking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What improvements are needed and where exactly should they be made?\",\n  \"document\": \"<PASTE_DOCUMENT_TEXT_HERE>\",\n  \"enable_web_search\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/research",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "research"]
+        },
+        "description": "Analyze document with precise location references. Replace <PASTE_DOCUMENT_TEXT_HERE> with text from upload response."
+      }
+    },
+    {
+      "name": "Find Grammar Issues",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Identify all grammar errors with specific locations and corrections needed\",\n  \"document\": \"<PASTE_DOCUMENT_TEXT_HERE>\",\n  \"enable_web_search\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/research",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "research"]
+        },
+        "description": "Find grammar errors with exact locations"
+      }
+    },
+    {
+      "name": "Find Outdated Information",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Find all outdated information, statistics, or data with their exact locations\",\n  \"document\": \"<PASTE_DOCUMENT_TEXT_HERE>\",\n  \"enable_web_search\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/research",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "research"]
+        },
+        "description": "Identify outdated data with locations"
+      }
+    },
+    {
+      "name": "Fetch URL Content",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"https://en.wikipedia.org/wiki/Artificial_intelligence_in_healthcare\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/fetch-url",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "fetch-url"]
+        },
+        "description": "Fetch content from a URL. Copy the 'text' field for research."
+      }
+    },
+    {
+      "name": "Web Search",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"AI in healthcare 2025\",\n  \"num_results\": 5\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/search",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "search"]
+        },
+        "description": "Perform web search (requires Google Search API configuration)"
+      }
+    },
+    {
+      "name": "Compare Items with Citations",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Compare all the benefits vs challenges mentioned, citing exact locations\",\n  \"document\": \"<PASTE_DOCUMENT_TEXT_HERE>\",\n  \"enable_web_search\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/research",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["api", "research"]
+        },
+        "description": "Comparative analysis with location citations"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

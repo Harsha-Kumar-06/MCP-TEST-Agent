@@ -48,3 +48,6 @@ Thumbs.db
 *.mov
 *.wmv
 .env
+__pycache__
+.pytest_cache
+.vscode
