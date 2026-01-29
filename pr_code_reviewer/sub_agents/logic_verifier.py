@@ -23,8 +23,11 @@ For every issue found, you MUST provide the exact location and a fix using this 
 
 **File:** <file_path>
 **Line:** <line_number> (approximate based on diff)
-**Issue:** <detailed description>
-**Fix:** <suggested_code_or_action>
+**Issue:** <Concisely state the problem>
+**Fix:** 
+```<language_extension>
+<exact_fixed_code_snippet>
+```
 
 If logic seems sound, state "Logic appears correct and matches the description."
 """,

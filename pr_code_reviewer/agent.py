@@ -33,12 +33,13 @@ Instructions:
 
 CRITICAL: In your "summary_markdown", you MUST preserve the specific feedback provided by the sub-agents. 
 Do not summarize them into generic statements.
-Copy the "**File:** ... **Line:** ... **Fix:** ..." blocks exactly as they are in the sub-reports so the user can find the code easily.
+Copy the "**File:** ... **Line:** ... **Fix:** ..." blocks exactly as they are.
+Ensure code blocks are correctly formatted.
 
 **Output Format (JSON ONLY):**
 {
   "decision": "APPROVE" | "REQUEST_CHANGES" | "COMMENT",
-  "summary_markdown": "### PR Review Summary... (your formatted markdown here)",
+  "summary_markdown": "### PR Review Summary... (your formatted markdown here, prioritized with code fixes)",
   "checks": {
     "security": "success" | "failure",
     "style": "success" | "failure",
