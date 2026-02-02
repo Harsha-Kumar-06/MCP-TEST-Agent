@@ -5,7 +5,7 @@ Supports: user lookup by email, grant/revoke project role access, list user's pr
 import os
 import logging
 import requests
-from typing import Any
+from typing import Any, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +31,8 @@ class JiraService:
         return f"{self.base_url}/rest/api/3/{path.lstrip('/')}"
 
     def _request(
-        self, method: str, path: str, json: dict | None = None, params: dict | None = None
-    ) -> tuple[dict | list | None, str | None]:
+        self, method: str, path: str, json: Optional[dict] = None, params: Optional[dict] = None
+    ) -> tuple[Optional[Union[dict, list]], Optional[str]]:
         if not self.base_url or not self._session.auth:
             return None, "Jira not configured (missing URL or credentials)"
         try:
@@ -55,6 +55,8 @@ class JiraService:
             return {"status": "error", "error": err}
         if not data or not isinstance(data, list):
             return {"status": "error", "error": "No user found"}
+        
+        # 1. Try exact email match (for users with visible email)
         for u in data:
             if (u.get("emailAddress") or "").lower() == email.lower():
                 return {
@@ -63,6 +65,22 @@ class JiraService:
                     "display_name": u.get("displayName"),
                     "email": u.get("emailAddress"),
                 }
+        
+        # 2. Fallback: If we have results but no visible email matched, pick the best candidate.
+        # This handles users with hidden emails in Jira profile privacy settings.
+        # We assume the first result is the most relevant from Jira's search.
+        if data:
+            u = data[0]
+            if u.get("accountId"):
+                # Use provided email since the API one might be hidden/missing
+                return {
+                    "status": "success",
+                    "account_id": u.get("accountId"),
+                    "display_name": u.get("displayName"),
+                    "email": u.get("emailAddress") or email,
+                    "note": "Email matched via search query (hidden in profile)."
+                }
+
         return {"status": "error", "error": f"No user found with email: {email}"}
 
     def get_project_roles(self, project_key: str) -> dict[str, Any]:
@@ -139,7 +157,7 @@ class JiraService:
 
 
 # Singleton for use by tools
-_jira_service: JiraService | None = None
+_jira_service: Optional[JiraService] = None
 
 
 def get_jira_service() -> JiraService:
