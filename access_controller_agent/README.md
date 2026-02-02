@@ -1,30 +1,52 @@
 # Access Controller Agent
 
-AI-powered organizational access authority agent built with **Google ADK**. It acts as a central, automated system for managing user access (starting with **Jira**; email-based workflows and more systems can be added later).
+AI-powered organizational access authority agent built with **Google ADK**. It acts as a central, automated system for managing user access to various systems (currently **Jira**, with planned support for Bitbucket, GitHub, Teams, etc.).
+
+## Primary Interface: Email
+
+**Email is the main entry point** for interacting with this agent. Users send emails requesting access changes, and the agent:
+1. Reads incoming emails from Gmail
+2. Parses the request to understand the intent
+3. Executes the appropriate action (grant/revoke access, etc.)
+4. Sends a reply with the result
+5. Asks follow-up questions if more information is needed
 
 ## Architecture (Hierarchical, ADK)
 
 - **Root:** `AccessControllerCoordinator` (LlmAgent) – routes requests to specialists via LLM-driven delegation.
 - **Sub-agents:**
-  - **JiraAgent** – Jira project access: grant, revoke, list user access, look up user by email. Uses Jira Cloud REST API v3.
-  - **EmailAgent** – Sends emails (confirmations, approval requests, notifications). Incoming email is passed as the user message.
+  - **JiraAgent** – Jira project access: grant, revoke, list user access, look up user by email, invite new users. Uses Jira Cloud REST API v3.
+  - **EmailAgent** – Reads and processes incoming emails, sends replies, follow-ups, and notifications. Uses Gmail IMAP/SMTP.
 
-Flow: User (or email ingestion) sends a message → Coordinator classifies intent → Delegates to **JiraAgent** or **EmailAgent** → Sub-agent uses tools and returns result.
+**Flow:** 
+1. Email arrives → Agent fetches unread emails
+2. Coordinator parses intent → Delegates to **JiraAgent** for access operations
+3. JiraAgent executes the action → Returns result
+4. Coordinator → Delegates to **EmailAgent** to send reply
 
-## Capabilities (current)
+## Capabilities
 
-- **Jira:** Grant/revoke project role access, list user access, resolve user by email.
-- **Email:** Send email (mock if SMTP not configured).
-- **Coordinator:** Single entry point; delegates to Jira or Email based on natural language.
+### Jira Access Management
+- **Grant access**: Add users to project roles
+- **Revoke access**: Remove users from project roles
+- **List access**: Show all projects/roles a user has access to
+- **Invite users**: Add new users to Jira who don't have accounts yet
+- **Check roles**: List available roles in a project, get user's roles
+
+### Email Communication
+- **Read emails**: Fetch unread emails, search emails
+- **Send emails**: Send new emails, reply in threads
+- **Follow-ups**: Ask for clarification when requests are unclear
+- **Notifications**: Send confirmations after actions complete
 
 ## Setup
 
-1. **Python 3.10+**, create and activate a venv:
+1. **Python 3.9+**, create and activate a venv:
 
    ```bash
    python -m venv .venv
-   .venv\Scripts\Activate.ps1   # Windows
-   # source .venv/bin/activate   # macOS/Linux
+   source .venv/bin/activate   # macOS/Linux
+   # .venv\Scripts\Activate.ps1   # Windows
    ```
 
 2. **Install dependencies:**
@@ -33,30 +55,107 @@ Flow: User (or email ingestion) sends a message → Coordinator classifies inten
    pip install -r requirements.txt
    ```
 
-3. **Environment:** Copy `.env.example` to `.env` and set:
+3. **Environment:** Copy `.env.example` to `.env` and configure:
 
-   - `GOOGLE_API_KEY` – required (Gemini).
-   - Optional: `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` for real Jira operations.
-   - Optional: `SMTP_*` and `EMAIL_FROM` for real email sending.
+### Required: Google API Key
+```bash
+GOOGLE_API_KEY=your-gemini-api-key
+```
 
-**Where to get the Jira API token:** Create it at [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens). Log in with your Jira/Atlassian email → **Create API token** (not “Create API token with scopes”) → name it, set expiration → copy the token once (it’s only shown once). Use that same email as `JIRA_EMAIL` and the token as `JIRA_API_TOKEN`. Your `JIRA_BASE_URL` is your Jira Cloud URL (e.g. `https://your-company.atlassian.net`). **Scope:** use the simple token with no scopes; it inherits your account’s Jira permissions. Ensure that account can manage project roles (e.g. Jira Admin or Project Admin on the relevant projects).
+### Required: Gmail Configuration
+```bash
+GMAIL_ADDRESS=your-bot@gmail.com
+GMAIL_APP_PASSWORD=your-app-password
+GMAIL_IMAP_HOST=imap.gmail.com  # optional, default
+GMAIL_SMTP_HOST=smtp.gmail.com  # optional, default
+EMAIL_BOT_NAME=Access Controller Bot  # optional
+```
 
-## Run
+**How to get Gmail App Password:**
+1. Enable 2-Factor Authentication on your Gmail account
+2. Go to [Google Account → Security → App Passwords](https://myaccount.google.com/apppasswords)
+3. Create a new app password for "Mail"
+4. Use this password as `GMAIL_APP_PASSWORD`
 
-**API server (FastAPI):**
+### Required: Jira Configuration
+```bash
+JIRA_BASE_URL=https://your-company.atlassian.net
+JIRA_EMAIL=your-jira-admin@company.com
+JIRA_API_TOKEN=your-jira-api-token
+```
+
+**How to get Jira API Token:**
+1. Go to [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+2. Create API token (not "with scopes") → name it, set expiration
+3. Copy the token immediately (shown only once)
+4. Use the same email as `JIRA_EMAIL`
+
+**Required Jira Permissions:** The account must have permission to manage project roles (Jira Admin or Project Admin).
+
+## Running the Server
+
+**Start the FastAPI server:**
 
 ```bash
 uvicorn access_controller_agent.server:app --reload --port 8000
 ```
 
-Then:
+## API Endpoints
 
-- **POST /request** or **POST /access** – body: `{"message": "Grant john@company.com access to project PROJ on Jira"}`.
-- **GET /health** – health check.
+### POST /request
+Handle any access request via natural language.
 
-**ADK CLI (optional):**
+```bash
+curl -X POST http://localhost:8000/request \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Grant john@company.com Developer access to project TEST"}'
+```
 
-From the parent directory that contains `access_controller_agent/`:
+### POST /email/poll
+Poll for new emails and process them automatically. **Use this for scheduled automation.**
+
+```bash
+curl -X POST http://localhost:8000/email/poll \
+  -H "Content-Type: application/json" \
+  -d '{"limit": 5, "auto_process": true}'
+```
+
+### GET /email/unread
+Check unread emails without processing.
+
+```bash
+curl http://localhost:8000/email/unread?limit=10
+```
+
+### GET /health
+Health check.
+
+```bash
+curl http://localhost:8000/health
+```
+
+## Example Email Requests
+
+Users can send emails like:
+
+- `"Please give john@company.com Developer access to PROJECT-X"`
+- `"Remove Sarah's access to the TEST project"`
+- `"What projects does mike@company.com have access to?"`
+- `"I need admin access to PROJECT-Y for the new sprint"` (grants to sender)
+- `"Add this new contractor to Jira: newuser@contractor.com"` (invites user)
+
+## Automated Email Processing
+
+For production, set up a cron job or scheduler to call `/email/poll` periodically:
+
+```bash
+# Every 5 minutes
+*/5 * * * * curl -X POST http://localhost:8000/email/poll -H "Content-Type: application/json" -d '{"limit": 10, "auto_process": true}'
+```
+
+## ADK CLI (Development)
+
+From the parent directory containing `access_controller_agent/`:
 
 ```bash
 adk run access_controller_agent
@@ -64,11 +163,9 @@ adk run access_controller_agent
 adk web --port 8000
 ```
 
-## Example requests
+## Future Integrations (Planned)
 
-- `Grant john@company.com access to project PROJ on Jira`
-- `Revoke jane@company.com from project PROJ`
-- `What Jira access does john@company.com have?`
-- `Send an email to manager@company.com saying access was granted`
-
-Without Jira/email config, the agent still runs and reports that those systems are not configured.
+- **Bitbucket**: Repository access management
+- **GitHub**: Organization and repository permissions
+- **Microsoft Teams**: Team membership management
+- **AWS IAM**: Cloud access permissions
