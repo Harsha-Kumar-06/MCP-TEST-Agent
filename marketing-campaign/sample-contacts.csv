@@ -1,0 +1,6 @@
+email,phone,firstName,lastName,company,tags,optInEmail,optInSMS
+john.doe@example.com,+15551234567,John,Doe,Acme Corp,lead;tech,true,true
+jane.smith@example.com,+15559876543,Jane,Smith,Tech Startup,customer;premium,true,false
+bob.johnson@example.com,,Bob,Johnson,Enterprise Inc,lead,true,false
+alice.williams@example.com,+15555555555,Alice,Williams,Small Business,customer,true,true
+charlie.brown@example.com,+15554444444,Charlie,Brown,Freelance,lead;tech,true,true

@@ -1,0 +1,41 @@
+Campaign Name: Black Friday SaaS Sale 2026
+
+Channels: Email
+
+Product Name: ProjectHub - Team Collaboration Platform
+
+Description: ProjectHub streamlines team collaboration with intuitive project management, real-time chat, file sharing, and time tracking all in one place. Perfect for remote teams and growing businesses.
+
+Features:
+- Kanban boards and Gantt charts
+- Real-time team chat and video calls
+- File storage with version control
+- Time tracking and reporting
+- Client portal for project updates
+
+Pricing: $29/month per user (50% off first 3 months)
+
+Target Audience: Small business owners, project managers, startup founders, ages 25-45
+
+Interests: Productivity, project management, remote work, team collaboration, SaaS tools
+
+Pain Points: Scattered communication, missed deadlines, lack of visibility, expensive tools
+
+Budget: 2500
+
+Start Date: 2026-11-25
+
+End Date: 2026-11-30
+
+Goals:
+- Generate 500 trial signups
+- Convert 100 paid subscribers
+- Build email list of 1000
+
+Company Name: ProjectHub Inc
+
+Email: sales@projecthub.io
+
+Phone: +1-555-PROJECT
+
+Website: https://projecthub.io

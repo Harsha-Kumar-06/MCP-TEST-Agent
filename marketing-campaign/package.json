@@ -1,0 +1,45 @@
+{
+  "name": "multi-agent-coordinator",
+  "version": "1.0.0",
+  "description": "Multi-agent coordinator pattern for marketing campaigns",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "example": "ts-node src/examples/email-sms-campaign.ts",
+    "build:backend": "tsc"
+  },
+  "keywords": [
+    "multi-agent",
+    "coordinator",
+    "marketing",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "formidable": "^3.5.0",
+    "mammoth": "^1.11.0",
+    "next": "^14.0.0",
+    "nodemailer": "^6.9.0",
+    "openai": "^4.0.0",
+    "pdf-parse": "^2.4.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "twilio": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/formidable": "^3.4.0",
+    "@types/node": "^20.0.0",
+    "@types/nodemailer": "^6.4.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
