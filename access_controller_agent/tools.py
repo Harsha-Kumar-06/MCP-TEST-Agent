@@ -1016,3 +1016,632 @@ Access Controller Bot"""
     logger.info(f"email_send_followup result: {res}")
     return res
 
+
+# ==========================================================================
+# CONFLUENCE TOOLS
+# ==========================================================================
+
+from .confluence_service import get_confluence_service
+
+
+# ---------- Confluence Space Tools ----------
+
+def confluence_list_spaces(limit: int = 50) -> dict[str, Any]:
+    """
+    List all Confluence spaces.
+    
+    Returns a list of spaces with their keys and names.
+    Use this to help users find the correct space key.
+    
+    limit: Maximum number of spaces to return (default 50).
+    """
+    logger.info(f"confluence_list_spaces(limit={limit})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.list_spaces(limit=limit)
+    logger.info(f"confluence_list_spaces result: {res.get('total', 0)} spaces found")
+    return res
+
+
+def confluence_get_space(space_key: str) -> dict[str, Any]:
+    """
+    Get details of a specific Confluence space.
+    
+    space_key: The space key (e.g., "DEV", "TEAM").
+    """
+    logger.info(f"confluence_get_space(space_key={space_key})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.get_space(space_key)
+    logger.info(f"confluence_get_space result: {res}")
+    return res
+
+
+def confluence_get_space_permissions(space_key: str) -> dict[str, Any]:
+    """
+    Get permissions for a Confluence space.
+    
+    Shows all users and groups that have access to the space and their permission levels.
+    
+    space_key: The space key (e.g., "DEV", "TEAM").
+    """
+    logger.info(f"confluence_get_space_permissions(space_key={space_key})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.get_space_permissions(space_key)
+    logger.info(f"confluence_get_space_permissions result: {res}")
+    return res
+
+
+def confluence_grant_space_access(
+    user_email: str, space_key: str, permission: str = "read"
+) -> dict[str, Any]:
+    """
+    Grant a user access to a Confluence space.
+    
+    user_email: The user's email address.
+    space_key: The space key (e.g., "DEV", "TEAM").
+    permission: Permission level - "read" (view), "write" (edit), or "admin" (full control).
+    """
+    logger.info(f"confluence_grant_space_access(user_email={user_email}, space_key={space_key}, permission={permission})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"User '{user_email}' not found. They may need to be invited to Atlassian first.",
+            "user_not_found": True
+        }
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.add_space_permission(space_key, account_id, permission)
+    
+    if res.get("status") == "success":
+        res["message"] = f"Granted {permission} access to '{display_name}' for space '{space_key}'."
+        res["user"] = display_name
+    
+    logger.info(f"confluence_grant_space_access result: {res}")
+    return res
+
+
+def confluence_revoke_space_access(user_email: str, space_key: str) -> dict[str, Any]:
+    """
+    Revoke a user's access from a Confluence space.
+    
+    Removes all permissions the user has for the specified space.
+    
+    user_email: The user's email address.
+    space_key: The space key (e.g., "DEV", "TEAM").
+    """
+    logger.info(f"confluence_revoke_space_access(user_email={user_email}, space_key={space_key})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.remove_space_permission(space_key, account_id)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        if not res.get("already_removed"):
+            res["message"] = f"Revoked access for '{display_name}' from space '{space_key}'."
+    
+    logger.info(f"confluence_revoke_space_access result: {res}")
+    return res
+
+
+def confluence_add_group_to_space(
+    group_name: str, space_key: str, permission: str = "read"
+) -> dict[str, Any]:
+    """
+    Grant a group access to a Confluence space.
+    
+    group_name: The group name.
+    space_key: The space key (e.g., "DEV", "TEAM").
+    permission: Permission level - "read", "write", or "admin".
+    """
+    logger.info(f"confluence_add_group_to_space(group_name={group_name}, space_key={space_key}, permission={permission})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.add_group_to_space(space_key, group_name, permission)
+    logger.info(f"confluence_add_group_to_space result: {res}")
+    return res
+
+
+def confluence_list_user_access(user_email: str) -> dict[str, Any]:
+    """
+    List all Confluence spaces a user has access to.
+    
+    user_email: The user's email address.
+    """
+    logger.info(f"confluence_list_user_access(user_email={user_email})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.get_user_space_permissions(account_id)
+    
+    if res.get("status") == "success":
+        res["user_email"] = user_email
+        res["display_name"] = display_name
+        spaces = res.get("spaces", [])
+        if spaces:
+            res["message"] = f"'{display_name}' has access to {len(spaces)} space(s)."
+        else:
+            res["message"] = f"'{display_name}' has no Confluence space access."
+    
+    logger.info(f"confluence_list_user_access result: {res}")
+    return res
+
+
+# ---------- Confluence Group Tools ----------
+
+def confluence_list_groups(limit: int = 50) -> dict[str, Any]:
+    """
+    List all Confluence groups.
+    Note: These are the same groups as Jira (Atlassian Cloud shared directory).
+    
+    limit: Maximum number of groups to return.
+    """
+    logger.info(f"confluence_list_groups(limit={limit})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.list_groups(limit=limit)
+    logger.info(f"confluence_list_groups result: {res}")
+    return res
+
+
+def confluence_get_group_members(group_name: str, limit: int = 50) -> dict[str, Any]:
+    """
+    Get members of a Confluence group.
+    
+    group_name: The name of the group.
+    limit: Maximum number of members to return.
+    """
+    logger.info(f"confluence_get_group_members(group_name={group_name}, limit={limit})")
+    svc = get_confluence_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Confluence not configured."}
+    
+    res = svc.get_group_members(group_name, limit=limit)
+    logger.info(f"confluence_get_group_members result: {res}")
+    return res
+
+
+# ==========================================================================
+# BITBUCKET TOOLS
+# ==========================================================================
+
+from .bitbucket_service import get_bitbucket_service
+
+
+# ---------- Bitbucket Workspace Tools ----------
+
+def bitbucket_list_workspaces() -> dict[str, Any]:
+    """
+    List all Bitbucket workspaces the authenticated user has access to.
+    
+    Workspaces are the top-level containers in Bitbucket that hold repositories.
+    """
+    logger.info("bitbucket_list_workspaces()")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.list_workspaces()
+    logger.info(f"bitbucket_list_workspaces result: {res.get('total', 0)} workspaces found")
+    return res
+
+
+def bitbucket_get_workspace_members(workspace: str = None) -> dict[str, Any]:
+    """
+    Get all members of a Bitbucket workspace.
+    
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_get_workspace_members(workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.get_workspace_members(workspace)
+    logger.info(f"bitbucket_get_workspace_members result: {res}")
+    return res
+
+
+def bitbucket_add_workspace_member(user_email: str, workspace: str = None) -> dict[str, Any]:
+    """
+    Add a user to a Bitbucket workspace.
+    
+    user_email: The user's email address.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_add_workspace_member(user_email={user_email}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"User '{user_email}' not found. They may need to be invited to Atlassian first.",
+            "user_not_found": True
+        }
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.add_workspace_member(account_id, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Added '{display_name}' to workspace."
+    
+    logger.info(f"bitbucket_add_workspace_member result: {res}")
+    return res
+
+
+def bitbucket_remove_workspace_member(user_email: str, workspace: str = None) -> dict[str, Any]:
+    """
+    Remove a user from a Bitbucket workspace.
+    
+    user_email: The user's email address.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_remove_workspace_member(user_email={user_email}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.remove_workspace_member(account_id, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Removed '{display_name}' from workspace."
+    
+    logger.info(f"bitbucket_remove_workspace_member result: {res}")
+    return res
+
+
+# ---------- Bitbucket Repository Tools ----------
+
+def bitbucket_list_repositories(workspace: str = None, limit: int = 50) -> dict[str, Any]:
+    """
+    List all repositories in a Bitbucket workspace.
+    
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    limit: Maximum number of repositories to return.
+    """
+    logger.info(f"bitbucket_list_repositories(workspace={workspace}, limit={limit})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.list_repositories(workspace, limit)
+    logger.info(f"bitbucket_list_repositories result: {res.get('total', 0)} repos found")
+    return res
+
+
+def bitbucket_get_repository(repo_slug: str, workspace: str = None) -> dict[str, Any]:
+    """
+    Get details of a specific Bitbucket repository.
+    
+    repo_slug: The repository slug (e.g., "my-repo").
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_get_repository(repo_slug={repo_slug}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.get_repository(repo_slug, workspace)
+    logger.info(f"bitbucket_get_repository result: {res}")
+    return res
+
+
+def bitbucket_get_repository_permissions(repo_slug: str, workspace: str = None) -> dict[str, Any]:
+    """
+    Get permissions for a Bitbucket repository.
+    
+    Shows all users and groups with their access levels (read, write, admin).
+    
+    repo_slug: The repository slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_get_repository_permissions(repo_slug={repo_slug}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.get_repository_permissions(repo_slug, workspace)
+    logger.info(f"bitbucket_get_repository_permissions result: {res}")
+    return res
+
+
+def bitbucket_grant_repository_access(
+    user_email: str, repo_slug: str, permission: str = "read", workspace: str = None
+) -> dict[str, Any]:
+    """
+    Grant a user access to a Bitbucket repository.
+    
+    user_email: The user's email address.
+    repo_slug: The repository slug.
+    permission: "read", "write", or "admin".
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_grant_repository_access(user_email={user_email}, repo_slug={repo_slug}, permission={permission})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"User '{user_email}' not found. They may need to be invited to Atlassian first.",
+            "user_not_found": True
+        }
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.add_repository_permission(repo_slug, account_id, permission, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Granted {permission} access to '{display_name}' for repository '{repo_slug}'."
+    
+    logger.info(f"bitbucket_grant_repository_access result: {res}")
+    return res
+
+
+def bitbucket_revoke_repository_access(
+    user_email: str, repo_slug: str, workspace: str = None
+) -> dict[str, Any]:
+    """
+    Revoke a user's access from a Bitbucket repository.
+    
+    user_email: The user's email address.
+    repo_slug: The repository slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_revoke_repository_access(user_email={user_email}, repo_slug={repo_slug})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.remove_repository_permission(repo_slug, account_id, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Revoked access for '{display_name}' from repository '{repo_slug}'."
+    
+    logger.info(f"bitbucket_revoke_repository_access result: {res}")
+    return res
+
+
+def bitbucket_add_group_to_repository(
+    group_slug: str, repo_slug: str, permission: str = "read", workspace: str = None
+) -> dict[str, Any]:
+    """
+    Grant a group access to a Bitbucket repository.
+    
+    group_slug: The group slug.
+    repo_slug: The repository slug.
+    permission: "read", "write", or "admin".
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_add_group_to_repository(group_slug={group_slug}, repo_slug={repo_slug}, permission={permission})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.add_group_to_repository(repo_slug, group_slug, permission, workspace)
+    logger.info(f"bitbucket_add_group_to_repository result: {res}")
+    return res
+
+
+def bitbucket_remove_group_from_repository(
+    group_slug: str, repo_slug: str, workspace: str = None
+) -> dict[str, Any]:
+    """
+    Remove a group's access from a Bitbucket repository.
+    
+    group_slug: The group slug.
+    repo_slug: The repository slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_remove_group_from_repository(group_slug={group_slug}, repo_slug={repo_slug})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.remove_group_from_repository(repo_slug, group_slug, workspace)
+    logger.info(f"bitbucket_remove_group_from_repository result: {res}")
+    return res
+
+
+def bitbucket_list_user_access(user_email: str, workspace: str = None) -> dict[str, Any]:
+    """
+    List all Bitbucket repositories a user has explicit access to.
+    
+    user_email: The user's email address.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_list_user_access(user_email={user_email}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.get_user_repository_access(account_id, workspace)
+    
+    if res.get("status") == "success":
+        res["user_email"] = user_email
+        res["display_name"] = display_name
+        repos = res.get("repositories", [])
+        if repos:
+            res["message"] = f"'{display_name}' has access to {len(repos)} repository(ies)."
+        else:
+            res["message"] = f"'{display_name}' has no explicit repository access."
+    
+    logger.info(f"bitbucket_list_user_access result: {res}")
+    return res
+
+
+# ---------- Bitbucket Group Tools ----------
+
+def bitbucket_list_groups(workspace: str = None) -> dict[str, Any]:
+    """
+    List all groups in a Bitbucket workspace.
+    
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_list_groups(workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.list_groups(workspace)
+    logger.info(f"bitbucket_list_groups result: {res}")
+    return res
+
+
+def bitbucket_get_group_members(group_slug: str, workspace: str = None) -> dict[str, Any]:
+    """
+    Get members of a Bitbucket workspace group.
+    
+    group_slug: The group slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_get_group_members(group_slug={group_slug}, workspace={workspace})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    res = svc.get_group_members(group_slug, workspace)
+    logger.info(f"bitbucket_get_group_members result: {res}")
+    return res
+
+
+def bitbucket_add_user_to_group(
+    user_email: str, group_slug: str, workspace: str = None
+) -> dict[str, Any]:
+    """
+    Add a user to a Bitbucket workspace group.
+    
+    user_email: The user's email address.
+    group_slug: The group slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_add_user_to_group(user_email={user_email}, group_slug={group_slug})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.add_user_to_group(account_id, group_slug, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Added '{display_name}' to group '{group_slug}'."
+    
+    logger.info(f"bitbucket_add_user_to_group result: {res}")
+    return res
+
+
+def bitbucket_remove_user_from_group(
+    user_email: str, group_slug: str, workspace: str = None
+) -> dict[str, Any]:
+    """
+    Remove a user from a Bitbucket workspace group.
+    
+    user_email: The user's email address.
+    group_slug: The group slug.
+    workspace: The workspace slug. If not provided, uses the default workspace.
+    """
+    logger.info(f"bitbucket_remove_user_from_group(user_email={user_email}, group_slug={group_slug})")
+    svc = get_bitbucket_service()
+    if not svc._session.auth:
+        return {"status": "skipped", "message": "Bitbucket not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.remove_user_from_group(account_id, group_slug, workspace)
+    
+    if res.get("status") == "success":
+        res["user"] = display_name
+        res["message"] = f"Removed '{display_name}' from group '{group_slug}'."
+    
+    logger.info(f"bitbucket_remove_user_from_group result: {res}")
+    return res
