@@ -27,17 +27,43 @@ AI-powered organizational access authority agent built with **Google ADK**. It a
 ## Capabilities
 
 ### Jira Access Management
-- **Grant access**: Add users to project roles
+
+#### User Management
+- **Invite users**: Add new users to Jira who don't have accounts yet
+- **Look up users**: Find users by email address
+- **Deactivate users**: Remove a user's entire Jira access
+
+#### Group Management (Recommended for bulk access)
+- **List groups**: See all available groups in Jira
+- **Add to group**: Add users to groups for bulk access management
+- **Remove from group**: Remove users from groups
+- **List group members**: See who's in a specific group
+- **Get user's groups**: See what groups a user belongs to
+
+#### Project Role Management
+- **Grant access**: Add users to project roles (Administrator, Member, Viewer)
 - **Revoke access**: Remove users from project roles
 - **List access**: Show all projects/roles a user has access to
-- **Invite users**: Add new users to Jira who don't have accounts yet
-- **Check roles**: List available roles in a project, get user's roles
+- **List projects**: Show all available projects
+- **List project roles**: Show available roles in a project
+- **Check roles**: Get user's roles in a specific project
 
 ### Email Communication
 - **Read emails**: Fetch unread emails, search emails
 - **Send emails**: Send new emails, reply in threads
 - **Follow-ups**: Ask for clarification when requests are unclear
 - **Notifications**: Send confirmations after actions complete
+
+## Jira Concepts
+
+Understanding Jira's access model is important:
+
+| Concept | Description | Tool |
+|---------|-------------|------|
+| **Groups** | Collections of users for bulk access management (e.g., "developers", "jira-software-users") | `jira_add_user_to_group` |
+| **Projects** | Containers for issues with a KEY (e.g., "KAN") and NAME (e.g., "Kanban Board") | `jira_list_projects` |
+| **Project Roles** | Roles within a project (Administrator, Member, Viewer) | `jira_grant_access` |
+| **Users** | Identified by email, must be invited if not in Jira | `jira_invite_user` |
 
 ## Setup
 
@@ -138,11 +164,27 @@ curl http://localhost:8000/health
 
 Users can send emails like:
 
+### Project Access
 - `"Please give john@company.com Developer access to PROJECT-X"`
 - `"Remove Sarah's access to the TEST project"`
 - `"What projects does mike@company.com have access to?"`
 - `"I need admin access to PROJECT-Y for the new sprint"` (grants to sender)
+
+### Group Access
+- `"Add john@company.com to the developers group"`
+- `"Remove sarah from the jira-software-users group"`
+- `"What groups is mike@company.com in?"`
+- `"Show me all available groups"`
+
+### User Management
 - `"Add this new contractor to Jira: newuser@contractor.com"` (invites user)
+- `"Invite bob@external.com to Jira and give them access to KAN project"`
+- `"Deactivate jane@company.com from Jira"` (removes all access)
+
+### Information Queries
+- `"What roles are available in the TEST project?"`
+- `"List all projects in Jira"`
+- `"Who has access to the KAN project?"`
 
 ## Automated Email Processing
 

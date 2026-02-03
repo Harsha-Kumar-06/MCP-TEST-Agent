@@ -185,7 +185,7 @@ class JiraService:
         return {"status": "success", "role_id": role_id, "members": members}
 
     def is_user_in_role(self, project_key: str, role_id: str, account_id: str) -> bool:
-        """Check if a user (by account_id) is already in the specified project role."""
+        """Check if a user (by account_id) is directly assigned to the specified project role."""
         result = self.get_role_members(project_key, role_id)
         if result.get("status") != "success":
             return False
@@ -193,6 +193,62 @@ class JiraService:
             if member.get("type") == "user" and member.get("account_id") == account_id:
                 return True
         return False
+
+    def get_user_access_details_in_project(self, project_key: str, account_id: str) -> dict[str, Any]:
+        """
+        Get detailed access information for a user in a project.
+        Checks both direct role assignments AND group-based access.
+        Returns: direct_roles, group_roles, and groups that grant access.
+        """
+        roles_resp = self.get_project_roles(project_key)
+        if roles_resp.get("status") != "success":
+            return roles_resp
+        
+        direct_roles = []
+        group_roles = []
+        access_granting_groups = []
+        
+        # Get user's groups first
+        user_groups_resp = self.get_user_groups(account_id)
+        user_group_names = set()
+        if user_groups_resp.get("status") == "success":
+            user_group_names = {g["name"] for g in user_groups_resp.get("groups", [])}
+        
+        for role_id, role_name in roles_resp.get("roles", {}).items():
+            if role_name == "atlassian-addons-project-access":
+                continue
+            
+            # Get all members (users and groups) in this role
+            members_resp = self.get_role_members(project_key, role_id)
+            if members_resp.get("status") != "success":
+                continue
+            
+            for member in members_resp.get("members", []):
+                # Check direct user assignment
+                if member.get("type") == "user" and member.get("account_id") == account_id:
+                    direct_roles.append({"role_id": role_id, "role_name": role_name})
+                
+                # Check group-based access
+                if member.get("type") == "group":
+                    group_name = member.get("name")
+                    if group_name in user_group_names:
+                        group_roles.append({
+                            "role_id": role_id, 
+                            "role_name": role_name,
+                            "via_group": group_name
+                        })
+                        if group_name not in access_granting_groups:
+                            access_granting_groups.append(group_name)
+        
+        return {
+            "status": "success",
+            "project_key": project_key,
+            "account_id": account_id,
+            "direct_roles": direct_roles,
+            "group_roles": group_roles,
+            "access_granting_groups": access_granting_groups,
+            "has_any_access": len(direct_roles) > 0 or len(group_roles) > 0
+        }
 
     def get_user_roles_in_project(self, project_key: str, account_id: str) -> dict[str, Any]:
         """
@@ -284,6 +340,220 @@ class JiraService:
         
         logger.info(f"Successfully revoked role from user.")
         return {"status": "success", "message": f"Removed user from project {project_key} role {role_id}"}
+
+    # ==================== GROUP MANAGEMENT ====================
+    
+    def list_groups(self, max_results: int = 50) -> dict[str, Any]:
+        """
+        List all groups in Jira.
+        Returns list of group names.
+        """
+        data, err = self._request("GET", "group/bulk", params={"maxResults": max_results})
+        if err:
+            return {"status": "error", "error": err}
+        if not data:
+            return {"status": "error", "error": "No groups returned"}
+        
+        groups = []
+        for g in data.get("values", []):
+            groups.append({
+                "name": g.get("name"),
+                "group_id": g.get("groupId"),
+            })
+        
+        return {
+            "status": "success",
+            "groups": groups,
+            "total": data.get("total", len(groups))
+        }
+    
+    def get_group_members(self, group_name: str, max_results: int = 50) -> dict[str, Any]:
+        """
+        Get members of a specific group.
+        """
+        data, err = self._request(
+            "GET", 
+            "group/member",
+            params={"groupname": group_name, "maxResults": max_results}
+        )
+        if err:
+            return {"status": "error", "error": err}
+        if not data:
+            return {"status": "error", "error": "No data returned"}
+        
+        members = []
+        for m in data.get("values", []):
+            members.append({
+                "account_id": m.get("accountId"),
+                "display_name": m.get("displayName"),
+                "email": m.get("emailAddress"),
+                "active": m.get("active", True)
+            })
+        
+        return {
+            "status": "success",
+            "group_name": group_name,
+            "members": members,
+            "total": data.get("total", len(members))
+        }
+    
+    def add_user_to_group(self, account_id: str, group_name: str) -> dict[str, Any]:
+        """
+        Add a user to a Jira group.
+        This is the recommended way to manage access at scale.
+        """
+        logger.info(f"Adding user {account_id} to group {group_name}")
+        data, err = self._request(
+            "POST",
+            "group/user",
+            params={"groupname": group_name},
+            json={"accountId": account_id}
+        )
+        
+        if err:
+            # Check if already in group
+            if "already" in str(err).lower() or "member" in str(err).lower():
+                return {
+                    "status": "success",
+                    "message": f"User is already a member of group '{group_name}'.",
+                    "already_member": True
+                }
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"Successfully added user to group '{group_name}'."
+        }
+    
+    def remove_user_from_group(self, account_id: str, group_name: str) -> dict[str, Any]:
+        """
+        Remove a user from a Jira group.
+        """
+        logger.info(f"Removing user {account_id} from group {group_name}")
+        _, err = self._request(
+            "DELETE",
+            "group/user",
+            params={"groupname": group_name, "accountId": account_id}
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"Successfully removed user from group '{group_name}'."
+        }
+    
+    def is_user_in_group(self, account_id: str, group_name: str) -> bool:
+        """Check if a user is a member of a specific group."""
+        result = self.get_group_members(group_name)
+        if result.get("status") != "success":
+            return False
+        for member in result.get("members", []):
+            if member.get("account_id") == account_id:
+                return True
+        return False
+    
+    # ==================== PROJECT MANAGEMENT ====================
+    
+    def list_projects(self, max_results: int = 50) -> dict[str, Any]:
+        """
+        List all projects in Jira.
+        Returns list of projects with key, name, and id.
+        """
+        data, err = self._request("GET", "project", params={"maxResults": max_results})
+        if err:
+            return {"status": "error", "error": err}
+        if not data or not isinstance(data, list):
+            return {"status": "error", "error": "No projects returned"}
+        
+        projects = []
+        for p in data:
+            projects.append({
+                "key": p.get("key"),
+                "name": p.get("name"),
+                "id": p.get("id"),
+                "project_type": p.get("projectTypeKey"),
+            })
+        
+        return {
+            "status": "success",
+            "projects": projects,
+            "total": len(projects)
+        }
+    
+    def get_project_by_key(self, project_key: str) -> dict[str, Any]:
+        """
+        Get details of a specific project by key.
+        """
+        data, err = self._request("GET", f"project/{project_key}")
+        if err:
+            return {"status": "error", "error": err}
+        if not data:
+            return {"status": "error", "error": "Project not found"}
+        
+        return {
+            "status": "success",
+            "project": {
+                "key": data.get("key"),
+                "name": data.get("name"),
+                "id": data.get("id"),
+                "description": data.get("description"),
+                "project_type": data.get("projectTypeKey"),
+                "lead": data.get("lead", {}).get("displayName"),
+            }
+        }
+    
+    # ==================== USER MANAGEMENT ====================
+    
+    def deactivate_user(self, account_id: str) -> dict[str, Any]:
+        """
+        Deactivate (delete) a user from Jira.
+        Note: This removes the user's access to Jira entirely.
+        The user can be restored by an admin.
+        """
+        logger.info(f"Deactivating user with account_id: {account_id}")
+        _, err = self._request(
+            "DELETE",
+            "user",
+            params={"accountId": account_id}
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"User with account ID {account_id} has been deactivated."
+        }
+    
+    def get_user_groups(self, account_id: str) -> dict[str, Any]:
+        """
+        Get all groups a user belongs to.
+        """
+        data, err = self._request(
+            "GET",
+            "user/groups",
+            params={"accountId": account_id}
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        if not data:
+            return {"status": "success", "groups": []}
+        
+        groups = []
+        for g in data:
+            groups.append({
+                "name": g.get("name"),
+                "group_id": g.get("groupId"),
+            })
+        
+        return {
+            "status": "success",
+            "account_id": account_id,
+            "groups": groups
+        }
 
     def get_user_accessible_projects(self, account_id: str) -> dict[str, Any]:
         """

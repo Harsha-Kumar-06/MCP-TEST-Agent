@@ -285,10 +285,13 @@ def jira_revoke_access(
     user_email: str, project_key: str, role_name: str
 ) -> dict[str, Any]:
     """
-    Revoke a user's access from a Jira project by removing them from a project role.
+    Revoke a user's DIRECT access from a Jira project by removing them from a project role.
+    Note: This only removes direct role assignments. If the user has access through a GROUP,
+    use jira_get_user_access_details to check, then use jira_remove_user_from_group.
+    
     user_email: User's email.
     project_key: Jira project key.
-    role_name: e.g. Developers. REQUIRED.
+    role_name: e.g. Member, Administrator, Viewer. REQUIRED.
     """
     logger.info(f"jira_revoke_access(user_email={user_email}, project_key={project_key}, role_name={role_name})")
     svc = get_jira_service()
@@ -336,17 +339,39 @@ def jira_revoke_access(
         logger.warning(f"jira_revoke_access failed: {err_res}")
         return err_res
     
-    # 4. Check if user actually has this role
-    if not svc.is_user_in_role(real_project_key, role_id, account_id):
-        res = {
-            "status": "success",
-            "message": f"User '{display_name}' does not have the '{matched_role_name}' role in project '{project_name}' ({real_project_key}). No action needed.",
-            "already_removed": True
-        }
-        logger.info(f"jira_revoke_access: {res}")
-        return res
+    # 4. Check detailed access (direct vs group-based)
+    access_details = svc.get_user_access_details_in_project(real_project_key, account_id)
     
-    # 5. Revoke the role
+    # 4a. Check if user has DIRECT assignment to this role
+    has_direct_role = False
+    for dr in access_details.get("direct_roles", []):
+        if dr.get("role_id") == role_id:
+            has_direct_role = True
+            break
+    
+    if not has_direct_role:
+        # Check if they have access through a group
+        group_access = []
+        for gr in access_details.get("group_roles", []):
+            if gr.get("role_id") == role_id:
+                group_access.append(gr.get("via_group"))
+        
+        if group_access:
+            return {
+                "status": "error",
+                "error": f"User '{display_name}' has the '{matched_role_name}' role in project '{project_name}' through GROUP membership, not direct assignment.",
+                "group_based_access": True,
+                "groups": group_access,
+                "suggestion": f"To revoke access, remove the user from these groups: {group_access}. Use jira_remove_user_from_group tool."
+            }
+        else:
+            return {
+                "status": "success",
+                "message": f"User '{display_name}' does not have the '{matched_role_name}' role in project '{project_name}' ({real_project_key}). No action needed.",
+                "already_removed": True
+            }
+    
+    # 5. Revoke the direct role
     res = svc.revoke_project_role(real_project_key, account_id, role_id)
     
     # 6. Verify the revoke worked
@@ -359,6 +384,154 @@ def jira_revoke_access(
             res["warning"] = "Revoke API returned success but user still found in role. This may be a permission or Jira configuration issue."
     
     logger.info(f"jira_revoke_access result: {res}")
+    return res
+
+
+def jira_revoke_all_project_access(user_email: str, project_key: str) -> dict[str, Any]:
+    """
+    Revoke ALL of a user's access from a specific Jira project.
+    This removes the user from ALL roles they have in the project (direct assignments only).
+    
+    Note: If user has access through groups, this will list those groups but cannot remove them
+    automatically. Use jira_remove_user_from_group for group-based access.
+    
+    user_email: User's email.
+    project_key: Jira project key.
+    """
+    logger.info(f"jira_revoke_all_project_access(user_email={user_email}, project_key={project_key})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured; no change made."}
+    
+    # 1. Resolve User
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    # 2. Resolve Project Key
+    projects_resp, _ = svc._request("GET", "project")
+    real_project_key = project_key.upper()
+    project_name = project_key
+    if projects_resp and isinstance(projects_resp, list):
+        for p in projects_resp:
+            if p.get("name", "").lower() == project_key.lower() or p.get("key", "").lower() == project_key.lower():
+                real_project_key = p.get("key")
+                project_name = p.get("name", real_project_key)
+                break
+    
+    # 3. Get detailed access info
+    access_details = svc.get_user_access_details_in_project(real_project_key, account_id)
+    if access_details.get("status") != "success":
+        return access_details
+    
+    direct_roles = access_details.get("direct_roles", [])
+    group_roles = access_details.get("group_roles", [])
+    
+    if not direct_roles and not group_roles:
+        return {
+            "status": "success",
+            "message": f"User '{display_name}' has no access to project '{project_name}' ({real_project_key}). No action needed.",
+            "already_removed": True
+        }
+    
+    # 4. Remove all direct role assignments
+    removed_roles = []
+    failed_roles = []
+    
+    for role in direct_roles:
+        role_id = role["role_id"]
+        role_name = role["role_name"]
+        res = svc.revoke_project_role(real_project_key, account_id, role_id)
+        if res.get("status") == "success":
+            removed_roles.append(role_name)
+        else:
+            failed_roles.append({"role": role_name, "error": res.get("error")})
+    
+    # 5. Build response
+    result = {
+        "status": "success" if not failed_roles else "partial",
+        "user": display_name,
+        "project": f"{project_name} ({real_project_key})",
+        "removed_direct_roles": removed_roles,
+    }
+    
+    if failed_roles:
+        result["failed_roles"] = failed_roles
+    
+    if group_roles:
+        groups = list(set(gr["via_group"] for gr in group_roles))
+        result["warning"] = f"User also has access through group membership. Remove from these groups to fully revoke access: {groups}"
+        result["access_granting_groups"] = groups
+    
+    if removed_roles:
+        result["message"] = f"Removed '{display_name}' from {len(removed_roles)} role(s): {removed_roles}."
+    elif group_roles:
+        result["message"] = f"User has no direct roles but has access through groups: {access_details.get('access_granting_groups')}."
+    else:
+        result["message"] = f"No roles to remove."
+    
+    logger.info(f"jira_revoke_all_project_access result: {result}")
+    return result
+
+
+def jira_get_user_access_details(user_email: str, project_key: str) -> dict[str, Any]:
+    """
+    Get DETAILED access information for a user in a specific project.
+    Shows both direct role assignments AND access through group membership.
+    
+    Use this to understand exactly HOW a user has access to a project before revoking.
+    
+    user_email: User's email.
+    project_key: Jira project key.
+    """
+    logger.info(f"jira_get_user_access_details(user_email={user_email}, project_key={project_key})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    # Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    # Resolve project key
+    projects_resp, _ = svc._request("GET", "project")
+    real_project_key = project_key.upper()
+    project_name = project_key
+    if projects_resp and isinstance(projects_resp, list):
+        for p in projects_resp:
+            if p.get("name", "").lower() == project_key.lower() or p.get("key", "").lower() == project_key.lower():
+                real_project_key = p.get("key")
+                project_name = p.get("name", real_project_key)
+                break
+    
+    # Get detailed access
+    res = svc.get_user_access_details_in_project(real_project_key, account_id)
+    
+    if res.get("status") == "success":
+        res["user_email"] = user_email
+        res["display_name"] = display_name
+        res["project_name"] = project_name
+        
+        # Build helpful message
+        direct = res.get("direct_roles", [])
+        group = res.get("group_roles", [])
+        
+        if direct and group:
+            res["message"] = f"'{display_name}' has {len(direct)} direct role(s) and {len(group)} role(s) via groups in '{project_name}'."
+        elif direct:
+            res["message"] = f"'{display_name}' has {len(direct)} direct role(s) in '{project_name}': {[r['role_name'] for r in direct]}."
+        elif group:
+            groups = res.get("access_granting_groups", [])
+            res["message"] = f"'{display_name}' has access to '{project_name}' ONLY through group membership: {groups}."
+        else:
+            res["message"] = f"'{display_name}' has NO access to '{project_name}'."
+    
+    logger.info(f"jira_get_user_access_details result: {res}")
     return res
 
 
@@ -429,6 +602,268 @@ def jira_get_user_roles_in_project(user_email: str, project_key: str) -> dict[st
             res["message"] = f"'{display_name}' has no roles in '{project_name}'."
     
     logger.info(f"jira_get_user_roles_in_project result: {res}")
+    return res
+
+
+# ---------- Jira Group Management Tools ----------
+
+def jira_list_groups(max_results: int = 50) -> dict[str, Any]:
+    """
+    List all groups in Jira.
+    Groups are used to manage access at scale - instead of adding users to individual projects,
+    you can add them to a group and the group to projects.
+    
+    max_results: Maximum number of groups to return (default 50).
+    
+    Returns a list of groups with their names.
+    """
+    logger.info(f"jira_list_groups(max_results={max_results})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    res = svc.list_groups(max_results=max_results)
+    logger.info(f"jira_list_groups result: {res.get('total', 0)} groups found")
+    return res
+
+
+def jira_get_group_members(group_name: str, max_results: int = 50) -> dict[str, Any]:
+    """
+    Get members of a specific Jira group.
+    
+    group_name: The name of the group (e.g., "jira-software-users", "developers").
+    max_results: Maximum number of members to return (default 50).
+    
+    Returns list of users in the group with their account IDs and display names.
+    """
+    logger.info(f"jira_get_group_members(group_name={group_name}, max_results={max_results})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    res = svc.get_group_members(group_name=group_name, max_results=max_results)
+    logger.info(f"jira_get_group_members result: {res}")
+    return res
+
+
+def jira_add_user_to_group(user_email: str, group_name: str) -> dict[str, Any]:
+    """
+    Add a user to a Jira group.
+    
+    This is the RECOMMENDED way to manage access at scale:
+    - Groups can be assigned to multiple projects at once
+    - Adding a user to a group automatically gives them access to all projects the group has access to
+    - Easier to manage than individual project role assignments
+    
+    user_email: The email of the user to add.
+    group_name: The name of the group (e.g., "developers", "jira-software-users").
+    """
+    logger.info(f"jira_add_user_to_group(user_email={user_email}, group_name={group_name})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured; no change made."}
+    
+    # 1. Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"User '{user_email}' not found in Jira. Invite them first using jira_invite_user.",
+            "user_not_found": True
+        }
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    # 2. Check if already in group
+    if svc.is_user_in_group(account_id, group_name):
+        return {
+            "status": "success",
+            "message": f"'{display_name}' is already a member of group '{group_name}'.",
+            "already_member": True
+        }
+    
+    # 3. Add to group
+    res = svc.add_user_to_group(account_id, group_name)
+    
+    # 4. Verify
+    if res.get("status") == "success":
+        if svc.is_user_in_group(account_id, group_name):
+            res["verified"] = True
+            res["message"] = f"Successfully added '{display_name}' to group '{group_name}'."
+        else:
+            res["verified"] = False
+            res["warning"] = "API returned success but user not found in group."
+    
+    logger.info(f"jira_add_user_to_group result: {res}")
+    return res
+
+
+def jira_remove_user_from_group(user_email: str, group_name: str) -> dict[str, Any]:
+    """
+    Remove a user from a Jira group.
+    
+    This will revoke any access the user had through this group membership.
+    
+    user_email: The email of the user to remove.
+    group_name: The name of the group.
+    """
+    logger.info(f"jira_remove_user_from_group(user_email={user_email}, group_name={group_name})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured; no change made."}
+    
+    # 1. Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    # 2. Check if in group
+    if not svc.is_user_in_group(account_id, group_name):
+        return {
+            "status": "success",
+            "message": f"'{display_name}' is not a member of group '{group_name}'. No action needed.",
+            "already_removed": True
+        }
+    
+    # 3. Remove from group
+    res = svc.remove_user_from_group(account_id, group_name)
+    
+    # 4. Verify
+    if res.get("status") == "success":
+        if not svc.is_user_in_group(account_id, group_name):
+            res["verified"] = True
+            res["message"] = f"Successfully removed '{display_name}' from group '{group_name}'."
+        else:
+            res["verified"] = False
+            res["warning"] = "API returned success but user still in group."
+    
+    logger.info(f"jira_remove_user_from_group result: {res}")
+    return res
+
+
+def jira_get_user_groups(user_email: str) -> dict[str, Any]:
+    """
+    Get all groups a user belongs to.
+    
+    Useful to understand a user's current access through group memberships.
+    
+    user_email: The email of the user.
+    """
+    logger.info(f"jira_get_user_groups(user_email={user_email})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    res = svc.get_user_groups(account_id)
+    if res.get("status") == "success":
+        res["user_email"] = user_email
+        res["display_name"] = display_name
+        group_names = [g["name"] for g in res.get("groups", [])]
+        if group_names:
+            res["message"] = f"'{display_name}' is a member of: {', '.join(group_names)}"
+        else:
+            res["message"] = f"'{display_name}' is not a member of any groups."
+    
+    logger.info(f"jira_get_user_groups result: {res}")
+    return res
+
+
+# ---------- Jira Project Tools ----------
+
+def jira_list_projects(max_results: int = 50) -> dict[str, Any]:
+    """
+    List all Jira projects.
+    
+    Use this to help users find the correct project key when they're unsure.
+    Returns a list of projects with their keys (e.g., "PROJ", "KAN") and names.
+    
+    max_results: Maximum number of projects to return (default 50).
+    """
+    logger.info(f"jira_list_projects(max_results={max_results})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    res = svc.list_projects(max_results=max_results)
+    logger.info(f"jira_list_projects result: {res.get('total', 0)} projects found")
+    return res
+
+
+def jira_get_project(project_key: str) -> dict[str, Any]:
+    """
+    Get details of a specific Jira project.
+    
+    project_key: The project key (e.g., "PROJ", "KAN") or project name.
+    
+    Returns project details including key, name, description, and lead.
+    """
+    logger.info(f"jira_get_project(project_key={project_key})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured."}
+    
+    # Try to resolve project key from name
+    projects_resp, _ = svc._request("GET", "project")
+    real_project_key = project_key.upper()
+    if projects_resp and isinstance(projects_resp, list):
+        for p in projects_resp:
+            if p.get("name", "").lower() == project_key.lower():
+                real_project_key = p.get("key")
+                break
+            if p.get("key", "").lower() == project_key.lower():
+                real_project_key = p.get("key")
+                break
+    
+    res = svc.get_project_by_key(real_project_key)
+    logger.info(f"jira_get_project result: {res}")
+    return res
+
+
+# ---------- Jira User Management Tools ----------
+
+def jira_deactivate_user(user_email: str) -> dict[str, Any]:
+    """
+    Deactivate (remove) a user from Jira entirely.
+    
+    WARNING: This removes ALL of the user's access to Jira.
+    Use this only when a user should no longer have any Jira access.
+    
+    For removing access from specific projects only, use jira_revoke_access instead.
+    For removing from groups, use jira_remove_user_from_group instead.
+    
+    user_email: The email of the user to deactivate.
+    """
+    logger.info(f"jira_deactivate_user(user_email={user_email})")
+    svc = get_jira_service()
+    if not svc.base_url or not svc._session.auth:
+        return {"status": "skipped", "message": "Jira not configured; no change made."}
+    
+    # 1. Resolve user
+    user = svc.get_user_by_email(user_email)
+    if user.get("status") != "success":
+        return user
+    
+    account_id = user.get("account_id")
+    display_name = user.get("display_name", user_email)
+    
+    # 2. Deactivate
+    res = svc.deactivate_user(account_id)
+    
+    if res.get("status") == "success":
+        res["message"] = f"User '{display_name}' ({user_email}) has been deactivated from Jira."
+    
+    logger.info(f"jira_deactivate_user result: {res}")
     return res
 
 
