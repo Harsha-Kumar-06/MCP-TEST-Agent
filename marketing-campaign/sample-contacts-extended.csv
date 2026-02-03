@@ -1,0 +1,26 @@
+email,phone,firstName,lastName,company,tags,optInEmail,optInSMS
+john.smith@techcorp.com,+1-555-0101,John,Smith,TechCorp Inc,VIP;Enterprise,true,true
+sarah.johnson@innovate.io,+1-555-0102,Sarah,Johnson,Innovate Labs,Startup;Tech,true,true
+michael.brown@dataflow.com,+1-555-0103,Michael,Brown,DataFlow Inc,Enterprise;Analytics,true,false
+emily.davis@cloudnet.io,+1-555-0104,Emily,Davis,CloudNet Solutions,SMB;Cloud,true,true
+david.wilson@smartsys.com,+1-555-0105,David,Wilson,SmartSystems,Startup;IoT,true,true
+jennifer.martinez@webflow.co,+1-555-0106,Jennifer,Martinez,WebFlow Co,SMB;Marketing,true,false
+robert.taylor@fintech.io,+1-555-0107,Robert,Taylor,FinTech Pro,Enterprise;Finance,true,true
+lisa.anderson@ecom.shop,+1-555-0108,Lisa,Anderson,eCommerce Shop,SMB;Retail,true,true
+james.thomas@ai-labs.com,+1-555-0109,James,Thomas,AI Labs,Startup;AI,true,false
+maria.garcia@healthtech.io,+1-555-0110,Maria,Garcia,HealthTech Corp,Enterprise;Healthcare,true,true
+william.moore@design.co,+1-555-0111,William,Moore,Design Studio,Freelance;Creative,true,false
+patricia.jackson@logistics.com,+1-555-0112,Patricia,Jackson,Logistics Hub,Enterprise;Supply Chain,true,true
+richard.white@saasapp.io,+1-555-0113,Richard,White,SaaS App Inc,Startup;SaaS,true,true
+linda.harris@consulting.com,+1-555-0114,Linda,Harris,Business Consulting,SMB;Consulting,true,false
+christopher.martin@mobile.io,+1-555-0115,Christopher,Martin,Mobile Dev Co,Startup;Mobile,true,true
+barbara.thompson@retail.com,+1-555-0116,Barbara,Thompson,Retail Pro Chain,Enterprise;Retail,true,true
+daniel.lee@blockchain.io,+1-555-0117,Daniel,Lee,BlockChain Ventures,Startup;Crypto,true,false
+nancy.perez@edutech.com,+1-555-0118,Nancy,Perez,EduTech Solutions,SMB;Education,true,true
+matthew.clark@security.io,+1-555-0119,Matthew,Clark,Security Firm Ltd,Enterprise;Security,true,true
+susan.rodriguez@marketing.co,+1-555-0120,Susan,Rodriguez,Marketing Pro Agency,SMB;Marketing,true,false
+kevin.lee@automation.io,+1-555-0121,Kevin,Lee,Automation Systems,Enterprise;Manufacturing,true,true
+amanda.martin@wellness.com,+1-555-0122,Amanda,Martin,Wellness Center,SMB;Healthcare,true,false
+jason.wright@realestate.io,+1-555-0123,Jason,Wright,Real Estate Group,Enterprise;Real Estate,true,true
+michelle.lopez@fashion.co,+1-555-0124,Michelle,Lopez,Fashion Boutique,SMB;Retail,true,true
+brian.hall@gaming.io,+1-555-0125,Brian,Hall,Gaming Studio Pro,Startup;Gaming,true,false
