@@ -19,6 +19,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "genkit": "^1.28.0",
+    "@genkit-ai/googleai": "^1.28.0",
     "dotenv": "^16.0.3",
     "formidable": "^3.5.0",
     "mammoth": "^1.11.0",
@@ -28,7 +30,8 @@
     "pdf-parse": "^2.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "twilio": "^4.19.0"
+    "twilio": "^4.19.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/formidable": "^3.4.0",

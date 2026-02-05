@@ -1,26 +1,90 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import {
     CoordinatorAgent,
     EmailSendingAgent,
     InstagramPostingAgent,
     SMSSendingAgent
 } from './agents';
+import { getAvailableFeatures, InitializationResult, initializeServices, isSystemReady } from './config/init';
 import { CampaignRequest } from './types/campaign';
 import { Contact } from './types/database';
+
+// Global initialization state
+let initializationResult: InitializationResult | null = null;
+
+/**
+ * Initialize the system - must be called before using the orchestrator
+ */
+export async function initialize(): Promise<InitializationResult> {
+  if (initializationResult) {
+    return initializationResult;
+  }
+  
+  try {
+    initializationResult = await initializeServices();
+    return initializationResult;
+  } catch (error) {
+    console.error('❌ Critical initialization error:', error);
+    // Return a failed state instead of crashing
+    initializationResult = {
+      success: false,
+      services: {
+        googleADK: { available: false, initialized: false, error: String(error) },
+        openAI: { available: false, configured: false },
+        email: { configured: false },
+        sms: { configured: false },
+        instagram: { configured: false },
+      },
+      errors: [`Critical error: ${error instanceof Error ? error.message : String(error)}`],
+      warnings: [],
+    };
+    return initializationResult;
+  }
+}
+
+/**
+ * Get initialization status
+ */
+export function getInitStatus(): InitializationResult | null {
+  return initializationResult;
+}
 
 /**
  * Main entry point for the Multi-Agent Coordinator System
  */
 export class MarketingCampaignOrchestrator {
   private coordinator: CoordinatorAgent;
+  private initialized: boolean = false;
 
   constructor() {
     this.coordinator = new CoordinatorAgent();
   }
 
   /**
+   * Ensure the system is initialized before running campaigns
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initialized) {
+      const result = await initialize();
+      this.initialized = true;
+      
+      if (!isSystemReady(result)) {
+        console.warn('\n⚠️ System not fully ready. Some features may be limited.');
+        console.log('Available features:');
+        getAvailableFeatures(result).forEach(f => console.log(`   • ${f}`));
+      }
+    }
+  }
+
+  /**
    * Execute a marketing campaign using the multi-agent coordinator pattern
    */
   async executeCampaign(request: CampaignRequest): Promise<void> {
+    // Safe initialization
+    await this.ensureInitialized();
+    
     console.log('\n' + '='.repeat(60));
     console.log('🚀 MULTI-AGENT COORDINATOR SYSTEM');
     console.log('   Marketing Campaign Automation');
@@ -110,6 +174,9 @@ export class MarketingCampaignOrchestrator {
     request: CampaignRequest,
     contacts: Contact[]
   ): Promise<any> {
+    // Safe initialization
+    await this.ensureInitialized();
+    
     console.log('\n' + '='.repeat(60));
     console.log('🚀 EXECUTING CAMPAIGN WITH CONTACTS');
     console.log('='.repeat(60));
@@ -233,6 +300,13 @@ export class MarketingCampaignOrchestrator {
 
 // Export for use in other modules
 export * from './agents/coordinator-agent';
+export {
+    generateStructuredContent, generateWithGoogleADK, initializeGoogleADK,
+    isGoogleADKAvailable, MarketingSchemas
+} from './config/google-adk-config';
+export { getAvailableFeatures, initializeServices, isSystemReady } from './config/init';
+export { generateContent, getActiveProvider, LLMConfig } from './config/llm-config';
+export { getInitStatus, initialize } from './index';
 export * from './types/campaign';
 export * from './types/database';
 
