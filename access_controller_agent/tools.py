@@ -1284,6 +1284,9 @@ def bitbucket_add_workspace_member(user_email: str, workspace: str = None) -> di
     """
     Add a user to a Bitbucket workspace.
     
+    This function automatically invites users to the workspace if they don't have access.
+    Requires Atlassian Admin API configuration (ATLASSIAN_ORG_ID and ATLASSIAN_API_KEY).
+    
     user_email: The user's email address.
     workspace: The workspace slug. If not provided, uses the default workspace.
     """
@@ -1301,14 +1304,27 @@ def bitbucket_add_workspace_member(user_email: str, workspace: str = None) -> di
             "user_not_found": True
         }
     
+    # Use account_id for Bitbucket API
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
     
-    res = svc.add_workspace_member(account_id, workspace)
+    if not account_id:
+        return {
+            "status": "error",
+            "error": f"Could not find account_id for '{user_email}'",
+        }
+    
+    res = svc.add_workspace_member(account_id, workspace, user_email)
     
     if res.get("status") == "success":
         res["user"] = display_name
-        res["message"] = f"Added '{display_name}' to workspace."
+        if res.get("invited"):
+            if res.get("requires_acceptance"):
+                res["message"] = f"✉️ Sent invitation to '{display_name}' ({user_email}). They must check their email and accept the invitation to activate Bitbucket access."
+            else:
+                res["message"] = f"Invited '{display_name}' to the workspace. They will receive an email invitation."
+        else:
+            res["message"] = f"Added '{display_name}' to workspace."
     
     logger.info(f"bitbucket_add_workspace_member result: {res}")
     return res
@@ -1326,13 +1342,20 @@ def bitbucket_remove_workspace_member(user_email: str, workspace: str = None) ->
     if not svc._session.auth:
         return {"status": "skipped", "message": "Bitbucket not configured."}
     
-    # Resolve user
-    user = svc.get_user_by_email(user_email)
+    # Resolve user - pass workspace to search in workspace members
+    user = svc.get_user_by_email(user_email, workspace)
     if user.get("status") != "success":
         return user
     
+    # Use account_id for Bitbucket API
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
+    
+    if not account_id:
+        return {
+            "status": "error",
+            "error": f"Could not find account_id for '{user_email}'",
+        }
     
     res = svc.remove_workspace_member(account_id, workspace)
     
@@ -1405,6 +1428,13 @@ def bitbucket_grant_repository_access(
     """
     Grant a user access to a Bitbucket repository.
     
+    This function automatically handles workspace membership:
+    - If user is already a workspace member: grants repository access
+    - If user is not a workspace member: automatically invites them to the workspace first
+    
+    Requires Atlassian Admin API configuration (ATLASSIAN_ORG_ID and ATLASSIAN_API_KEY)
+    for automatic workspace invitations.
+    
     user_email: The user's email address.
     repo_slug: The repository slug.
     permission: "read", "write", or "admin".
@@ -1415,17 +1445,74 @@ def bitbucket_grant_repository_access(
     if not svc._session.auth:
         return {"status": "skipped", "message": "Bitbucket not configured."}
     
-    # Resolve user
-    user = svc.get_user_by_email(user_email)
+    # Resolve user - need to get their account_id for Bitbucket API
+    user = svc.get_user_by_email(user_email, workspace=workspace)
     if user.get("status") != "success":
         return {
             "status": "error",
-            "error": f"User '{user_email}' not found. They may need to be invited to Atlassian first.",
+            "error": f"User '{user_email}' not found in Atlassian. They need to be invited to Atlassian first via Jira.",
             "user_not_found": True
         }
     
+    # Check if user is NOT in workspace
+    if user.get("not_in_workspace"):
+        logger.info(f"User '{user_email}' not in workspace. Attempting automatic invitation...")
+        
+        # Try to automatically add user to workspace
+        account_id = user.get("account_id")
+        add_result = svc.add_workspace_member(account_id, workspace, user_email)
+        
+        if add_result.get("status") != "success":
+            # If automatic invitation failed, return clear error
+            error_msg = add_result.get("error", "Failed to add user to workspace")
+            
+            if add_result.get("needs_manual_invitation"):
+                return {
+                    "status": "error",
+                    "error": f"User '{user_email}' is not a member of the Bitbucket workspace. "
+                             f"Automatic invitation is not configured. {error_msg}",
+                    "needs_workspace_membership": True,
+                    "manual_url": add_result.get("manual_url")
+                }
+            
+            return {
+                "status": "error",
+                "error": f"Failed to add user to workspace: {error_msg}"
+            }
+        
+        # User was invited successfully
+        if add_result.get("invited"):
+            if add_result.get("requires_acceptance"):
+                return {
+                    "status": "success",
+                    "message": f"✉️ Sent invitation to '{user_email}' for the Bitbucket workspace. "
+                               f"They must check their email and accept the invitation to activate their Bitbucket access. "
+                               f"Once accepted, please run this command again to grant repository access.",
+                    "invited": True,
+                    "requires_user_action": True,
+                    "next_steps": f"1. User checks email for Bitbucket invitation\n2. User accepts the invitation\n3. Run: bitbucket_grant_repository_access('{user_email}', '{repo_slug}', '{permission}')"
+                }
+            
+            return {
+                "status": "success",
+                "message": f"Invited '{user_email}' to the Bitbucket workspace. "
+                           f"They will receive an email invitation. "
+                           f"Repository access will be granted automatically once they accept.",
+                "invited": True
+            }
+        
+        # User was already in org and was granted workspace access
+        logger.info(f"User added to workspace. Now granting repository access...")
+    
+    # Use account_id for Bitbucket repository permissions API
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
+    
+    if not account_id:
+        return {
+            "status": "error",
+            "error": f"Could not resolve account_id for '{user_email}'",
+        }
     
     res = svc.add_repository_permission(repo_slug, account_id, permission, workspace)
     
@@ -1452,13 +1539,20 @@ def bitbucket_revoke_repository_access(
     if not svc._session.auth:
         return {"status": "skipped", "message": "Bitbucket not configured."}
     
-    # Resolve user
-    user = svc.get_user_by_email(user_email)
+    # Resolve user - pass workspace to search in workspace members
+    user = svc.get_user_by_email(user_email, workspace)
     if user.get("status") != "success":
         return user
     
+    # Use account_id for Bitbucket repository permissions API
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
+    
+    if not account_id:
+        return {
+            "status": "error",
+            "error": f"Could not find account_id for '{user_email}'",
+        }
     
     res = svc.remove_repository_permission(repo_slug, account_id, workspace)
     
