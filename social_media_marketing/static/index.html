@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Marketing Agent</title>
+    <link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Social Media Marketing Agent</h1>
+            <p>Get trends analysis or marketing strategy advice powered by AI</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Mode Selection & Parameters -->
+            <div class="control-panel">
+                <div class="mode-section">
+                    <span class="section-label">🎯 Select Mode</span>
+                    <div class="mode-selector">
+                        <label class="mode-option">
+                            <input type="radio" name="mode" value="trend_researcher" checked>
+                            <span class="mode-badge">📈 Trend Researcher</span>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="mode" value="marketing_advisor">
+                            <span class="mode-badge">💼 Marketing Advisor</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Parameters Section -->
+                <div class="params-section">
+                    <!-- Trend Researcher Parameters -->
+                    <div id="trend-params" class="param-group active">
+                        <span class="section-label">⚙️ Trend Researcher Parameters (Optional)</span>
+                        <div class="param-row">
+                            <div class="param-field">
+                                <label>Platform</label>
+                                <select id="trendPlatform" class="param-select">
+                                    <option value="">All Platforms</option>
+                                    <option value="instagram">📷 Instagram</option>
+                                    <option value="tiktok">🎵 TikTok</option>
+                                    <option value="youtube">▶️ YouTube</option>
+                                </select>
+                            </div>
+                            <div class="param-field">
+                                <label>Region</label>
+                                <select id="trendRegion" class="param-select">
+                                    <option value="">Worldwide</option>
+                                    <option value="north-america">North America</option>
+                                    <option value="europe">Europe</option>
+                                    <option value="asia">Asia</option>
+                                    <option value="us">United States</option>
+                                    <option value="uk">United Kingdom</option>
+                                </select>
+                            </div>
+                            <div class="param-field">
+                                <label>Category</label>
+                                <select id="trendCategory" class="param-select">
+                                    <option value="">All Categories</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="fitness">Fitness & Health</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="fashion">Fashion & Beauty</option>
+                                    <option value="gaming">Gaming</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Marketing Advisor Parameters -->
+                    <div id="marketing-params" class="param-group">
+                        <span class="section-label">⚙️ Marketing Parameters (Optional)</span>
+                        <div class="param-row">
+                            <div class="param-field">
+                                <label>Region</label>
+                                <select id="marketingRegion" class="param-select">
+                                    <option value="">Worldwide</option>
+                                    <option value="north-america">North America</option>
+                                    <option value="europe">Europe</option>
+                                    <option value="asia">Asia</option>
+                                    <option value="us">United States</option>
+                                    <option value="uk">United Kingdom</option>
+                                </select>
+                            </div>
+                            <div class="param-field">
+                                <label>Budget (USD)</label>
+                                <input type="text" id="marketingBudget" class="param-input" placeholder="e.g., 5000, 50000">
+                            </div>
+                            <div class="param-field">
+                                <label>Duration</label>
+                                <input type="text" id="marketingDuration" class="param-input" placeholder="e.g., 3 months, 90 days">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-panel">
+                <div id="chatMessages" class="chat-messages">
+                    <div class="chat-message system" id="welcomeMessage">
+                        <div class="message-icon">🤖</div>
+                        <div class="message-content">
+                            <p><strong>Welcome!</strong></p>
+                            <p>Choose a mode and ask me anything about social media trends or marketing strategies.</p>
+                            <span class="message-time">System</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="message-input-area">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Ask your question here..." 
+                        autocomplete="off"
+                    >
+                    <button id="sendBtn" class="btn-send">➤ Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=2"></script>
+</body>
+</html>
