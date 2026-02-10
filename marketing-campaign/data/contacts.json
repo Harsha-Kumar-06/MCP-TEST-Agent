@@ -1,1 +1,79 @@
-[]
+[
+  {
+    "email": "john.doe@example.com",
+    "phone": "+15551234567",
+    "firstName": "John",
+    "lastName": "Doe",
+    "company": "Acme Corp",
+    "tags": [
+      "lead",
+      "tech"
+    ],
+    "optInEmail": true,
+    "optInSMS": true,
+    "id": "contact-1770743131882-8gafl9l9j",
+    "createdAt": "2026-02-10T17:05:31.882Z",
+    "updatedAt": "2026-02-10T17:05:31.882Z"
+  },
+  {
+    "email": "jane.smith@example.com",
+    "phone": "+15559876543",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "company": "Tech Startup",
+    "tags": [
+      "customer",
+      "premium"
+    ],
+    "optInEmail": true,
+    "optInSMS": true,
+    "id": "contact-1770743131885-96b5w0i31",
+    "createdAt": "2026-02-10T17:05:31.885Z",
+    "updatedAt": "2026-02-10T17:05:31.885Z"
+  },
+  {
+    "email": "bob.johnson@example.com",
+    "firstName": "Bob",
+    "lastName": "Johnson",
+    "company": "Enterprise Inc",
+    "tags": [
+      "lead"
+    ],
+    "optInEmail": true,
+    "optInSMS": true,
+    "id": "contact-1770743131887-rs6kxu5po",
+    "createdAt": "2026-02-10T17:05:31.887Z",
+    "updatedAt": "2026-02-10T17:05:31.887Z"
+  },
+  {
+    "email": "alice.williams@example.com",
+    "phone": "+15555555555",
+    "firstName": "Alice",
+    "lastName": "Williams",
+    "company": "Small Business",
+    "tags": [
+      "customer"
+    ],
+    "optInEmail": true,
+    "optInSMS": true,
+    "id": "contact-1770743131888-mpgu58c3c",
+    "createdAt": "2026-02-10T17:05:31.888Z",
+    "updatedAt": "2026-02-10T17:05:31.888Z"
+  },
+  {
+    "email": "charlie.brown@example.com",
+    "phone": "+15554444444",
+    "firstName": "Charlie",
+    "lastName": "Brown",
+    "company": "Freelance",
+    "tags": [
+      "lead",
+      "tech"
+    ],
+    "optInEmail": true,
+    "optInSMS": true,
+    "id": "contact-1770743131890-dbxakcg22",
+    "createdAt": "2026-02-10T17:05:31.890Z",
+    "updatedAt": "2026-02-10T17:05:31.890Z"
+  }
+]

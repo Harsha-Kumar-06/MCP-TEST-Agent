@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { campaignDB } from '../../../src/database/campaign-database';
 import { contactDB } from '../../../src/database/contact-database';
-import { executeCampaignWithContacts } from '../../../src/index';
+import { MarketingCampaignOrchestrator } from '../../../src/index';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -50,7 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log(`   Channels: ${campaign.channels.join(', ')}`);
 
     // Execute the campaign with original data
-    const result = await executeCampaignWithContacts(
+    const orchestrator = new MarketingCampaignOrchestrator();
+    const result = await orchestrator.executeCampaignWithContacts(
       campaign.campaignData,
       contacts
     );
@@ -59,17 +60,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const newCampaign = await campaignDB.createCampaign({
       campaignName: `${campaign.campaignName} (Resent)`,
       channels: campaign.channels,
-      status: result.success ? 'completed' : 'failed',
+      status: 'completed',
       recipientType: campaign.recipientType,
       recipientCount: contacts.length,
       recipientInfo: campaign.recipientInfo,
       executedAt: new Date(),
       results: {
-        emailsSent: result.results.emailResults?.sent || 0,
-        emailsFailed: result.results.emailResults?.failed || 0,
-        smsSent: result.results.smsResults?.sent || 0,
-        smsFailed: result.results.smsResults?.failed || 0,
-        instagramPosts: result.results.instagramResults?.success ? 1 : 0,
+        emailsSent: result.sendingResults?.emailResults?.sent || 0,
+        emailsFailed: result.sendingResults?.emailResults?.failed || 0,
+        smsSent: result.sendingResults?.smsResults?.sent || 0,
+        smsFailed: result.sendingResults?.smsResults?.failed || 0,
+        instagramPosts: result.sendingResults?.instagramResults?.feedPost?.success ? 1 : 0,
       },
       campaignData: campaign.campaignData,
       recipientData: campaign.recipientData,
@@ -79,7 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       success: true, 
       data: newCampaign,
       message: 'Campaign resent successfully',
-      results: result.results
+      results: result.sendingResults
     });
 
   } catch (error) {
