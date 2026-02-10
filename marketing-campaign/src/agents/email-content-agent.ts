@@ -66,6 +66,44 @@ export class EmailContentAgent {
     }
   }
 
+  /**
+   * Inject tracking pixel and wrap links with click tracking into existing HTML
+   * This is a public method used by EmailSendingAgent
+   */
+  public injectTrackingIntoHtml(
+    html: string,
+    recipientEmail: string,
+    campaignId: string,
+    recipientId: string
+  ): string {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const encodedEmail = encodeURIComponent(recipientEmail);
+    const encodedRecipientId = encodeURIComponent(recipientId);
+    
+    // Add tracking pixel before </body>
+    const trackingPixel = `<img src="${baseUrl}/api/track/open?campaignId=${campaignId}&recipientId=${encodedRecipientId}&recipientEmail=${encodedEmail}" width="1" height="1" style="display:none" alt="" />`;
+    
+    let trackedHtml = html;
+    
+    // Inject tracking pixel
+    if (trackedHtml.includes('</body>')) {
+      trackedHtml = trackedHtml.replace('</body>', `${trackingPixel}</body>`);
+    } else {
+      trackedHtml += trackingPixel;
+    }
+    
+    // Wrap links with click tracking
+    trackedHtml = trackedHtml.replace(
+      /href="(https?:\/\/[^"]+)"/g,
+      (match, url) => {
+        const trackingUrl = `${baseUrl}/api/track/click?campaignId=${campaignId}&recipientId=${encodedRecipientId}&recipientEmail=${encodedEmail}&url=${encodeURIComponent(url)}`;
+        return `href="${trackingUrl}"`;
+      }
+    );
+    
+    return trackedHtml;
+  }
+
   private generateSubjectLine(request: CampaignRequest, voice: string): string {
     const product = request.product.name;
     const voiceMap = {

@@ -56,10 +56,12 @@ export class CoordinatorAgent {
     // Use AI to intelligently determine what agents are needed
     const subTasks: SubTask[] = [];
     let taskId = 1;
+    const contentTaskIds: string[] = []; // Track content task IDs for compliance dependencies
 
     // Always start with audience segmentation
+    const audienceTaskId = `task-${taskId++}`;
     subTasks.push({
-      id: `task-${taskId++}`,
+      id: audienceTaskId,
       agentType: 'audience-segmentation',
       taskDescription: 'Analyze and segment target audience',
       priority: 'high',
@@ -68,40 +70,42 @@ export class CoordinatorAgent {
 
     // Channel-specific agents based on request
     if (request.channels.includes('email')) {
+      const emailTaskId = `task-${taskId++}`;
+      contentTaskIds.push(emailTaskId);
       subTasks.push({
-        id: `task-${taskId++}`,
+        id: emailTaskId,
         agentType: 'email-content',
         taskDescription: 'Generate email marketing content',
         priority: 'high',
         status: 'pending',
-        dependencies: ['task-1'], // Depends on audience segmentation
+        dependencies: [audienceTaskId], // Depends on audience segmentation
       });
     }
 
     if (request.channels.includes('sms')) {
+      const smsTaskId = `task-${taskId++}`;
+      contentTaskIds.push(smsTaskId);
       subTasks.push({
-        id: `task-${taskId++}`,
+        id: smsTaskId,
         agentType: 'sms-content',
         taskDescription: 'Generate SMS marketing content',
         priority: 'high',
         status: 'pending',
-        dependencies: ['task-1'], // Depends on audience segmentation
+        dependencies: [audienceTaskId], // Depends on audience segmentation
       });
     }
 
-    // Compliance check (always required)
+    // Compliance check (always required) - depends on all content tasks
     subTasks.push({
       id: `task-${taskId++}`,
       agentType: 'compliance',
       taskDescription: 'Review campaign for legal compliance',
       priority: 'high',
       status: 'pending',
-      dependencies: request.channels.includes('email') 
-        ? ['task-2', 'task-3'] 
-        : ['task-2'], // Depends on content creation
+      dependencies: contentTaskIds.length > 0 ? contentTaskIds : [audienceTaskId],
     });
 
-    // Analytics setup (always required)
+    // Analytics setup (always required) - no dependencies, can run in parallel
     subTasks.push({
       id: `task-${taskId++}`,
       agentType: 'analytics-setup',

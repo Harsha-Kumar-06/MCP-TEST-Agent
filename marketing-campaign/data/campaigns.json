@@ -119,5 +119,118 @@
       }
     },
     "id": "campaign-1770740198147-3hr25wnpa"
+  },
+  {
+    "campaignName": "Puma",
+    "channels": [
+      "email"
+    ],
+    "status": "failed",
+    "recipientType": "single",
+    "recipientCount": 0,
+    "recipientInfo": "Execution failed",
+    "executedAt": "2026-02-10T16:30:01.102Z",
+    "results": {},
+    "campaignData": {
+      "campaignId": "camp-1770740991043",
+      "campaignName": "Puma",
+      "channels": [
+        "email"
+      ],
+      "product": {
+        "name": "Fitbit",
+        "description": "It is best",
+        "features": [
+          "better fitness tracker",
+          "high end gps",
+          "steps counter"
+        ],
+        "pricing": "$50"
+      },
+      "targetAudience": {
+        "demographics": "Fitness influencers",
+        "interests": [
+          "Technology"
+        ],
+        "painPoints": [
+          "slow work"
+        ]
+      },
+      "budget": 1000,
+      "timeline": {
+        "startDate": "2026-02-12",
+        "endDate": "2026-02-18"
+      },
+      "goals": [
+        "Generates youth for fit "
+      ],
+      "brandVoice": "professional"
+    },
+    "id": "campaign-1770741001104-qv9tu5l0m"
+  },
+  {
+    "campaignName": "Puma",
+    "channels": [
+      "email"
+    ],
+    "status": "completed",
+    "recipientType": "single",
+    "recipientCount": 1,
+    "recipientInfo": "arunapotla222@gmail.com",
+    "executedAt": "2026-02-10T16:42:23.181Z",
+    "results": {
+      "emailsSent": 1,
+      "emailsFailed": 0,
+      "smsSent": 0,
+      "smsFailed": 0,
+      "instagramPosts": 0
+    },
+    "campaignData": {
+      "campaignId": "camp-1770741735027",
+      "campaignName": "Puma",
+      "channels": [
+        "email"
+      ],
+      "product": {
+        "name": "Fitbit",
+        "description": "It is better ",
+        "features": [
+          "steps counter",
+          "heart rate "
+        ],
+        "pricing": "$50"
+      },
+      "targetAudience": {
+        "demographics": "Fitness influencers",
+        "interests": [
+          "Technology"
+        ],
+        "painPoints": [
+          "slow work"
+        ]
+      },
+      "budget": 1000,
+      "timeline": {
+        "startDate": "2026-02-12",
+        "endDate": "2026-02-18"
+      },
+      "goals": [
+        "target for youth to be fit"
+      ],
+      "brandVoice": "professional"
+    },
+    "recipientData": {
+      "singleContact": {
+        "id": "contact-1770741735027",
+        "email": "arunapotla222@gmail.com",
+        "phone": "",
+        "firstName": "Aruna",
+        "lastName": "AK",
+        "company": "Procal",
+        "optInEmail": true,
+        "optInSMS": true
+      }
+    },
+    "id": "campaign-1770741743183-9qr6jn8qu"
   }
 ]

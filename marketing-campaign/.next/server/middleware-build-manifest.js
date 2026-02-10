@@ -24,6 +24,11 @@ self.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/campaigns": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/campaigns.js"
+    ],
     "/campaigns/create": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",

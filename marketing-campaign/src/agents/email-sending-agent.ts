@@ -118,11 +118,11 @@ export class EmailSendingAgent {
       const personalizedText = this.personalizeContent(emailContent.bodyText, recipient);
       
       // Generate tracking-enabled HTML for this specific recipient
-      let personalizedHtml = emailContent.bodyHtml;
+      let personalizedHtml = this.personalizeContent(emailContent.bodyHtml, recipient);
       if (campaignId && recipient.id) {
         // Use EmailContentAgent to inject tracking
-        personalizedHtml = emailContentAgent.generateBodyHtml(
-          emailContent.bodyHtml,
+        personalizedHtml = emailContentAgent.injectTrackingIntoHtml(
+          personalizedHtml,
           recipient.email,
           campaignId,
           recipient.id
