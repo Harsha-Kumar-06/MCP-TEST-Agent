@@ -77,6 +77,86 @@ class ConfluenceService:
 
     # ==================== SPACE MANAGEMENT ====================
 
+    def find_space_by_name(self, space_name: str) -> dict[str, Any]:
+        """
+        Find a space by name and return its key.
+        Performs case-insensitive partial matching.
+        Returns the best matching space or error if not found.
+        """
+        spaces_result = self.list_spaces(limit=100)
+        if spaces_result.get("status") != "success":
+            return spaces_result
+        
+        spaces = spaces_result.get("spaces", [])
+        if not spaces:
+            return {"status": "error", "error": "No spaces found in Confluence"}
+        
+        search_lower = space_name.lower().strip()
+        
+        # Try exact matches first
+        exact_matches = [s for s in spaces if s.get("name", "").lower() == search_lower]
+        if len(exact_matches) == 1:
+            return {
+                "status": "success",
+                "space": exact_matches[0],
+                "match_type": "exact"
+            }
+        
+        # Try starts-with matches
+        starts_matches = [s for s in spaces if s.get("name", "").lower().startswith(search_lower)]
+        if len(starts_matches) == 1:
+            return {
+                "status": "success",
+                "space": starts_matches[0],
+                "match_type": "starts_with"
+            }
+        
+        # Try contains matches
+        contains_matches = [s for s in spaces if search_lower in s.get("name", "").lower()]
+        if len(contains_matches) == 1:
+            return {
+                "status": "success",
+                "space": contains_matches[0],
+                "match_type": "contains"
+            }
+        
+        # Multiple matches - return them for disambiguation
+        if exact_matches:
+            return {
+                "status": "ambiguous",
+                "matches": exact_matches,
+                "message": f"Multiple spaces match '{space_name}'. Please clarify."
+            }
+        if starts_matches:
+            return {
+                "status": "success",
+                "space": starts_matches[0],  # Pick first starts_with match
+                "match_type": "starts_with",
+                "other_matches": starts_matches[1:] if len(starts_matches) > 1 else []
+            }
+        if contains_matches:
+            return {
+                "status": "success",
+                "space": contains_matches[0],  # Pick first contains match
+                "match_type": "contains",
+                "other_matches": contains_matches[1:] if len(contains_matches) > 1 else []
+            }
+        
+        # Check if the input might be a space key
+        key_match = [s for s in spaces if s.get("key", "").lower() == search_lower]
+        if key_match:
+            return {
+                "status": "success",
+                "space": key_match[0],
+                "match_type": "key"
+            }
+        
+        return {
+            "status": "error",
+            "error": f"No space found matching '{space_name}'",
+            "available_spaces": [{"key": s.get("key"), "name": s.get("name")} for s in spaces[:10]]
+        }
+
     def list_spaces(self, limit: int = 50) -> dict[str, Any]:
         """
         List all Confluence spaces.
@@ -177,6 +257,229 @@ class ConfluenceService:
             return str(data["id"]), None
         return None, "Space ID not found"
 
+    # ==================== RBAC SPACE ROLES API (V2) ====================
+
+    def get_available_space_roles(self) -> dict[str, Any]:
+        """
+        Get available space roles from Confluence Cloud.
+        These are the roles that can be assigned to users for space access.
+        Standard roles: Admin, Manager, Collaborator, Viewer
+        
+        Uses: GET /wiki/api/v2/space-roles
+        """
+        data, err = self._request("GET", "space-roles", use_v2=True)
+        if err:
+            return {"status": "error", "error": err}
+        
+        roles = data.get("results", []) if data else []
+        
+        # Parse role information
+        parsed_roles = []
+        for role in roles:
+            parsed_roles.append({
+                "id": role.get("id"),
+                "name": role.get("name"),
+                "type": role.get("type"),  # SYSTEM or CUSTOM
+                "description": role.get("description", ""),
+                "permissions": role.get("spacePermissions", [])
+            })
+        
+        return {
+            "status": "success",
+            "roles": parsed_roles,
+            "total": len(parsed_roles)
+        }
+
+    def get_space_role_assignments(self, space_id: str) -> dict[str, Any]:
+        """
+        Get current role assignments for a space.
+        
+        Uses: GET /wiki/api/v2/spaces/{id}/role-assignments
+        """
+        data, err = self._request("GET", f"spaces/{space_id}/role-assignments", use_v2=True)
+        if err:
+            return {"status": "error", "error": err}
+        
+        assignments = data.get("results", []) if data else []
+        
+        parsed = []
+        for a in assignments:
+            principal = a.get("principal", {})
+            parsed.append({
+                "principal_type": principal.get("principalType"),
+                "principal_id": principal.get("principalId"),
+                "role_id": a.get("roleId")
+            })
+        
+        return {
+            "status": "success",
+            "assignments": parsed,
+            "total": len(parsed)
+        }
+
+    def add_user_to_space_with_role(
+        self, space_id: str, account_id: str, role_id: str
+    ) -> dict[str, Any]:
+        """
+        Add a user to a space with a specific role using V2 API.
+        
+        Uses: POST /wiki/api/v2/spaces/{id}/role-assignments
+        
+        Args:
+            space_id: The numeric space ID
+            account_id: The user's Atlassian account ID
+            role_id: The role ID (get from get_available_space_roles)
+        """
+        payload = [{
+            "principal": {
+                "principalType": "USER",
+                "principalId": account_id
+            },
+            "roleId": role_id
+        }]
+        
+        logger.info(f"Adding user {account_id} to space {space_id} with role {role_id}")
+        
+        data, err = self._request("POST", f"spaces/{space_id}/role-assignments", json=payload, use_v2=True)
+        if err:
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"Added user to space with role",
+            "space_id": space_id,
+            "role_id": role_id,
+            "account_id": account_id
+        }
+
+    def find_role_by_name(self, role_name: str) -> dict[str, Any]:
+        """
+        Find a role ID by role name (case-insensitive).
+        
+        Args:
+            role_name: Role name like "Viewer", "Collaborator", "Manager", or "Admin"
+        
+        Returns the role info or error.
+        """
+        roles_result = self.get_available_space_roles()
+        if roles_result.get("status") != "success":
+            return roles_result
+        
+        roles = roles_result.get("roles", [])
+        search_lower = role_name.lower().strip()
+        
+        # Map common aliases to standard role names
+        role_aliases = {
+            "read": "viewer",
+            "view": "viewer",
+            "reader": "viewer",
+            "write": "collaborator",
+            "editor": "collaborator",
+            "edit": "collaborator",
+            "contributor": "collaborator",
+            "manage": "manager",
+            "maintainer": "manager",
+            "administrator": "admin",
+            "administer": "admin",
+            "owner": "admin",
+        }
+        
+        # Normalize the search term
+        normalized = role_aliases.get(search_lower, search_lower)
+        
+        # Find matching role
+        for role in roles:
+            role_name_lower = role.get("name", "").lower()
+            if role_name_lower == normalized or normalized in role_name_lower:
+                return {
+                    "status": "success",
+                    "role": role
+                }
+        
+        return {
+            "status": "error",
+            "error": f"Role '{role_name}' not found",
+            "available_roles": [r.get("name") for r in roles]
+        }
+
+    def grant_space_access_with_role(
+        self, space_key: str, account_id: str, role_name: str = "Viewer"
+    ) -> dict[str, Any]:
+        """
+        Grant a user access to a space with a specific role using RBAC.
+        
+        This is the recommended method for Confluence Cloud with RBAC enabled.
+        
+        Args:
+            space_key: The space key (e.g., "DEV")
+            account_id: The user's Atlassian account ID
+            role_name: Role name - "Viewer", "Collaborator", "Manager", or "Admin"
+        
+        Returns success/error status.
+        """
+        logger.info(f"Granting {role_name} access to user {account_id} for space {space_key}")
+        
+        # Step 1: Get space ID
+        space_id, err = self._get_space_id(space_key)
+        if err:
+            return {"status": "error", "error": f"Could not get space ID: {err}"}
+        
+        # Step 2: Find the role
+        role_result = self.find_role_by_name(role_name)
+        if role_result.get("status") != "success":
+            # If roles API not available, fall back to legacy
+            logger.warning(f"Could not find role: {role_result}")
+            return self._add_space_permission_legacy(space_key, account_id, 
+                "read" if role_name.lower() in ["viewer", "read"] else
+                "admin" if role_name.lower() in ["admin", "administrator"] else "write")
+        
+        role = role_result.get("role", {})
+        role_id = role.get("id")
+        role_display = role.get("name")
+        
+        # Step 3: Add user to space with role
+        result = self.add_user_to_space_with_role(space_id, account_id, role_id)
+        
+        if result.get("status") == "success":
+            result["role_name"] = role_display
+            result["space_key"] = space_key
+            result["message"] = f"Granted '{role_display}' access to space '{space_key}'"
+        
+        return result
+
+    def revoke_space_role_access(self, space_key: str, account_id: str) -> dict[str, Any]:
+        """
+        Revoke a user's role-based access from a space.
+        Sets role to None for the user in the space role assignments.
+        """
+        # Get space ID
+        space_id, err = self._get_space_id(space_key)
+        if err:
+            return {"status": "error", "error": f"Could not get space ID: {err}"}
+        
+        # To revoke access, we set roleId to null for the user
+        payload = [{
+            "principal": {
+                "principalType": "USER",
+                "principalId": account_id
+            },
+            "roleId": None  # Setting to None removes access
+        }]
+        
+        logger.info(f"Revoking role access for user {account_id} from space {space_key}")
+        
+        data, err = self._request("POST", f"spaces/{space_id}/role-assignments", json=payload, use_v2=True)
+        if err:
+            # Fall back to legacy removal method
+            return self.remove_space_permission(space_key, account_id)
+        
+        return {
+            "status": "success",
+            "message": f"Revoked access from space '{space_key}'",
+            "space_key": space_key,
+            "account_id": account_id
+        }
+
     def add_space_permission(
         self, space_key: str, account_id: str, permission_type: str = "read"
     ) -> dict[str, Any]:
@@ -192,17 +495,38 @@ class ConfluenceService:
         """
         logger.info(f"Adding user {account_id} to space {space_key} with {permission_type} permission")
         
-        # First try the V2 API (works with RBAC mode)
-        result = self._add_space_permission_v2(space_key, account_id, permission_type)
+        # Map permission type to role name for RBAC mode
+        role_map = {
+            "read": "Viewer",
+            "write": "Collaborator", 
+            "admin": "Admin",
+            "view": "Viewer",
+            "viewer": "Viewer",
+            "collaborator": "Collaborator",
+            "manager": "Manager",
+            "editor": "Collaborator",
+        }
+        role_name = role_map.get(permission_type.lower(), "Viewer")
+        
+        # First, try the new RBAC Space Roles API (V2)
+        result = self.grant_space_access_with_role(space_key, account_id, role_name)
         if result.get("status") == "success":
             return result
         
-        # If V2 fails (not RBAC mode), try legacy API
+        # If V2 RBAC fails, try the legacy V2 member approach
         v2_error = result.get("error", "")
-        if "not found" in v2_error.lower() or "404" in v2_error:
+        logger.info(f"RBAC role assignment failed: {v2_error}, trying legacy V2 approach")
+        
+        legacy_v2_result = self._add_space_permission_v2(space_key, account_id, permission_type)
+        if legacy_v2_result.get("status") == "success":
+            return legacy_v2_result
+        
+        # If V2 fails completely, try legacy V1 API
+        legacy_error = legacy_v2_result.get("error", "")
+        if "not found" in legacy_error.lower() or "404" in legacy_error:
             return self._add_space_permission_legacy(space_key, account_id, permission_type)
         
-        # Return the V2 error if it's an RBAC-related failure
+        # Return the original error with actionable guidance
         return result
 
     def _add_space_permission_v2(
@@ -210,60 +534,178 @@ class ConfluenceService:
     ) -> dict[str, Any]:
         """
         Add space permission using V2 API (for RBAC mode).
-        Uses the /wiki/api/v2/spaces/{id}/permissions endpoint.
+        Uses space roles: Viewer, Collaborator, Manager, Admin
         """
         # Get space ID (V2 API requires numeric ID, not key)
         space_id, err = self._get_space_id(space_key)
         if err:
             return {"status": "error", "error": f"Could not get space ID: {err}"}
         
-        # Map permission type to principal role
-        # In RBAC mode, we use principalType and principalId
+        # Map permission type to Confluence space role names
+        # These are the standard roles in Confluence Cloud
         role_map = {
-            "read": "read",
-            "write": "write",
-            "admin": "admin",
+            "read": "Viewer",          # Read-only access
+            "write": "Collaborator",   # Can create and edit
+            "admin": "Admin",          # Full admin rights
         }
         
-        role = role_map.get(permission_type.lower(), "read")
+        role_name = role_map.get(permission_type.lower(), "Viewer")
         
-        # V2 API payload for adding user permission
+        # Try to add user as a space member with the appropriate role
+        # The correct endpoint is /wiki/rest/api/space/{spaceKey}/member
+        result = self._add_space_member(space_key, space_id, account_id, role_name)
+        if result.get("status") == "success":
+            return result
+        
+        # If that fails, try the V2 permissions endpoint with correct payload
+        return self._add_space_role_permission(space_key, space_id, account_id, permission_type)
+
+    def _add_space_member(
+        self, space_key: str, space_id: str, account_id: str, role_name: str
+    ) -> dict[str, Any]:
+        """
+        Add a user as a space member with a specific role.
+        This is the correct way to add users to spaces in RBAC mode.
+        Uses the /wiki/rest/api/space/{spaceKey}/member endpoint.
+        """
+        logger.info(f"Adding {account_id} as {role_name} to space {space_key}")
+        
+        # Payload for adding a space member
         payload = {
-            "subject": {
-                "type": "user",
-                "identifier": account_id
-            },
-            "operation": {
-                "key": role,
-                "targetType": "space"
+            "members": [{
+                "type": "known",
+                "accountId": account_id
+            }],
+            "role": role_name
+        }
+        
+        # Try POST /wiki/rest/api/space/{spaceKey}/member
+        data, err = self._request("POST", f"space/{space_key}/member", json=payload)
+        if not err:
+            return {
+                "status": "success",
+                "message": f"Added user to space {space_key} with role {role_name}",
+                "space_key": space_key,
+                "role": role_name,
             }
-        }
         
-        # Try V2 endpoint
-        data, err = self._request("POST", f"spaces/{space_id}/permissions", json=payload, use_v2=True)
-        if err:
-            # Check if it's an RBAC-specific error - try alternative approach
-            if "RBAC" in str(err) or "roles-only" in str(err):
-                return self._add_space_role_permission(space_key, space_id, account_id, permission_type)
-            return {"status": "error", "error": err}
+        # If specific error about role, try individual role names
+        if "role" in str(err).lower():
+            # Try with lowercase role name
+            payload["role"] = role_name.lower()
+            data, err = self._request("POST", f"space/{space_key}/member", json=payload)
+            if not err:
+                return {
+                    "status": "success",
+                    "message": f"Added user to space {space_key} with role {role_name}",
+                    "space_key": space_key,
+                    "role": role_name,
+                }
         
-        return {
-            "status": "success",
-            "message": f"Added {permission_type} permissions to space {space_key} for user",
-            "space_key": space_key,
-            "permission": permission_type,
-        }
+        logger.warning(f"Failed to add space member via /member endpoint: {err}")
+        return {"status": "error", "error": err}
 
     def _add_space_role_permission(
         self, space_key: str, space_id: str, account_id: str, permission_type: str
     ) -> dict[str, Any]:
         """
         Add user to space using role-based approach for RBAC mode.
-        This uses the space roles endpoint.
+        This fetches actual space roles and adds the user to the appropriate role.
         """
-        # In RBAC mode, spaces have roles: viewers, editors, admins
-        # We need to add the user to the appropriate role
+        # Map permission to typical role names
+        role_keywords = {
+            "read": ["viewer", "read", "guest"],
+            "write": ["editor", "write", "contributor", "member"], 
+            "admin": ["admin", "administrator", "owner"],
+        }
+        target_keywords = role_keywords.get(permission_type.lower(), ["viewer"])
         
+        # Step 1: Get space roles
+        roles_result = self._get_space_roles(space_id)
+        if roles_result.get("status") != "success":
+            logger.warning(f"Could not fetch space roles: {roles_result}")
+            # Fall back to trying default endpoints
+            return self._add_space_role_direct(space_key, space_id, account_id, permission_type)
+        
+        roles = roles_result.get("roles", [])
+        if not roles:
+            return self._add_space_role_direct(space_key, space_id, account_id, permission_type)
+        
+        # Step 2: Find the best matching role
+        target_role = None
+        for role in roles:
+            role_name = role.get("name", "").lower()
+            for keyword in target_keywords:
+                if keyword in role_name:
+                    target_role = role
+                    break
+            if target_role:
+                break
+        
+        if not target_role and roles:
+            # Use the first role as fallback (usually a default viewer/member role)
+            target_role = roles[0]
+        
+        if not target_role:
+            return self._add_space_role_direct(space_key, space_id, account_id, permission_type)
+        
+        # Step 3: Add user to the role
+        role_id = target_role.get("id")
+        role_name = target_role.get("name")
+        
+        add_result = self._add_user_to_space_role(space_id, role_id, account_id)
+        if add_result.get("status") == "success":
+            return {
+                "status": "success",
+                "message": f"Added user to '{role_name}' role in space '{space_key}'",
+                "space_key": space_key,
+                "permission": permission_type,
+                "role": role_name,
+            }
+        
+        # If role addition failed, try direct add as last resort
+        return self._add_space_role_direct(space_key, space_id, account_id, permission_type)
+
+    def _get_space_roles(self, space_id: str) -> dict[str, Any]:
+        """Get available roles for a space (V2 API)."""
+        # Try different endpoints for space roles
+        endpoints = [
+            f"spaces/{space_id}/roles",
+            f"spaces/{space_id}/space-roles",
+        ]
+        
+        for endpoint in endpoints:
+            data, err = self._request("GET", endpoint, use_v2=True)
+            if not err and data:
+                roles = data.get("results", []) or data if isinstance(data, list) else []
+                return {"status": "success", "roles": roles}
+        
+        return {"status": "error", "error": "Could not fetch space roles"}
+
+    def _add_user_to_space_role(self, space_id: str, role_id: str, account_id: str) -> dict[str, Any]:
+        """Add a user to a specific space role."""
+        endpoints = [
+            (f"spaces/{space_id}/roles/{role_id}/members", {"accountId": account_id}),
+            (f"spaces/{space_id}/space-roles/{role_id}/principals", {"principalId": account_id, "principalType": "user"}),
+        ]
+        
+        for endpoint, payload in endpoints:
+            data, err = self._request("POST", endpoint, json=payload, use_v2=True)
+            if not err:
+                return {"status": "success"}
+            # Try PUT as well
+            data, err = self._request("PUT", endpoint, json=payload, use_v2=True)
+            if not err:
+                return {"status": "success"}
+        
+        return {"status": "error", "error": "Could not add user to space role"}
+
+    def _add_space_role_direct(
+        self, space_key: str, space_id: str, account_id: str, permission_type: str
+    ) -> dict[str, Any]:
+        """
+        Try direct role assignment endpoints as last resort.
+        """
         # Map permission to role name
         role_map = {
             "read": "viewer",
@@ -272,30 +714,28 @@ class ConfluenceService:
         }
         role_name = role_map.get(permission_type.lower(), "viewer")
         
-        # Try to add user to space role via V2 API
-        # The endpoint might be: /wiki/api/v2/spaces/{id}/roles/{role}/members
-        payload = {
-            "accountId": account_id
-        }
+        payload = {"accountId": account_id}
         
         # Try different role endpoints that Confluence Cloud might support
         endpoints_to_try = [
             f"spaces/{space_id}/permissions/users/{account_id}",
             f"spaces/{space_id}/roles/{role_name}/members",
+            f"spaces/{space_id}/principals",
         ]
         
         for endpoint in endpoints_to_try:
-            data, err = self._request("PUT", endpoint, json=payload, use_v2=True)
-            if not err:
-                return {
-                    "status": "success",
-                    "message": f"Added {permission_type} permissions to space {space_key} via role",
-                    "space_key": space_key,
-                    "permission": permission_type,
-                    "role": role_name,
-                }
+            for method in ["PUT", "POST"]:
+                data, err = self._request(method, endpoint, json=payload, use_v2=True)
+                if not err:
+                    return {
+                        "status": "success",
+                        "message": f"Added {permission_type} permissions to space {space_key} via role",
+                        "space_key": space_key,
+                        "permission": permission_type,
+                        "role": role_name,
+                    }
         
-        # If role-based approach doesn't work, try adding to a group
+        # If all role-based approaches fail, try adding to a group
         # that has access to the space
         group_result = self._try_add_via_group(space_key, account_id, permission_type)
         if group_result.get("status") == "success":
@@ -320,9 +760,45 @@ class ConfluenceService:
     ) -> dict[str, Any]:
         """
         Try to add user access via group membership.
-        First finds/creates an appropriate group, then adds user to it.
+        First checks which groups already have access to this space,
+        then adds the user to an appropriate group.
         """
-        # Check if there's a default group for this permission level
+        # Step 1: Check which groups have access to this specific space
+        space_perms = self.get_space_permissions(space_key)
+        if space_perms.get("status") == "success":
+            group_perms = space_perms.get("group_permissions", [])
+            
+            # Filter groups by permission level
+            suitable_groups = []
+            for gp in group_perms:
+                group_name = gp.get("group_name")
+                operation = gp.get("operation", "").lower()
+                
+                # Check if this group matches our permission level
+                if permission_type == "read" and operation in ["read", "view"]:
+                    suitable_groups.append(group_name)
+                elif permission_type == "write" and operation in ["create", "update", "write", "edit"]:
+                    suitable_groups.insert(0, group_name)  # Prefer write groups
+                elif permission_type == "admin" and operation in ["administer", "admin"]:
+                    suitable_groups.insert(0, group_name)
+            
+            # Try to add user to a suitable group
+            for group_name in suitable_groups:
+                if group_name:
+                    add_result = self.add_user_to_group(group_name, account_id)
+                    if add_result.get("status") == "success":
+                        return {
+                            "status": "success",
+                            "message": (
+                                f"Added user to group '{group_name}' which has {permission_type} access "
+                                f"to space '{space_key}'."
+                            ),
+                            "method": "space_group_membership",
+                            "group": group_name,
+                            "space_key": space_key,
+                        }
+        
+        # Step 2: Fallback to default groups if no space-specific groups found
         default_groups = {
             "read": ["confluence-users", "confluence-viewers"],
             "write": ["confluence-editors", "site-admins"],

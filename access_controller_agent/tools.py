@@ -1308,57 +1308,140 @@ def confluence_list_spaces(limit: int = 50) -> dict[str, Any]:
     return res
 
 
-def confluence_get_space(space_key: str) -> dict[str, Any]:
+def confluence_get_space(space_name_or_key: str) -> dict[str, Any]:
     """
     Get details of a specific Confluence space.
+    Automatically resolves space names to space keys.
     
-    space_key: The space key (e.g., "DEV", "TEAM").
+    space_name_or_key: Either the space NAME (e.g., "Engineering Docs") or KEY (e.g., "DEV").
     """
-    logger.info(f"confluence_get_space(space_key={space_key})")
+    logger.info(f"confluence_get_space(space={space_name_or_key})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
+    
+    # Auto-resolve space name to key
+    space_result = svc.find_space_by_name(space_name_or_key)
+    if space_result.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"Could not find space '{space_name_or_key}'",
+            "available_spaces": space_result.get("available_spaces", [])
+        }
+    
+    space = space_result.get("space", {})
+    space_key = space.get("key")
     
     res = svc.get_space(space_key)
     logger.info(f"confluence_get_space result: {res}")
     return res
 
 
-def confluence_get_space_permissions(space_key: str) -> dict[str, Any]:
+def confluence_get_space_permissions(space_name_or_key: str) -> dict[str, Any]:
     """
     Get permissions for a Confluence space.
+    Automatically resolves space names to space keys.
     
     Shows all users and groups that have access to the space and their permission levels.
     
-    space_key: The space key (e.g., "DEV", "TEAM").
+    space_name_or_key: Either the space NAME (e.g., "Engineering Docs") or KEY (e.g., "DEV").
     """
-    logger.info(f"confluence_get_space_permissions(space_key={space_key})")
+    logger.info(f"confluence_get_space_permissions(space={space_name_or_key})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
     
+    # Auto-resolve space name to key
+    space_result = svc.find_space_by_name(space_name_or_key)
+    if space_result.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"Could not find space '{space_name_or_key}'",
+            "available_spaces": space_result.get("available_spaces", [])
+        }
+    
+    space = space_result.get("space", {})
+    space_key = space.get("key")
+    space_name = space.get("name")
+    
     res = svc.get_space_permissions(space_key)
+    if res.get("status") == "success":
+        res["space_name"] = space_name
     logger.info(f"confluence_get_space_permissions result: {res}")
     return res
 
 
 def confluence_grant_space_access(
-    user_email: str, space_key: str, permission: str = "write"
+    user_email: str, space_name_or_key: str, role: str = "Collaborator"
 ) -> dict[str, Any]:
     """
-    Grant a user access to a Confluence space.
+    Grant a user access to a Confluence space with a specific role.
     Automatically invites user to the organization if they don't exist.
+    Automatically resolves space names to space keys.
     
     user_email: The user's email address.
-    space_key: The space key (e.g., "DEV", "TEAM").
-    permission: Permission level - "read" (view), "write" (edit - default), or "admin" (full control).
+    space_name_or_key: Either the space NAME (e.g., "Engineering Docs") or KEY (e.g., "DEV").
+                       The space name will be automatically resolved to the key.
+    role: Access role - "Viewer" (read-only), "Collaborator" (edit - default), 
+          "Manager" (manage), or "Admin" (full control).
+          Also accepts: "read"/"view" → Viewer, "write"/"edit" → Collaborator, "admin" → Admin
     """
-    logger.info(f"confluence_grant_space_access(user_email={user_email}, space_key={space_key}, permission={permission})")
+    logger.info(f"confluence_grant_space_access(user_email={user_email}, space={space_name_or_key}, role={role})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
     
-    # Resolve user - auto-invite if not found
+    # Step 1: Auto-resolve space name to key (NEVER ask user for key)
+    space_result = svc.find_space_by_name(space_name_or_key)
+    
+    if space_result.get("status") == "ambiguous":
+        # Multiple exact matches - need clarification
+        matches = space_result.get("matches", [])
+        return {
+            "status": "error",
+            "error": f"Multiple spaces match '{space_name_or_key}'. Please specify which one:",
+            "matches": [{"key": s.get("key"), "name": s.get("name")} for s in matches]
+        }
+    
+    if space_result.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"Could not find space '{space_name_or_key}'",
+            "available_spaces": space_result.get("available_spaces", [])
+        }
+    
+    space = space_result.get("space", {})
+    space_key = space.get("key")
+    space_name = space.get("name")
+    
+    logger.info(f"Resolved space '{space_name_or_key}' to key '{space_key}' (name: '{space_name}')")
+    
+    # Step 2: Normalize role name
+    role_map = {
+        "read": "Viewer",
+        "view": "Viewer", 
+        "viewer": "Viewer",
+        "write": "Collaborator",
+        "edit": "Collaborator",
+        "editor": "Collaborator",
+        "collaborator": "Collaborator",
+        "contributor": "Collaborator",
+        "manage": "Manager",
+        "manager": "Manager",
+        "admin": "Admin",
+        "administrator": "Admin",
+    }
+    normalized_role = role_map.get(role.lower().strip(), role)
+    
+    # Map role back to permission type for compatibility
+    permission_type = {
+        "Viewer": "read",
+        "Collaborator": "write",
+        "Manager": "write",
+        "Admin": "admin"
+    }.get(normalized_role, "write")
+    
+    # Step 3: Resolve user - auto-invite if not found
     user = svc.get_user_by_email(user_email)
     invited = False
     
@@ -1378,40 +1461,83 @@ def confluence_grant_space_access(
         if user.get("status") != "success":
             return {
                 "status": "success" if invited else "error",
-                "message": f"✓ Invited {user_email} to organization. Access to space '{space_key}' will be granted once they activate their account." if invited else f"User '{user_email}' not found. Use invite_user_to_org to invite them first.",
+                "message": f"✓ Invited {user_email} to organization. {normalized_role} access to space '{space_name}' will be granted once they activate their account." if invited else f"User '{user_email}' not found. Use invite_user_to_org to invite them first.",
                 "invited": invited,
                 "pending_space": space_key if invited else None,
-                "pending_permission": permission if invited else None,
+                "pending_space_name": space_name if invited else None,
+                "pending_role": normalized_role if invited else None,
                 "user_not_found": not invited
             }
     
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
     
-    res = svc.add_space_permission(space_key, account_id, permission)
+    # Step 4: Grant access using the service (handles RBAC internally)
+    res = svc.add_space_permission(space_key, account_id, permission_type)
     
     if res.get("status") == "success":
-        res["message"] = f"✓ Granted {permission} access to '{display_name}' for space '{space_key}'." + (" (newly invited)" if invited else "")
+        role_used = res.get("role_name", normalized_role)
+        res["message"] = f"✓ Granted '{role_used}' access to '{display_name}' for space '{space_name}'." + (" (newly invited)" if invited else "")
         res["user"] = display_name
+        res["space_name"] = space_name
+        res["space_key"] = space_key
+        res["role"] = role_used
         res["invited"] = invited
+    elif "RBAC" in str(res.get("error", "")) or "roles-only" in str(res.get("error", "")) or res.get("suggestion"):
+        # RBAC mode - provide actionable next steps
+        perms = svc.get_space_permissions(space_key)
+        groups_with_access = []
+        if perms.get("status") == "success":
+            groups_with_access = list(set(
+                gp.get("group_name") for gp in perms.get("group_permissions", [])
+                if gp.get("group_name")
+            ))
+        
+        res["rbac_mode"] = True
+        res["user"] = display_name
+        res["space_name"] = space_name
+        res["groups_with_space_access"] = groups_with_access
+        if groups_with_access:
+            res["next_step"] = f"Add user to one of these groups: {groups_with_access}"
+            res["message"] = (
+                f"This space uses RBAC (role-based access). To grant access, add '{display_name}' "
+                f"to one of these groups that already have space access: {groups_with_access}. "
+                f"Use jira_add_user_to_group('{user_email}', '{groups_with_access[0]}') to add them."
+            )
+        else:
+            res["next_step"] = "Configure space permissions in Confluence admin UI first"
     
     logger.info(f"confluence_grant_space_access result: {res}")
     return res
 
 
-def confluence_revoke_space_access(user_email: str, space_key: str) -> dict[str, Any]:
+def confluence_revoke_space_access(user_email: str, space_name_or_key: str) -> dict[str, Any]:
     """
     Revoke a user's access from a Confluence space.
+    Automatically resolves space names to space keys.
     
     Removes all permissions the user has for the specified space.
     
     user_email: The user's email address.
-    space_key: The space key (e.g., "DEV", "TEAM").
+    space_name_or_key: Either the space NAME (e.g., "Engineering Docs") or KEY (e.g., "DEV").
     """
-    logger.info(f"confluence_revoke_space_access(user_email={user_email}, space_key={space_key})")
+    logger.info(f"confluence_revoke_space_access(user_email={user_email}, space={space_name_or_key})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
+    
+    # Auto-resolve space name to key
+    space_result = svc.find_space_by_name(space_name_or_key)
+    if space_result.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"Could not find space '{space_name_or_key}'",
+            "available_spaces": space_result.get("available_spaces", [])
+        }
+    
+    space = space_result.get("space", {})
+    space_key = space.get("key")
+    space_name = space.get("name")
     
     # Resolve user
     user = svc.get_user_by_email(user_email)
@@ -1421,34 +1547,56 @@ def confluence_revoke_space_access(user_email: str, space_key: str) -> dict[str,
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
     
-    res = svc.remove_space_permission(space_key, account_id)
+    # Try RBAC role revocation first, then legacy
+    res = svc.revoke_space_role_access(space_key, account_id)
+    if res.get("status") != "success":
+        res = svc.remove_space_permission(space_key, account_id)
     
     if res.get("status") == "success":
         res["user"] = display_name
+        res["space_name"] = space_name
+        res["space_key"] = space_key
         if not res.get("already_removed"):
-            res["message"] = f"Revoked access for '{display_name}' from space '{space_key}'."
+            res["message"] = f"Revoked access for '{display_name}' from space '{space_name}'."
     
     logger.info(f"confluence_revoke_space_access result: {res}")
     return res
 
 
 def confluence_add_group_to_space(
-    group_name: str, space_key: str, permission: str = "read"
+    group_name: str, space_name_or_key: str, permission: str = "read"
 ) -> dict[str, Any]:
     """
     Grant a group access to a Confluence space.
+    Automatically resolves space names to space keys.
     
     group_name: The group name.
-    space_key: The space key (e.g., "DEV", "TEAM").
+    space_name_or_key: Either the space NAME (e.g., "Engineering Docs") or KEY (e.g., "DEV").
     permission: Permission level - "read", "write", or "admin".
     """
-    logger.info(f"confluence_add_group_to_space(group_name={group_name}, space_key={space_key}, permission={permission})")
+    logger.info(f"confluence_add_group_to_space(group_name={group_name}, space={space_name_or_key}, permission={permission})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
     
+    # Auto-resolve space name to key
+    space_result = svc.find_space_by_name(space_name_or_key)
+    if space_result.get("status") != "success":
+        return {
+            "status": "error",
+            "error": f"Could not find space '{space_name_or_key}'",
+            "available_spaces": space_result.get("available_spaces", [])
+        }
+    
+    space = space_result.get("space", {})
+    space_key = space.get("key")
+    space_name = space.get("name")
+    
     res = svc.add_group_to_space(space_key, group_name, permission)
+    if res.get("status") == "success":
+        res["space_name"] = space_name
     logger.info(f"confluence_add_group_to_space result: {res}")
+    return res
     return res
 
 
