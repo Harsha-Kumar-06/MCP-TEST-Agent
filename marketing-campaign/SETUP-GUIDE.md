@@ -2,22 +2,31 @@
 
 ## What's Included
 
+### ✅ AI Integration (Google ADK/Genkit)
+- **Gemini 2.5 Flash** - Primary AI model (FREE tier available)
+- **Genkit Developer UI** - Test agents interactively at localhost:4000
+- **Auto-fallback** - Falls back to OpenAI if configured
+
 ### ✅ Backend (Node.js/TypeScript)
 - **Multi-agent coordinator system** with dynamic routing
-- **5 specialized agents**: Audience Segmentation, Email Content, SMS Content, Compliance, Analytics
-- **2 sending agents**: Email (Gmail SMTP) & SMS (Twilio)
+- **6 specialized agents**: Audience Segmentation, Email Content, SMS Content, Instagram Posting, Compliance, Analytics
+- **3 sending agents**: Email (Gmail SMTP), SMS (Twilio), Instagram (Graph API)
 - **Contact database** (file-based, easily replaceable with PostgreSQL/MongoDB)
 - **CSV import** functionality
 
 ### ✅ Frontend (Next.js/React)
 - **Campaign creation UI** with full form
+- **Document upload** - Auto-fill from PDF/DOCX/TXT
 - **Contact management** page
 - **CSV upload** interface
+- **Template library** - Save and reuse campaigns
 - **Dashboard** homepage
 
 ### ✅ Integration
+- **Google ADK (Genkit)** with Gemini 2.5 Flash for AI content generation
 - **Gmail SMTP** for email sending (using Nodemailer)
 - **Twilio** for SMS sending (free trial available)
+- **Instagram Graph API** for automatic posting
 - **API routes** for all operations
 
 ---
@@ -27,11 +36,28 @@
 ### 1. Install Dependencies
 
 ```bash
-cd "c:\Users\Harsha Kumar\Desktop\DRAVYN\Cordinator pattern\next"
+cd marketing-campaign
 npm install
 ```
 
-### 2. Configure Gmail SMTP
+### 2. Configure Google ADK (Recommended - FREE)
+
+The system uses Google ADK (Genkit) with Gemini 2.5 Flash as the primary AI provider.
+
+#### Step 1: Get Google API Key
+1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
+2. Create or select a project
+3. Generate an API key
+4. Copy the key
+
+#### Step 2: Add to `.env` file
+```env
+GOOGLE_GENAI_API_KEY=your_api_key_here
+GOOGLE_MODEL=flash
+LLM_PROVIDER=auto
+```
+
+### 3. Configure Gmail SMTP
 
 #### Step 1: Enable 2-Factor Authentication
 1. Go to [Google Account Security](https://myaccount.google.com/security)
@@ -54,16 +80,24 @@ npm install
 2. Copy **Auth Token** from dashboard
 3. Get a **phone number** (or use trial number)
 
-### 4. Create .env File
+### 5. Create .env File
 
 ```bash
-# Copy the example file
+# Copy the example file (Windows)
 copy .env.example .env
+
+# Copy the example file (Mac/Linux)
+cp .env.example .env
 ```
 
 Edit `.env` with your credentials:
 
 ```env
+# Google ADK (Genkit/Gemini) - RECOMMENDED (FREE)
+GOOGLE_GENAI_API_KEY=your_google_api_key_here
+GOOGLE_MODEL=flash
+LLM_PROVIDER=auto
+
 # Gmail SMTP
 GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-16-char-app-password
@@ -73,16 +107,29 @@ FROM_NAME=Your Company Name
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token_here
 TWILIO_PHONE_NUMBER=+15551234567
+
+# Instagram (optional)
+INSTAGRAM_ACCESS_TOKEN=EAA...
+INSTAGRAM_ACCOUNT_ID=17841234567890123
 ```
 
-### 5. Run the Application
+### 6. Run the Application
 
 ```bash
-# Start Next.js development server
+# Start Next.js development server (Web UI)
 npm run dev
+
+# Run example agent (terminal)
+npm run example
+
+# Run with Genkit Developer UI
+npm install -g genkit
+genkit start -- npx tsx src/index.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open:
+- Web UI: [http://localhost:3000](http://localhost:3000)
+- Genkit UI: [http://localhost:4000](http://localhost:4000) (if using genkit start)
 
 ---
 
@@ -214,8 +261,10 @@ Recipients receive messages
 
 | Feature | Status | Notes |
 |---------|--------|-------|
+| Google ADK (Genkit) | ✅ | Gemini 2.5 Flash - FREE tier |
 | Email Sending | ✅ | Gmail SMTP via Nodemailer |
 | SMS Sending | ✅ | Twilio (free trial) |
+| Instagram Posting | ✅ | Facebook Graph API - FREE |
 | CSV Upload | ✅ | Frontend + API |
 | Contact Management | ✅ | File-based DB |
 | Campaign UI | ✅ | Next.js forms |
@@ -224,6 +273,7 @@ Recipients receive messages
 | Analytics Tracking | ✅ | UTM parameters |
 | Personalization | ✅ | Merge tags |
 | Rate Limiting | ✅ | Prevents spam flags |
+| Genkit Dev UI | ✅ | Test agents at localhost:4000 |
 
 ---
 
@@ -231,29 +281,45 @@ Recipients receive messages
 
 ```
 ├── pages/
-│   ├── index.tsx                    # Homepage
+│   ├── index.tsx                    # Homepage/Dashboard
 │   ├── contacts.tsx                 # Contact management
-│   ├── campaigns/create.tsx         # Campaign form
+│   ├── campaigns/
+│   │   ├── index.tsx                # Campaign list
+│   │   ├── create.tsx               # Campaign form
+│   │   ├── templates.tsx            # Template library
+│   │   └── [id].tsx                 # Campaign details
 │   └── api/
 │       ├── contacts/                # Contact APIs
-│       └── campaigns/               # Campaign APIs
+│       ├── campaigns/               # Campaign APIs
+│       └── track/                   # Tracking APIs
 ├── src/
 │   ├── agents/
 │   │   ├── coordinator-agent.ts     # Main coordinator
 │   │   ├── email-sending-agent.ts   # Gmail SMTP
 │   │   ├── sms-sending-agent.ts     # Twilio SMS
-│   │   ├── email-content-agent.ts   # Content generation
-│   │   ├── sms-content-agent.ts     # SMS content
+│   │   ├── instagram-posting-agent.ts # Instagram Graph API
+│   │   ├── email-content-agent.ts   # Email content generation
+│   │   ├── sms-content-agent.ts     # SMS content generation
+│   │   ├── audience-segmentation-agent.ts # Audience analysis
 │   │   ├── compliance-agent.ts      # Legal checks
-│   │   └── analytics-setup-agent.ts # Tracking
+│   │   └── analytics-setup-agent.ts # Tracking setup
+│   ├── config/
+│   │   ├── google-adk-config.ts     # Google ADK/Genkit setup
+│   │   ├── llm-config.ts            # LLM configuration
+│   │   └── init.ts                  # Service initialization
 │   ├── database/
-│   │   └── contact-database.ts      # File-based DB
+│   │   ├── campaign-database.ts     # Campaign storage
+│   │   ├── contact-database.ts      # Contact storage
+│   │   └── tracking-database.ts     # Analytics tracking
+│   ├── scheduler/
+│   │   └── campaign-scheduler.ts    # Scheduled execution
 │   ├── types/
 │   │   ├── campaign.ts              # Campaign types
 │   │   └── database.ts              # Database types
 │   └── index.ts                     # Main orchestrator
 ├── data/                            # Auto-created for contacts
 ├── sample-contacts.csv              # Example CSV
+├── sample-campaign-*.txt            # Example campaign documents
 └── .env                             # Your credentials
 ```
 
@@ -293,15 +359,32 @@ Recipients receive messages
 ## 🎉 You're All Set!
 
 The system is now fully functional with:
+- ✅ Google ADK (Genkit) with Gemini 2.5 Flash AI
 - ✅ Web UI for campaign creation
+- ✅ Genkit Developer UI for testing agents
 - ✅ CSV upload for contacts
 - ✅ Gmail for email sending
 - ✅ Twilio for SMS sending
+- ✅ Instagram Graph API for posting
 - ✅ Multi-agent AI coordination
 - ✅ Compliance checking
 - ✅ Analytics tracking
 
 **Next Steps:**
-1. Upload contacts via CSV
-2. Create your first campaign
-3. Watch the magic happen! 🚀
+1. Get your Google API key from https://aistudio.google.com/apikey
+2. Configure your `.env` file
+3. Run `npm run dev` for Web UI or `npm run example` for terminal
+4. Upload contacts via CSV
+5. Create your first campaign
+6. Watch the magic happen! 🚀
+
+**Testing the Agents:**
+```bash
+# Install Genkit CLI globally
+npm install -g genkit
+
+# Start the Genkit Developer UI
+genkit start -- npx tsx src/index.ts
+
+# Open http://localhost:4000 to test agents interactively
+```

@@ -16,39 +16,42 @@ This system uses a **central coordinator agent** that intelligently analyzes cam
                                │
                     ┌──────────▼──────────┐
                     │  Coordinator Agent  │
-                    │  (AI-Powered)       │
+                    │  (Genkit/Gemini AI) │
                     └──────────┬──────────┘
                                │
         ┌──────────────────────┼──────────────────────┐
         │                      │                      │
 ┌───────▼────────┐   ┌────────▼────────┐   ┌────────▼────────┐
-│ Email Agent    │   │  SMS Agent      │   │ Audience Agent  │
-│ (Content)      │   │  (Content)      │   │ (Segmentation)  │
+│ Email Agent    │   │  SMS Agent      │   │ Instagram Agent │
+│ (Content)      │   │  (Content)      │   │ (Posting)       │
 └────────────────┘   └─────────────────┘   └─────────────────┘
         │                      │                      │
         └──────────────────────┼──────────────────────┘
                                │
-                    ┌──────────▼──────────┐
-                    │  Compliance Agent   │
-                    └──────────┬──────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │  Analytics Agent    │
-                    └─────────────────────┘
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+┌───────▼────────┐   ┌────────▼────────┐   ┌────────▼────────┐
+│ Audience Agent │   │ Compliance Agent│   │ Analytics Agent │
+│ (Segmentation) │   │ (Validation)    │   │ (Tracking)      │
+└────────────────┘   └─────────────────┘   └─────────────────┘
 ```
 
 ## 🚀 Features
 
 - **Dynamic Routing**: AI-powered coordinator determines which agents to invoke based on campaign requirements
+- **Google ADK Integration**: Powered by Genkit with Gemini 2.5 Flash (FREE tier available)
 - **Specialized Agents**: Each agent focuses on a specific task
   - 👥 Audience Segmentation Agent
   - ✉️ Email Content Agent (with A/B testing)
   - 📱 SMS Content Agent (with character optimization)
+  - 📸 Instagram Posting Agent (automatic posting)
   - ⚖️ Compliance Agent (CAN-SPAM, TCPA, GDPR)
   - 📊 Analytics Setup Agent (UTM tracking, KPIs)
+- **Multi-Channel Support**: Email, SMS, and Instagram in coordinated campaigns
 - **Dependency Management**: Tasks execute in the correct order based on dependencies
 - **Compliance Checking**: Automatic regulatory compliance validation
 - **A/B Testing**: Built-in variant generation for optimization
+- **Web UI**: Full-featured Next.js dashboard for campaign management
 
 ## 📦 Installation
 
@@ -56,10 +59,13 @@ This system uses a **central coordinator agent** that intelligently analyzes cam
 # Install dependencies
 npm install
 
-# Copy environment file
+# Copy environment file (Windows)
+copy .env.example .env
+
+# Copy environment file (Mac/Linux)
 cp .env.example .env
 
-# Add your API keys to .env
+# Add your API keys to .env (see Configuration section)
 ```
 
 ## 🎮 Usage
@@ -108,12 +114,25 @@ await orchestrator.executeCampaign(campaignRequest);
 ### Run Examples
 
 ```bash
-# Run the email + SMS campaign example
+# Run the email + SMS campaign example (terminal)
 npm run example
 
 # Or run individual examples
 npx ts-node src/examples/email-only-campaign.ts
 npx ts-node src/examples/sms-only-campaign.ts
+
+# Run with Genkit Developer UI (recommended for testing)
+npm install -g genkit
+genkit start -- npx tsx src/index.ts
+# Then open http://localhost:4000 in your browser
+```
+
+### Run the Web UI
+
+```bash
+# Start the Next.js development server
+npm run dev
+# Then open http://localhost:3000 in your browser
 ```
 
 ## 📁 Project Structure
@@ -124,18 +143,44 @@ src/
 │   ├── coordinator-agent.ts           # Main coordinator (brain)
 │   ├── audience-segmentation-agent.ts # Audience analysis
 │   ├── email-content-agent.ts         # Email generation
+│   ├── email-sending-agent.ts         # Email delivery (Gmail SMTP)
 │   ├── sms-content-agent.ts           # SMS generation
+│   ├── sms-sending-agent.ts           # SMS delivery (Twilio)
+│   ├── instagram-posting-agent.ts     # Instagram posting (Graph API)
 │   ├── compliance-agent.ts            # Legal compliance
 │   └── analytics-setup-agent.ts       # Tracking setup
-├── types/
-│   └── campaign.ts                    # TypeScript interfaces
 ├── config/
-│   └── llm-config.ts                  # AI model configuration
+│   ├── google-adk-config.ts           # Google ADK/Genkit configuration
+│   ├── llm-config.ts                  # AI model configuration
+│   └── init.ts                        # Service initialization
+├── database/
+│   ├── campaign-database.ts           # Campaign storage
+│   ├── contact-database.ts            # Contact management
+│   └── tracking-database.ts           # Analytics tracking
+├── scheduler/
+│   └── campaign-scheduler.ts          # Scheduled campaign execution
+├── types/
+│   ├── campaign.ts                    # TypeScript interfaces
+│   └── database.ts                    # Database types
 ├── examples/
 │   ├── email-sms-campaign.ts          # Combined example
 │   ├── email-only-campaign.ts         # Email-only example
 │   └── sms-only-campaign.ts           # SMS-only example
 └── index.ts                           # Main orchestrator
+
+pages/                                 # Next.js frontend
+├── index.tsx                          # Dashboard
+├── contacts.tsx                       # Contact management
+├── campaigns/
+│   ├── index.tsx                      # Campaign list
+│   ├── create.tsx                     # Create campaign
+│   ├── [id].tsx                       # Campaign details
+│   ├── templates.tsx                  # Template library
+│   └── edit/[id].tsx                  # Edit campaign
+└── api/                               # API routes
+    ├── campaigns/                     # Campaign APIs
+    ├── contacts/                      # Contact APIs
+    └── track/                         # Tracking APIs
 ```
 
 ## 🔧 Configuration
@@ -145,19 +190,45 @@ src/
 Create a `.env` file with your API keys:
 
 ```env
+# Google ADK (Genkit/Gemini) - RECOMMENDED (FREE TIER AVAILABLE)
+# Get API key from: https://aistudio.google.com/apikey
+GOOGLE_GENAI_API_KEY=your_google_api_key_here
+
+# Model Selection (Latest as of Feb 2026):
+# - 'flash' = gemini-2.5-flash (RECOMMENDED - best price-performance, FREE)
+# - 'lite'  = gemini-2.5-flash-lite (fastest, FREE)
+# - 'pro'   = gemini-2.5-pro (advanced reasoning)
+GOOGLE_MODEL=flash
+
+# LLM Provider: 'auto' (recommended), 'google', or 'openai'
+LLM_PROVIDER=auto
+
+# Optional: OpenAI (fallback)
 OPENAI_API_KEY=your_openai_key_here
-# or
-ANTHROPIC_API_KEY=your_anthropic_key_here
+
+# Gmail SMTP (for sending emails)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-16-char-app-password
+FROM_NAME=Your Company Name
+
+# Twilio (for SMS - optional)
+TWILIO_ACCOUNT_SID=ACxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=+15551234567
+
+# Instagram (for posting - optional)
+INSTAGRAM_ACCESS_TOKEN=EAA...
+INSTAGRAM_ACCOUNT_ID=17841234567890123
 ```
 
 ### LLM Configuration
 
-Edit `src/config/llm-config.ts` to change AI model settings:
+The system uses Google ADK (Genkit) with Gemini 2.5 Flash by default. Edit `src/config/llm-config.ts` to customize:
 
 ```typescript
 export const LLMConfig = {
-  provider: 'openai',
-  model: 'gpt-4',
+  provider: 'auto',           // 'auto', 'google', or 'openai'
+  googleModel: 'flash',       // 'flash', 'lite', or 'pro'
   temperature: 0.7,
   maxTokens: 2000,
 };

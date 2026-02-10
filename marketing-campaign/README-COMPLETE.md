@@ -2,38 +2,54 @@
 
 ## ✅ What You Now Have
 
-### 1. **Complete Web Application**
+### 1. **AI-Powered Multi-Agent System**
+- ✅ Google ADK (Genkit) integration
+- ✅ Gemini 2.5 Flash AI model (FREE tier)
+- ✅ OpenAI GPT-4 fallback (optional)
+- ✅ Genkit Developer UI at localhost:4000
+- ✅ Interactive agent testing
+
+### 2. **Complete Web Application**
 - ✅ Next.js frontend with React
 - ✅ Campaign creation UI
 - ✅ Contact management dashboard  
 - ✅ CSV upload interface
+- ✅ Template library
+- ✅ Document upload (PDF/DOCX/TXT)
 - ✅ API routes for all operations
 
-### 2. **Email Sending (Gmail SMTP)**
+### 3. **Email Sending (Gmail SMTP)**
 - ✅ Send via Gmail using Nodemailer
 - ✅ HTML + Plain text emails
 - ✅ Personalization with merge tags
 - ✅ A/B testing variants
 - ✅ Rate limiting to avoid spam flags
 - ✅ Unsubscribe links
+- ✅ Open/click tracking
 
-### 3. **SMS Sending (Twilio)**
+### 4. **SMS Sending (Twilio)**
 - ✅ Send SMS via Twilio API
 - ✅ Character optimization (160 char limit)
 - ✅ Personalization
 - ✅ Opt-in management
 - ✅ Free trial available ($15 credit)
 
-### 4. **Contact Management**
+### 5. **Instagram Posting**
+- ✅ Facebook Graph API integration
+- ✅ Automatic posting with captions
+- ✅ Hashtag generation
+- ✅ FREE (200 posts/day limit)
+
+### 6. **Contact Management**
 - ✅ CSV upload functionality
 - ✅ File-based database (easily replaceable)
 - ✅ Contact lists
 - ✅ Opt-in/opt-out tracking
 
-### 5. **Multi-Agent Coordinator**
+### 7. **Multi-Agent Coordinator**
 - ✅ Dynamic routing to specialized agents
 - ✅ Audience segmentation
-- ✅ Content generation (email & SMS)
+- ✅ Content generation (email, SMS, Instagram)
 - ✅ Compliance checking (CAN-SPAM, TCPA, GDPR)
 - ✅ Analytics setup with UTM tracking
 
@@ -41,7 +57,20 @@
 
 ## 🚀 Quick Start (3 Steps)
 
-### Step 1: Configure Gmail SMTP
+### Step 1: Configure Google ADK (FREE)
+
+1. **Get API Key**
+   - Go to: https://aistudio.google.com/apikey
+   - Generate an API key
+
+2. **Add to `.env` file**
+   ```env
+   GOOGLE_GENAI_API_KEY=your_api_key_here
+   GOOGLE_MODEL=flash
+   LLM_PROVIDER=auto
+   ```
+
+### Step 2: Configure Gmail SMTP
 
 1. **Enable 2-Factor Authentication**
    - Go to: https://myaccount.google.com/security
@@ -56,9 +85,10 @@
    ```env
    GMAIL_USER=your-email@gmail.com
    GMAIL_APP_PASSWORD=your-16-char-password
+   FROM_NAME=Your Company Name
    ```
 
-### Step 2: (Optional) Configure Twilio
+### Step 3: (Optional) Configure Twilio
 
 1. **Sign up for free trial**: https://www.twilio.com/try-twilio
 2. **Get credentials** from dashboard
@@ -69,13 +99,26 @@
    TWILIO_PHONE_NUMBER=+15551234567
    ```
 
-### Step 3: Run the App
+### Step 4: Run the App
 
 ```bash
+# Install dependencies
+npm install
+
+# Run example agent (fastest test)
+npm run example
+
+# Start Web UI
 npm run dev
+
+# Start Genkit Developer UI (for agent testing)
+npm install -g genkit
+genkit start -- npx tsx src/index.ts
 ```
 
-Open: http://localhost:3000
+Open:
+- Web UI: http://localhost:3000
+- Genkit UI: http://localhost:4000
 
 ---
 

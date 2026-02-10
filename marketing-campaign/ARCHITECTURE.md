@@ -2,7 +2,7 @@
 
 ## 🏗️ Overview
 
-This is a **Multi-Agent Marketing Campaign Automation System** built using the **Coordinator Pattern**. It orchestrates multiple specialized AI agents to plan, create, and execute multi-channel marketing campaigns.
+This is a **Multi-Agent Marketing Campaign Automation System** built using the **Coordinator Pattern** powered by **Google ADK (Genkit)** with **Gemini 2.5 Flash**. It orchestrates multiple specialized AI agents to plan, create, and execute multi-channel marketing campaigns.
 
 ## 📐 Architecture Pattern
 
@@ -11,7 +11,7 @@ This is a **Multi-Agent Marketing Campaign Automation System** built using the *
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Campaign Coordinator                      │
-│  (Orchestrates all agents and manages campaign execution)   │
+│  (Orchestrates all agents using Genkit + Gemini 2.5 Flash)  │
 └─────────────────┬───────────────────────────────────────────┘
                   │
     ┌─────────────┼─────────────┬──────────────┬──────────────┐
@@ -28,9 +28,16 @@ This is a **Multi-Agent Marketing Campaign Automation System** built using the *
                             ▼
                   ┌──────────────────┐
                   │  Sending Agents  │
-                  │  - Email Sender  │
-                  │  - SMS Sender    │
+                  │  - Email (SMTP)  │
+                  │  - SMS (Twilio)  │
                   │  - Instagram API │
+                  └──────────────────┘
+                            │
+                            ▼
+                  ┌──────────────────┐
+                  │ Analytics Agent  │
+                  │ - UTM Tracking   │
+                  │ - Conversion KPIs│
                   └──────────────────┘
 ```
 
@@ -72,6 +79,11 @@ src/agents/
 ├── analytics-setup-agent.ts          # Sets up tracking
 ├── email-sending-agent.ts            # Sends emails via SMTP
 └── sms-sending-agent.ts              # Sends SMS via Twilio
+
+src/config/
+├── google-adk-config.ts              # Google ADK/Genkit setup
+├── llm-config.ts                     # LLM provider configuration
+└── init.ts                           # Service initialization
 ```
 
 ### 3. Database Layer (File-based JSON)
@@ -190,8 +202,14 @@ data/
 
 ## 🛠️ Technology Stack
 
+### AI/LLM
+- **Google ADK (Genkit) 1.28** - AI orchestration framework
+- **Gemini 2.5 Flash** - Primary AI model (FREE tier available)
+- **Gemini 2.5 Pro** - Advanced reasoning (optional)
+- **OpenAI GPT-4** - Fallback provider (optional)
+
 ### Frontend
-- **Next.js 14.2** - React framework with SSR & API routes
+- **Next.js 14** - React framework with SSR & API routes
 - **TypeScript 5.0** - Type-safe development
 - **Tailwind CSS 3.4** - Utility-first styling
 - **React 18** - UI library
@@ -200,12 +218,15 @@ data/
 - **Node.js** - Runtime environment
 - **Next.js API Routes** - RESTful API endpoints
 - **TypeScript** - Type-safe backend
+- **Genkit Developer UI** - Agent testing at localhost:4000
 
 ### Integrations
 - **Nodemailer 6.9** - Email sending via Gmail SMTP
 - **Twilio 4.19** - SMS sending API
 - **Facebook Graph API v18** - Instagram posting
 - **Formidable 3.5** - CSV file parsing
+- **pdf-parse** - PDF document parsing
+- **mammoth** - DOCX document parsing
 
 ### Database
 - **File-based JSON** - Simple, no setup required
@@ -272,6 +293,16 @@ data/
 
 ### Environment Variables (.env)
 ```bash
+# AI Configuration (Google ADK - FREE)
+GOOGLE_GENAI_API_KEY=your_google_api_key
+GOOGLE_MODEL=flash                  # flash, lite, or pro
+LLM_PROVIDER=auto                   # auto, google, or openai
+LLM_TEMPERATURE=0.7
+LLM_MAX_TOKENS=2000
+
+# Optional: OpenAI (fallback)
+OPENAI_API_KEY=sk-xxxxx
+
 # Email Configuration (Gmail SMTP)
 GMAIL_USER=your.email@gmail.com
 GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx

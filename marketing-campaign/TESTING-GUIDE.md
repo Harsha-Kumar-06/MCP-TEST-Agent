@@ -1,22 +1,83 @@
 # Quick Testing Guide 🧪
 
 ## Prerequisites
-1. Make sure `.env` file is configured:
-   ```bash
-   GMAIL_USER=your-email@gmail.com
-   GMAIL_APP_PASSWORD=your-16-char-app-password
-   FROM_NAME=Your Company Name
-   ```
 
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
+### 1. Configure Environment
+Make sure `.env` file has these variables:
+```bash
+# Google ADK (Required for AI features)
+GOOGLE_GENAI_API_KEY=your_api_key_here
+GOOGLE_MODEL=flash
+LLM_PROVIDER=auto
 
-3. You should see in the terminal:
-   ```
-   🕐 Campaign Scheduler started - checking every minute
-   ```
+# Gmail SMTP (Required for email sending)
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-16-char-app-password
+FROM_NAME=Your Company Name
+
+# Optional: Twilio for SMS
+TWILIO_ACCOUNT_SID=ACxxxxx
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_PHONE_NUMBER=+15551234567
+```
+
+### 2. Start the Development Server
+```bash
+npm run dev
+```
+
+### 3. Verify Initialization
+You should see in the terminal:
+```
+🔧 Initializing Marketing Campaign Agent Services...
+────────────────────────────────────────────────────────────
+✅ Google ADK (Genkit) initialized with Gemini 2.5 Flash
+✅ Email service configured
+🕐 Campaign Scheduler started - checking every minute
+```
+
+---
+
+## Quick Test: Run the Agent (1 minute)
+
+The fastest way to test:
+```bash
+npm run example
+```
+
+Expected output:
+```
+Starting Email + SMS Campaign Example...
+
+🔧 Initializing Marketing Campaign Agent Services...
+✅ Google ADK (Genkit) initialized with Gemini 2.5 Flash
+
+============================================================
+🚀 MULTI-AGENT COORDINATOR SYSTEM
+============================================================
+Campaign: Q1 Product Launch - Email & SMS
+Channels: EMAIL, SMS
+...
+✅ Campaign setup complete!
+```
+
+---
+
+## Test with Genkit Developer UI (Recommended)
+
+```bash
+# Install Genkit CLI (once)
+npm install -g genkit
+
+# Start the Genkit Developer UI
+genkit start -- npx tsx src/index.ts
+```
+
+Open http://localhost:4000 to:
+- Test individual agents
+- View execution traces
+- Debug AI responses
+- Inspect tool calls
 
 ---
 
@@ -228,32 +289,47 @@ cat data/campaigns.json | jq '.[] | select(.status == "scheduled")'
 
 ## Common Issues
 
-### 1. Gmail SMTP not working
+### 1. Google ADK not initializing
+**Error:** `Google ADK not configured`
+**Solution:**
+- Get API key from: https://aistudio.google.com/apikey
+- Add to `.env`: `GOOGLE_GENAI_API_KEY=your_key`
+- Set `GOOGLE_MODEL=flash` and `LLM_PROVIDER=auto`
+
+### 2. Gmail SMTP not working
 **Error:** `Invalid login`
 **Solution:**
 - Use App Password, not regular password
 - Enable 2FA on Gmail account
 - Generate App Password at: https://myaccount.google.com/apppasswords
 
-### 2. Scheduler not running
+### 3. Scheduler not running
 **Error:** No logs showing
 **Solution:**
 - Restart server (scheduler auto-starts)
-- Check for TypeScript errors: `npm run build`
+- Check for TypeScript errors: `npx tsc --noEmit`
 
-### 3. Tracking pixel not loading
+### 4. Tracking pixel not loading
 **Error:** Broken image in email
 **Solution:**
 - Ensure server is accessible from email client
 - Check if tracking API endpoints work
 - Test: `curl http://localhost:3000/api/track/open?campaignId=test&recipientId=test`
 
-### 4. Templates not saving
+### 5. Templates not saving
 **Error:** Database error
 **Solution:**
 - Check `data/` directory exists
 - Ensure write permissions
 - Check `campaigns.json` is valid JSON
+
+### 6. Genkit CLI not found
+**Error:** `could not determine executable to run`
+**Solution:**
+```bash
+npm install -g genkit
+genkit start -- npx tsx src/index.ts
+```
 
 ---
 

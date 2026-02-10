@@ -57,8 +57,10 @@
 ### 2. Intelligent Multi-Agent System
 **Status: ✅ FULLY WORKING**
 
+**Powered by:** Google ADK (Genkit) with Gemini 2.5 Flash (FREE tier available)
+
 ```
-🧠 Coordinator Agent (Dynamic Task Routing)
+🧠 Coordinator Agent (Genkit + Gemini 2.5 Flash)
 ├── 👥 Audience Segmentation Agent
 │   └── Filters contacts by email/SMS/Instagram opt-in
 ├── ✉️ Email Content Generation Agent
@@ -77,14 +79,29 @@
     └── Instagram posting (Graph API)
 ```
 
+**AI Model Options:**
+- `flash` - Gemini 2.5 Flash (RECOMMENDED - best price-performance, FREE)
+- `lite` - Gemini 2.5 Flash Lite (fastest, FREE)
+- `pro` - Gemini 2.5 Pro (advanced reasoning)
+- OpenAI GPT-4 (optional fallback)
+
 **How It Works:**
 1. Coordinator receives campaign request
-2. Dynamically determines which agents to activate
+2. Dynamically determines which agents to activate (using Gemini AI)
 3. Routes tasks based on selected channels
 4. Agents execute in parallel where possible
 5. Results aggregated and returned
 
+**Testing with Genkit UI:**
+```bash
+npm install -g genkit
+genkit start -- npx tsx src/index.ts
+# Open http://localhost:4000 to test agents interactively
+```
+
 **Files:**
+- `/src/config/google-adk-config.ts` (Genkit setup)
+- `/src/config/llm-config.ts` (LLM configuration)
 - `/src/agents/coordinator-agent.ts` (brain)
 - `/src/index.ts` (orchestrator)
 - `/src/agents/*.ts` (specialized agents)
