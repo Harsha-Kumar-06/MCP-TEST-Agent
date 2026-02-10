@@ -1,0 +1,72 @@
+portfolio_name: "Balanced Growth Portfolio"
+portfolio_id: "PORT_67890"
+as_of_date: "2026-02-03"
+currency: "USD"
+
+# Available cash
+cash_balance: 3000000
+
+# Portfolio positions
+positions:
+  - ticker: "AAPL"
+    company_name: "Apple Inc."
+    shares: 15000
+    current_price: 200.00
+    cost_basis: 170.00
+    acquisition_date: "2023-03-20"
+    sector: "Technology"
+    esg_score: 72
+    beta: 1.2
+    
+  - ticker: "MSFT"
+    company_name: "Microsoft Corporation"
+    shares: 20000
+    current_price: 400.00
+    cost_basis: 350.00
+    acquisition_date: "2022-06-15"
+    sector: "Technology"
+    esg_score: 82
+    beta: 1.1
+    
+  - ticker: "JNJ"
+    company_name: "Johnson & Johnson"
+    shares: 25000
+    current_price: 160.00
+    cost_basis: 155.00
+    acquisition_date: "2023-01-10"
+    sector: "Healthcare"
+    esg_score: 79
+    beta: 0.68
+    
+  - ticker: "JPM"
+    company_name: "JPMorgan Chase"
+    shares: 35000
+    current_price: 150.00
+    cost_basis: 140.00
+    acquisition_date: "2023-02-25"
+    sector: "Financials"
+    esg_score: 58
+    beta: 1.3
+
+# Policy constraints
+policy_limits:
+  technology_limit: 30.0
+  healthcare_limit: 25.0
+  financials_limit: 25.0
+  energy_limit: 15.0
+  esg_minimum: 60
+  max_portfolio_beta: 1.3
+
+# Investment preferences
+investment_objectives:
+  primary_goal: "growth"
+  risk_tolerance: "moderate"
+  time_horizon_years: 10
+  esg_priority: "high"
+  tax_sensitivity: "high"
+
+# Constraints
+constraints:
+  no_short_selling: true
+  minimum_cash_balance: 2000000
+  max_single_position_pct: 10.0

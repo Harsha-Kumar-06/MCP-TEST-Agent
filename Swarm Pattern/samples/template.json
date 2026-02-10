@@ -1,0 +1,20 @@
+{
+  "portfolio_name": "My Portfolio",
+  "cash_balance": 1000000,
+  "positions": [
+    {
+      "ticker": "AAPL",
+      "shares": 1000,
+      "current_price": 150.0,
+      "cost_basis": 140.0,
+      "acquisition_date": "2023-01-15",
+      "sector": "Technology",
+      "esg_score": 72,
+      "beta": 1.2
+    }
+  ],
+  "policy_limits": {
+    "technology_limit": 30.0,
+    "esg_minimum": 60
+  }
+}

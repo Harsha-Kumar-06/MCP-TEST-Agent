@@ -1,0 +1,161 @@
+{
+  "portfolio_name": "Tech-Heavy Portfolio",
+  "portfolio_id": "PORT_12345",
+  "total_value": 50000000,
+  "currency": "USD",
+  "as_of_date": "2026-02-03",
+  
+  "cash_balance": 3000000,
+  
+  "positions": [
+    {
+      "ticker": "AAPL",
+      "company_name": "Apple Inc.",
+      "shares": 15000,
+      "current_price": 200.00,
+      "cost_basis": 170.00,
+      "acquisition_date": "2023-03-20",
+      "sector": "Technology",
+      "industry": "Consumer Electronics",
+      "esg_score": 72,
+      "beta": 1.2,
+      "market_value": 3000000,
+      "unrealized_gain": 450000
+    },
+    {
+      "ticker": "MSFT",
+      "company_name": "Microsoft Corporation",
+      "shares": 20000,
+      "current_price": 400.00,
+      "cost_basis": 350.00,
+      "acquisition_date": "2022-06-15",
+      "sector": "Technology",
+      "industry": "Software",
+      "esg_score": 82,
+      "beta": 1.1,
+      "market_value": 8000000,
+      "unrealized_gain": 1000000
+    },
+    {
+      "ticker": "NVDA",
+      "company_name": "NVIDIA Corporation",
+      "shares": 10000,
+      "current_price": 500.00,
+      "cost_basis": 450.00,
+      "acquisition_date": "2024-03-10",
+      "sector": "Technology",
+      "industry": "Semiconductors",
+      "esg_score": 78,
+      "beta": 1.8,
+      "market_value": 5000000,
+      "unrealized_gain": 500000
+    },
+    {
+      "ticker": "GOOGL",
+      "company_name": "Alphabet Inc.",
+      "shares": 8000,
+      "current_price": 140.00,
+      "cost_basis": 120.00,
+      "acquisition_date": "2022-09-01",
+      "sector": "Technology",
+      "industry": "Internet Services",
+      "esg_score": 71,
+      "beta": 1.15,
+      "market_value": 1120000,
+      "unrealized_gain": 160000
+    },
+    {
+      "ticker": "JNJ",
+      "company_name": "Johnson & Johnson",
+      "shares": 25000,
+      "current_price": 160.00,
+      "cost_basis": 155.00,
+      "acquisition_date": "2023-01-10",
+      "sector": "Healthcare",
+      "industry": "Pharmaceuticals",
+      "esg_score": 79,
+      "beta": 0.68,
+      "market_value": 4000000,
+      "unrealized_gain": 125000
+    },
+    {
+      "ticker": "UNH",
+      "company_name": "UnitedHealth Group",
+      "shares": 8000,
+      "current_price": 500.00,
+      "cost_basis": 480.00,
+      "acquisition_date": "2023-05-20",
+      "sector": "Healthcare",
+      "industry": "Health Insurance",
+      "esg_score": 72,
+      "beta": 0.82,
+      "market_value": 4000000,
+      "unrealized_gain": 160000
+    },
+    {
+      "ticker": "JPM",
+      "company_name": "JPMorgan Chase & Co.",
+      "shares": 35000,
+      "current_price": 150.00,
+      "cost_basis": 140.00,
+      "acquisition_date": "2023-02-25",
+      "sector": "Financials",
+      "industry": "Banking",
+      "esg_score": 58,
+      "beta": 1.3,
+      "market_value": 5250000,
+      "unrealized_gain": 350000
+    },
+    {
+      "ticker": "BAC",
+      "company_name": "Bank of America",
+      "shares": 50000,
+      "current_price": 40.00,
+      "cost_basis": 38.00,
+      "acquisition_date": "2023-04-12",
+      "sector": "Financials",
+      "industry": "Banking",
+      "esg_score": 62,
+      "beta": 1.4,
+      "market_value": 2000000,
+      "unrealized_gain": 100000
+    },
+    {
+      "ticker": "XOM",
+      "company_name": "Exxon Mobil",
+      "shares": 35000,
+      "current_price": 115.00,
+      "cost_basis": 110.00,
+      "acquisition_date": "2024-05-15",
+      "sector": "Energy",
+      "industry": "Oil & Gas",
+      "esg_score": 45,
+      "beta": 1.1,
+      "market_value": 4025000,
+      "unrealized_gain": 175000
+    }
+  ],
+  
+  "policy_limits": {
+    "technology_limit": 30.0,
+    "financials_limit": 25.0,
+    "energy_limit": 15.0,
+    "single_position_limit": 10.0,
+    "esg_minimum": 60,
+    "max_beta": 1.5
+  },
+  
+  "investment_objectives": {
+    "primary": "growth",
+    "risk_tolerance": "moderate",
+    "time_horizon_years": 10,
+    "esg_priority": "moderate",
+    "tax_sensitivity": "high"
+  },
+  
+  "constraints": {
+    "no_short_selling": true,
+    "maintain_minimum_cash": 2000000,
+    "rebalancing_frequency": "quarterly"
+  }
+}

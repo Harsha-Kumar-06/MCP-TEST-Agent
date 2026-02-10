@@ -1,0 +1,31 @@
+
+============================================================
+EXAMPLE 1
+============================================================
+Input:
+
+        I own 10000 shares of Apple (AAPL) bought at $150, now at $185.
+        Also have 5000 Microsoft (MSFT) shares, cost basis $350, current price $410.
+        Cash balance: $500000
+        
+DEBUG MSFT matched: groups=('5000', 'MSFT', '350', '410.'), text='5000 microsoft (msft) shares cost basis  350 current price  '
+DEBUG MSFT: matched_text=5000 microsoft (msft) shares cost basis  350 current price  410., groups=('5000', 'MSFT', '350', '410.')
+Traceback (most recent call last):
+  File "c:\Users\Harsha Kumar\Desktop\DRAVYN\Agents\Swarm Pattern\portfolio_swarm\text_parser.py", line 380, in <module>
+    print(f"\n\u2705 Parsed successfully!")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 2: character maps to <undefined>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\Harsha Kumar\Desktop\DRAVYN\Agents\Swarm Pattern\portfolio_swarm\text_parser.py", line 389, in <module>
+    print(f"\n\u274c Error: {e}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u274c' in position 2: character maps to <undefined>

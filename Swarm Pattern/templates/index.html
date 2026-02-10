@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Swarm Optimizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            background: #f8fafc;
+            padding: 30px 20px;
+            border-right: 1px solid #e2e8f0;
+        }
+        
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .sidebar .section {
+            margin-bottom: 30px;
+            clear: both;
+        }
+        
+        .sidebar label {
+            display: block;
+            margin: 0;
+            color: #475569;
+            font-weight: 500;
+        }
+        
+        .sidebar input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .sidebar input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar input[type="range"]::-webkit-slider-thumb:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+        
+        .sidebar input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar input[type="range"]::-moz-range-thumb:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+        
+        .sidebar .range-value {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #1e293b;
+            font-weight: 600;
+            padding: 5px 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            display: inline-block;
+            min-width: 50px;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar .range-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .sidebar .checkbox-group label {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .main {
+            padding: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #3b82f6;
+        }
+        
+        .tab.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .metric-card .label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .metric-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+        
+        .textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .positions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .positions-table th,
+        .positions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .positions-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+        
+        .positions-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .vote-card {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .vote-approve {
+            background: #dcfce7;
+            border-left-color: #22c55e;
+        }
+        
+        .vote-reject {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+        
+        .vote-card strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .trade-row {
+            padding: 10px;
+            background: #f8fafc;
+            margin: 8px 0;
+            border-radius: 6px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Portfolio Swarm Optimizer</h1>
+            <p>AI-Powered Multi-Agent Portfolio Optimization</p>
+        </div>
+        
+        <div class="content">
+            <div class="sidebar">
+                <div class="section">
+                    <h2>⚙️ Configuration</h2>
+                    <div style="margin-bottom:25px;">
+                        <div class="range-header">
+                            <label>Max Iterations</label>
+                            <div class="range-value" id="maxIterationsValue">5</div>
+                        </div>
+                        <input type="range" id="maxIterations" min="1" max="20" value="5">
+                    </div>
+                    
+                    <div style="margin-bottom:25px;">
+                        <div class="range-header">
+                            <label>Min Iterations <span style="font-size:0.75rem; color:#6b7280;">(force debate)</span></label>
+                            <div class="range-value" id="minIterationsValue">1</div>
+                        </div>
+                        <input type="range" id="minIterations" min="1" max="10" value="1">
+                        <p style="font-size:0.75rem; color:#6b7280; margin-top:4px;">Set higher to see more agent debate rounds</p>
+                    </div>
+                    
+                    <div style="margin-bottom:25px;">
+                        <div class="range-header">
+                            <label>Consensus Threshold</label>
+                            <div class="range-value" id="consensusThresholdValue">0.60</div>
+                        </div>
+                        <input type="range" id="consensusThreshold" min="0.5" max="1.0" step="0.05" value="0.6">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>🤖 Active Agents</h2>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useMarket" checked>
+                        <label for="useMarket">Market Analysis</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useRisk" checked>
+                        <label for="useRisk">Risk Assessment</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useTax" checked>
+                        <label for="useTax">Tax Strategy</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useEsg" checked>
+                        <label for="useEsg">ESG Compliance</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="useTrading" checked>
+                        <label for="useTrading">Algorithmic Trading</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('portfolio')">📊 Portfolio</button>
+                    <button class="tab" onclick="showTab('strategy')">🎯 Strategy</button>
+                    <button class="tab" onclick="showTab('optimize')">🤖 Optimize</button>
+                    <button class="tab" onclick="showTab('results')">📈 Results</button>
+                </div>
+                
+                <div id="portfolio" class="tab-content active">
+                    <h2>Portfolio Input</h2>
+                    <div id="inputMethodLockNotice" style="display:none; background:#fef3c7; padding:12px 20px; border-radius:8px; border-left:4px solid #f59e0b; margin-bottom:15px;">
+                        <strong style="color:#92400e;">🔒 Input Locked</strong>
+                        <span style="color:#78350f; font-size:0.9rem;"> - Optimization is running. Wait for it to complete or refresh the page.</span>
+                    </div>
+                    <div id="inputMethodButtons">
+                        <button class="btn btn-primary" id="btnSample" onclick="loadSample()">Load Sample Portfolio ($50M)</button>
+                        <button class="btn btn-primary" id="btnText" onclick="showTextInput()">Enter Text Description</button>
+                        <button class="btn btn-primary" id="btnFile" onclick="showFileUpload()">Upload File (CSV/JSON/YAML)</button>
+                    </div>
+                    
+                    <div id="textInput" style="display:none; margin-top:20px;">
+                        <h3>Describe Your Portfolio</h3>
+                        <textarea class="textarea" id="portfolioText" rows="10" placeholder="Example:
+I own 10,000 shares of Apple (AAPL) bought at $150, now at $185.
+Also have 5,000 Microsoft (MSFT) shares, cost basis $350, current price $410.
+Plus 3,000 Tesla shares at $245 (bought at $195).
+Cash balance: $500,000"></textarea>
+                        <button class="btn btn-success" onclick="parseText()">Parse Portfolio</button>
+                    </div>
+                    
+                    <div id="fileUpload" style="display:none; margin-top:20px;">
+                        <h3>Upload Portfolio File</h3>
+                        <p style="color:#64748b; margin-bottom:15px;">Supported formats: CSV, JSON, YAML</p>
+                        <input type="file" id="portfolioFile" accept=".csv,.json,.yaml,.yml" style="margin-bottom:15px;">
+                        <button class="btn btn-success" onclick="uploadFile()">Upload & Parse</button>
+                        <div id="uploadProgress" style="display:none; margin-top:15px;">
+                            <div class="spinner"></div>
+                            <p>Uploading and parsing file...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="portfolioDisplay" style="margin-top:30px;"></div>
+                </div>
+                
+                <!-- Strategy Selection Tab -->
+                <div id="strategy" class="tab-content">
+                    <h2>🎯 Select Optimization Strategy</h2>
+                    <p style="color:#64748b; margin-bottom:15px;">Choose how the AI agents should optimize your portfolio. Each strategy has different priorities and risk tolerance.</p>
+                    
+                    <!-- Rating Legend -->
+                    <div style="background:#f0f9ff; padding:12px 16px; border-radius:8px; margin-bottom:20px; border:1px solid #bae6fd;">
+                        <strong style="color:#0369a1; font-size:0.9rem;">⭐ Personalized Ratings</strong>
+                        <span style="color:#0c4a6e; font-size:0.85rem; display:block; margin-top:4px;">
+                            Ratings adjust based on YOUR portfolio's beta, ESG score, and sector concentration.
+                        </span>
+                        <div style="margin-top:8px; font-size:0.8rem; color:#0369a1;">
+                            <span style="background:#22c55e; color:white; padding:2px 6px; border-radius:3px; margin-right:8px;">BEST FIT</span> Optimal for your portfolio |
+                            ⭐⭐☆☆☆ Lower ratings may trigger more agent debate
+                        </div>
+                    </div>
+                    
+                    <div id="strategyNotLoaded" style="background:#fef3c7; padding:15px 20px; border-radius:8px; border-left:4px solid #f59e0b; margin-bottom:20px;">
+                        <strong style="color:#92400e;">⚠️ Load a portfolio first</strong>
+                        <p style="color:#78350f; font-size:0.9rem; margin:5px 0 0 0;">Please load a portfolio in the Portfolio tab before selecting a strategy.</p>
+                    </div>
+                    
+                    <div id="strategyCards" style="display:none;">
+                        <div id="strategyGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px;">
+                            <!-- Strategy cards will be loaded here -->
+                        </div>
+                        
+                        <div id="selectedStrategyInfo" style="display:none; margin-top:30px; padding:20px; background:#dcfce7; border-radius:12px; border-left:4px solid #22c55e;">
+                            <h3 style="margin:0 0 10px 0; color:#166534;">✅ Selected Strategy: <span id="selectedStrategyName"></span></h3>
+                            <p id="selectedStrategyDesc" style="color:#15803d; margin:0;"></p>
+                            <button class="btn btn-success" onclick="showTab('optimize')" style="margin-top:15px;">Continue to Optimization →</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="optimize" class="tab-content">
+                    <h2>Optimize Portfolio</h2>
+                    
+                    <div id="optimizationStatus" style="display:none; background:#fef3c7; padding:12px 20px; border-radius:8px; border-left:4px solid #f59e0b; margin-bottom:15px;">
+                        <strong style="color:#92400e;">⚠️ Optimization in progress...</strong>
+                        <span style="color:#78350f; font-size:0.9rem;"> Starting a new optimization will stop the current one.</span>
+                    </div>
+                    
+                    <div id="strategyReminder" style="display:none; background:#eff6ff; padding:12px 20px; border-radius:8px; border-left:4px solid #3b82f6; margin-bottom:15px;">
+                        <strong style="color:#1e40af;">🎯 Strategy: <span id="currentStrategyName">Balanced</span></strong>
+                        <span style="color:#3b82f6; font-size:0.9rem;"> - <a href="#" onclick="showTab('strategy'); return false;">Change strategy</a></span>
+                    </div>
+                    
+                    <div style="background:#eff6ff; padding:15px 20px; border-radius:8px; border-left:4px solid #3b82f6; margin-bottom:20px;">
+                        <h3 style="margin:0 0 8px 0; color:#1e40af; font-size:1rem;">⏱️ Optimization Process</h3>
+                        <p style="margin:0; color:#475569; font-size:0.9rem; line-height:1.5;">
+                            Our AI agents will analyze your portfolio through multiple perspectives (market trends, risk, tax, ESG, trading). 
+                            <strong>Expected duration: 10-30 seconds</strong> with API quota available.
+                            <br>
+                            <strong>Configuration:</strong> Min <span id="displayMinIterations">1</span> to Max <span id="displayMaxIterations">5</span> iterations, 
+                            <span id="displayConsensusThreshold">60</span>% consensus required.
+                            <br>
+                            <small style="opacity:0.85;">💡 Tip: Set <strong>Min Iterations > 1</strong> to force agents to debate more before reaching consensus.</small>
+                            <br>
+                            <small style="opacity:0.85; color:#dc2626;"><strong>⚠️ If slow (60+ sec):</strong> API quota exhausted - uncheck 2-3 agents or wait for daily reset.</small>
+                        </p>
+                    </div>
+                    
+                    <label><strong>What would you like to optimize?</strong></label>
+                    <textarea class="textarea" id="optimizeQuestion" rows="3" placeholder="Example: Optimize my portfolio for better returns while managing risk and minimizing taxes">Optimize my portfolio for better returns while managing risk</textarea>
+                    <button class="btn btn-success" id="runOptimizationBtn" onclick="runOptimization()">🚀 Run Optimization</button>
+                    
+                    <div id="optimizeLoading" class="loading">
+                        <div class="spinner"></div>
+                        <h3 style="margin:20px 0 10px 0; color:#1e293b;">🤖 Multi-Agent Optimization in Progress</h3>
+                        <p style="color:#64748b; margin-bottom:20px;"><strong>Estimated time: 40-60 seconds</strong></p>
+                        
+                        <div style="max-width:600px; margin:0 auto; text-align:left;">
+                            <div id="progressSteps" style="background:#f8fafc; padding:20px; border-radius:8px; border-left:4px solid #3b82f6;">
+                                <div id="step1" style="margin-bottom:12px; opacity:0.4;">⏳ <strong>Step 1:</strong> Initializing agents...</div>
+                                <div id="step2" style="margin-bottom:12px; opacity:0.4;">⏳ <strong>Step 2:</strong> Market analysis in progress...</div>
+                                <div id="step3" style="margin-bottom:12px; opacity:0.4;">⏳ <strong>Step 3:</strong> Risk assessment & ESG compliance...</div>
+                                <div id="step4" style="margin-bottom:12px; opacity:0.4;">⏳ <strong>Step 4:</strong> Tax strategy evaluation...</div>
+                                <div id="step5" style="opacity:0.4;">⏳ <strong>Step 5:</strong> Building consensus & trade plan...</div>
+                            </div>
+                            
+                            <div style="margin-top:20px; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                                <div id="progressBar" style="background:#3b82f6; height:100%; width:0%; transition:width 0.5s;"></div>
+                            </div>
+                            
+                            <p id="progressPercent" style="text-align:center; margin-top:10px; color:#475569; font-weight:600;">0%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="results" class="tab-content">
+                    <h2>Optimization Results</h2>
+                    <div id="resultsDisplay">
+                        <p style="color:#64748b;">Run an optimization to see results here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPortfolio = null;
+        let isOptimizationRunning = false;
+        let currentOptimizationAborted = false;
+        let activeInputMethod = null; // Track: 'sample', 'text', 'file'
+        let countdownInterval = null; // Track countdown timer
+        let selectedStrategy = null; // Track selected strategy
+        let availableStrategies = []; // Cached strategies
+        
+        // Load available strategies from server
+        async function loadStrategies() {
+            try {
+                const response = await fetch('/get_strategies');
+                const data = await response.json();
+                if (data.success) {
+                    availableStrategies = data.strategies;
+                    displayStrategyCards();
+                }
+            } catch (error) {
+                console.error('Error loading strategies:', error);
+            }
+        }
+        
+        // Star rating helper function
+        function renderStars(score, tooltip = '') {
+            const fullStars = Math.floor(score);
+            const halfStar = score % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            let stars = '';
+            for (let i = 0; i < fullStars; i++) stars += '⭐';
+            if (halfStar) stars += '✨';
+            for (let i = 0; i < emptyStars; i++) stars += '☆';
+            return stars;
+        }
+        
+        // Calculate strategy rating based on PORTFOLIO characteristics
+        // ALWAYS ensures some strategies are LOW (for testing debate)
+        function getStrategyRating(strategy) {
+            const priorities = strategy.priorities || {};
+            const growth = priorities.growth || 5;
+            const risk_priority = priorities.risk || 5;
+            const esg = priorities.esg || 5;
+            const income = priorities.income || 5;
+            const tax = priorities.tax_efficiency || 5;
+            
+            // Base score from strategy balance
+            const values = [growth, risk_priority, esg, income, tax];
+            const avg = values.reduce((a, b) => a + b, 0) / values.length;
+            const variance = values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / values.length;
+            const balance = Math.max(0, 1 - variance / 20);
+            
+            let bonus = 0;
+            let penalty = 0;  // NEW: Ensure some strategies are always low
+            let label = '';
+            
+            // PORTFOLIO-AWARE RATINGS
+            if (currentPortfolio) {
+                const portfolioBeta = currentPortfolio.beta || 1.0;
+                const portfolioESG = currentPortfolio.esg_score || 70;
+                const sectorAlloc = currentPortfolio.sector_allocation || {};
+                const maxSector = Math.max(...Object.values(sectorAlloc), 0);
+                const totalValue = currentPortfolio.total_value || 0;
+                
+                // === BONUSES (strategies that FIT the portfolio) ===
+                
+                // High beta portfolio -> recommend conservative/risk strategies
+                if (portfolioBeta > 1.2) {
+                    if (strategy.type === 'conservative_income') bonus += 1.0;
+                    else if (strategy.type === 'risk_minimization') bonus += 1.2;
+                }
+                // Low beta portfolio -> balanced works well
+                else if (portfolioBeta < 0.9) {
+                    if (strategy.type === 'balanced') bonus += 0.8;
+                }
+                
+                // Low ESG portfolio -> recommend ESG-focused
+                if (portfolioESG < 65) {
+                    if (strategy.type === 'esg_focused') bonus += 1.0;
+                }
+                
+                // High sector concentration -> recommend sector rotation
+                if (maxSector > 35) {
+                    if (strategy.type === 'balanced') bonus += 0.6;
+                    else if (strategy.type === 'sector_rotation') bonus += 0.8;
+                }
+                
+                // Large portfolio -> tax efficiency matters
+                if (totalValue > 1000000) {
+                    if (strategy.type === 'tax_efficient') bonus += 0.5;
+                }
+                
+                // === PENALTIES (strategies that DON'T FIT - for testing!) ===
+                
+                // High beta portfolio -> aggressive growth is RISKY (low rating)
+                if (portfolioBeta > 1.1) {
+                    if (strategy.type === 'aggressive_growth') penalty += 3.0;
+                }
+                // Low beta/conservative portfolio -> aggressive is mismatched
+                else if (portfolioBeta < 1.0) {
+                    if (strategy.type === 'aggressive_growth') penalty += 2.5;
+                }
+                
+                // High ESG portfolio -> ESG-focused is redundant (lower rating)
+                if (portfolioESG > 75) {
+                    if (strategy.type === 'esg_focused') penalty += 2.0;
+                }
+                
+                // Well-diversified portfolio -> sector rotation unnecessary
+                if (maxSector < 25) {
+                    if (strategy.type === 'sector_rotation') penalty += 2.5;
+                }
+                
+                // Small portfolio -> tax efficiency less impactful
+                if (totalValue < 500000) {
+                    if (strategy.type === 'tax_efficient') penalty += 1.5;
+                }
+                
+                // Risk minimization on already-low-risk portfolio
+                if (portfolioBeta < 0.8) {
+                    if (strategy.type === 'risk_minimization') penalty += 2.0;
+                }
+                
+                // Dividend growth on growth-heavy portfolio (based on sector)
+                const techWeight = sectorAlloc['Technology'] || 0;
+                if (techWeight > 30) {
+                    if (strategy.type === 'dividend_growth') penalty += 2.0;
+                }
+                
+                // GUARANTEED LOW: At least one strategy always gets penalized
+                // Sector rotation is rarely optimal for most portfolios
+                if (strategy.type === 'sector_rotation') penalty += 1.0;  // Base penalty
+                // Aggressive growth is risky for ANY portfolio
+                if (strategy.type === 'aggressive_growth') penalty += 0.5;  // Base penalty
+                
+            } else {
+                // No portfolio loaded - use static ratings with spread
+                if (strategy.type === 'balanced') bonus = 0.5;
+                if (strategy.type === 'conservative_income') bonus = 0.3;
+                // Always mark these as low when no portfolio
+                if (strategy.type === 'aggressive_growth') penalty = 2.5;
+                if (strategy.type === 'sector_rotation') penalty = 2.0;
+            }
+            
+            if (strategy.min_esg >= 70) bonus += 0.2;
+            
+            // Calculate final score with penalties
+            const rawScore = 3 + balance * 2 + bonus - penalty;
+            const score = Math.min(5, Math.max(1, rawScore));
+            
+            // Debug: Log strategy scores
+            console.log(`Strategy ${strategy.type}: base=~${(3 + balance*2).toFixed(1)}, bonus=${bonus.toFixed(1)}, penalty=${penalty.toFixed(1)}, final=${score.toFixed(1)}`);
+            
+            // Generate context-aware label
+            if (score >= 4.5) label = 'Best for Your Portfolio';
+            else if (score >= 4) label = 'Recommended';
+            else if (score >= 3.5) label = 'Good Choice';
+            else if (score >= 3) label = 'Moderate';
+            else if (score >= 2.5) label = 'May Not Fit';
+            else label = 'Poor Fit';
+            
+            return { score, label };
+        }
+        
+        // Calculate trade quality rating
+        function getTradeRating(trade) {
+            let score = 3; // Base score
+            const action = (trade.action || '').toLowerCase();
+            const rationale = (trade.rationale || '').toLowerCase();
+            
+            // Boost for clear rationales
+            if (rationale.length > 50) score += 0.5;
+            if (rationale.includes('risk') || rationale.includes('diversif')) score += 0.3;
+            if (rationale.includes('tax') || rationale.includes('loss harvest')) score += 0.3;
+            if (rationale.includes('esg') || rationale.includes('compliance')) score += 0.2;
+            if (rationale.includes('momentum') || rationale.includes('trend')) score += 0.2;
+            
+            // Reduce for risky indicators
+            if (rationale.includes('volatile') || rationale.includes('uncertain')) score -= 0.3;
+            if (rationale.includes('speculative')) score -= 0.5;
+            
+            score = Math.max(1, Math.min(5, score));
+            
+            let label = '';
+            if (score >= 4.5) label = 'Strong';
+            else if (score >= 4) label = 'Recommended';
+            else if (score >= 3) label = 'Moderate';
+            else label = 'Cautious';
+            
+            return { score, label };
+        }
+        
+        // Display strategy cards
+        function displayStrategyCards() {
+            const grid = document.getElementById('strategyGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            // Sort strategies by rating (best first)
+            availableStrategies.sort((a, b) => getStrategyRating(b).score - getStrategyRating(a).score);
+            
+            availableStrategies.forEach((strategy, index) => {
+                const riskColor = strategy.risk_level === 'High' ? '#ef4444' : 
+                                  strategy.risk_level === 'Medium' ? '#f59e0b' : '#22c55e';
+                const riskBg = strategy.risk_level === 'High' ? '#fee2e2' : 
+                               strategy.risk_level === 'Medium' ? '#fef3c7' : '#dcfce7';
+                
+                // Calculate strategy rating
+                const strategyRating = getStrategyRating(strategy);
+                const isLowRated = strategyRating.score < 3;
+                const isTopRated = index === 0 && strategyRating.score >= 4;
+                
+                const card = document.createElement('div');
+                card.className = 'strategy-card';
+                card.id = `strategy-${strategy.type}`;
+                
+                // Different styling for low-rated strategies (but still clickable!)
+                const borderColor = isTopRated ? '#22c55e' : (isLowRated ? '#f97316' : '#3b82f6');
+                const bgColor = isLowRated ? '#fff7ed' : '#f8fafc';
+                
+                card.style.cssText = `
+                    background: ${bgColor};
+                    padding: 20px;
+                    border-radius: 12px;
+                    border-left: 4px solid ${borderColor};
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                    ${isLowRated ? 'opacity: 0.85;' : ''}
+                `;
+                card.onmouseover = function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+                    this.style.opacity = '1';
+                };
+                card.onmouseout = function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = 'none';
+                        this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+                        if (isLowRated) this.style.opacity = '0.85';
+                    }
+                };
+                card.onclick = function() { selectStrategy(strategy); };
+                
+                const stars = renderStars(strategyRating.score, strategyRating.label);
+                
+                // Add badge for top rated only
+                let badge = '';
+                if (isTopRated) {
+                    badge = '<span style="background:#22c55e; color:white; padding:2px 8px; border-radius:4px; font-size:0.7rem; margin-left:8px;">BEST FIT</span>';
+                }
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <h3 style="margin:0; color:#1e293b; font-size:1.1rem;">${strategy.name}${badge}</h3>
+                        <div style="font-size:1.1rem;" title="${strategyRating.label}">${stars}</div>
+                    </div>
+                    <p style="color:#64748b; font-size:0.9rem; margin-bottom:8px; line-height:1.4;">${strategy.description}</p>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
+                            β ${strategy.target_beta}
+                        </span>
+                        <span style="background:${riskBg}; color:${riskColor}; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
+                            ${strategy.risk_level} Risk
+                        </span>
+                        <span style="background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
+                            ESG ≥${strategy.min_esg}
+                        </span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Select a strategy
+        async function selectStrategy(strategy) {
+            // Update UI
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('selected');
+                card.style.borderLeftColor = '#3b82f6';
+                card.style.background = '#f8fafc';
+            });
+            
+            const selectedCard = document.getElementById(`strategy-${strategy.type}`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedCard.style.borderLeftColor = '#22c55e';
+                selectedCard.style.background = '#dcfce7';
+                selectedCard.style.transform = 'translateY(-3px)';
+                selectedCard.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+            }
+            
+            // Store selected strategy
+            selectedStrategy = strategy;
+            
+            // Send to server
+            try {
+                await fetch('/set_strategy', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({strategy_type: strategy.type})
+                });
+            } catch (error) {
+                console.error('Error setting strategy:', error);
+            }
+            
+            // Show selection info
+            document.getElementById('selectedStrategyInfo').style.display = 'block';
+            document.getElementById('selectedStrategyName').textContent = strategy.name;
+            document.getElementById('selectedStrategyDesc').textContent = strategy.description;
+            
+            // Update optimize tab reminder
+            document.getElementById('currentStrategyName').textContent = strategy.name;
+            document.getElementById('strategyReminder').style.display = 'block';
+        }
+        
+        // Show strategy cards after portfolio is loaded
+        function showStrategySelection() {
+            document.getElementById('strategyNotLoaded').style.display = 'none';
+            document.getElementById('strategyCards').style.display = 'block';
+            
+            // Load strategies if not already loaded, otherwise refresh display
+            // Always refresh to recalculate portfolio-aware ratings
+            if (availableStrategies.length === 0) {
+                loadStrategies();
+            } else {
+                displayStrategyCards();  // Refresh ratings based on current portfolio
+            }
+            
+            // Auto-select best strategy based on portfolio
+            if (!selectedStrategy && availableStrategies.length > 0) {
+                // Sort by rating and select the best one
+                const sortedStrategies = [...availableStrategies].sort(
+                    (a, b) => getStrategyRating(b).score - getStrategyRating(a).score
+                );
+                selectStrategy(sortedStrategies[0]);
+            }
+        }
+        
+        function showTab(tabName, skipClear = false) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Clear/reset the tab being shown (unless skipClear is true)
+            if (!skipClear) {
+                clearTabContent(tabName);
+            }
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Highlight the correct tab button
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function clearTabContent(tabName) {
+            console.log('🧹 Clearing tab:', tabName);
+            
+            switch(tabName) {
+                case 'optimize':
+                    // Reset optimization progress display
+                    const optimizeLoading = document.getElementById('optimizeLoading');
+                    if (optimizeLoading) {
+                        optimizeLoading.style.display = 'none';
+                    }
+                    
+                    // Reset progress bar and steps
+                    const progressBar = document.getElementById('progressBar');
+                    const progressPercent = document.getElementById('progressPercent');
+                    const progressSteps = document.getElementById('progressSteps');
+                    
+                    if (progressBar) progressBar.style.width = '0%';
+                    if (progressPercent) progressPercent.textContent = '0%';
+                    if (progressSteps) {
+                        progressSteps.innerHTML = `
+                            <div style="color:#475569; font-weight:600; margin-bottom:10px;">⏳ Ready to optimize</div>
+                            <div style="color:#64748b; font-size:0.95rem;">Configure settings and click "Run Optimization"</div>
+                        `;
+                    }
+                    
+                    // Hide optimization status banner
+                    const statusDiv = document.getElementById('optimizationStatus');
+                    if (statusDiv) statusDiv.style.display = 'none';
+                    
+                    // Reset button
+                    const runBtn = document.getElementById('runOptimizationBtn');
+                    if (runBtn) runBtn.innerHTML = '🚀 Run Optimization';
+                    
+                    console.log('✅ Optimize tab cleared');
+                    break;
+                    
+                case 'results':
+                    // Clear results display to initial state
+                    const resultsDisplay = document.getElementById('resultsDisplay');
+                    if (resultsDisplay) {
+                        resultsDisplay.innerHTML = '<p style="color:#64748b;">Run an optimization to see results here.</p>';
+                    }
+                    console.log('✅ Results tab cleared');
+                    break;
+                    
+                case 'portfolio':
+                    // Don't clear portfolio data automatically - user might want to review it
+                    // Portfolio data will be replaced when loading new data
+                    console.log('✅ Portfolio tab (keeping existing data)');
+                    break;
+                    
+                default:
+                    console.log('ℹ️ No clearing needed for:', tabName);
+            }
+        }
+        
+        function updateRangeValue(id, value) {
+            console.log('🔄 updateRangeValue called with:', id, '=', value);
+            const display = document.getElementById(id + 'Value');
+            console.log('Display element:', display);
+            if (!display) {
+                console.error('❌ Display element not found for:', id + 'Value');
+                return;
+            }
+            
+            if (id === 'consensusThreshold') {
+                display.textContent = parseFloat(value).toFixed(2);
+                console.log('✅ Updated consensus threshold display to:', display.textContent);
+                const thresholdDisplay = document.getElementById('displayConsensusThreshold');
+                if (thresholdDisplay) {
+                    thresholdDisplay.textContent = (parseFloat(value) * 100).toFixed(0);
+                }
+            } else if (id === 'maxIterations') {
+                display.textContent = value;
+                console.log('✅ Updated max iterations display to:', display.textContent);
+                const iterDisplay = document.getElementById('displayMaxIterations');
+                if (iterDisplay) {
+                    iterDisplay.textContent = value;
+                }
+                // Ensure minIterations doesn't exceed maxIterations
+                const minSlider = document.getElementById('minIterations');
+                if (minSlider && parseInt(minSlider.value) > parseInt(value)) {
+                    minSlider.value = value;
+                    updateRangeValue('minIterations', value);
+                }
+            } else if (id === 'minIterations') {
+                display.textContent = value;
+                console.log('✅ Updated min iterations display to:', display.textContent);
+                const minDisplay = document.getElementById('displayMinIterations');
+                if (minDisplay) {
+                    minDisplay.textContent = value;
+                }
+                // Ensure minIterations doesn't exceed maxIterations
+                const maxSlider = document.getElementById('maxIterations');
+                if (maxSlider && parseInt(value) > parseInt(maxSlider.value)) {
+                    const maxVal = document.getElementById('maxIterations').value;
+                    document.getElementById('minIterations').value = maxVal;
+                    display.textContent = maxVal;
+                }
+            } else {
+                display.textContent = value;
+            }
+        }
+        
+        function showTextInput() {
+            // Check if optimization is running
+            if (isOptimizationRunning) {
+                showAlert('error', '🔒 Cannot switch input method while optimization is running');
+                return;
+            }
+            
+            // If switching from a different active method, clear everything
+            if (activeInputMethod && activeInputMethod !== 'text') {
+                clearForFreshStart();
+            }
+            
+            activeInputMethod = 'text';
+            document.getElementById('textInput').style.display = 'block';
+            document.getElementById('fileUpload').style.display = 'none';
+            updateInputButtonStyles();
+        }
+        
+        function showFileUpload() {
+            // Check if optimization is running
+            if (isOptimizationRunning) {
+                showAlert('error', '🔒 Cannot switch input method while optimization is running');
+                return;
+            }
+            
+            // If switching from a different active method, clear everything
+            if (activeInputMethod && activeInputMethod !== 'file') {
+                clearForFreshStart();
+            }
+            
+            activeInputMethod = 'file';
+            document.getElementById('fileUpload').style.display = 'block';
+            document.getElementById('textInput').style.display = 'none';
+            updateInputButtonStyles();
+        }
+        
+        function clearForFreshStart() {
+            console.log('🧹 Clearing for fresh start - switching input method');
+            
+            // Stop any countdown timer
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            
+            // Remove countdown alert if present
+            const countdownAlert = document.getElementById('countdown-alert');
+            if (countdownAlert) countdownAlert.remove();
+            
+            // Clear portfolio data
+            currentPortfolio = null;
+            
+            // Clear portfolio display
+            const portfolioDisplay = document.getElementById('portfolioDisplay');
+            if (portfolioDisplay) portfolioDisplay.innerHTML = '';
+            
+            // Remove recommendation banner
+            const recBanner = document.getElementById('recommendation-banner');
+            if (recBanner) recBanner.remove();
+            
+            // Clear text input
+            const textArea = document.getElementById('portfolioText');
+            if (textArea) textArea.value = '';
+            
+            // Clear file input
+            const fileInput = document.getElementById('portfolioFile');
+            if (fileInput) fileInput.value = '';
+            
+            // Clear results
+            const resultsDisplay = document.getElementById('resultsDisplay');
+            if (resultsDisplay) {
+                resultsDisplay.innerHTML = '<p style="color:#64748b;">Run an optimization to see results here.</p>';
+            }
+            
+            // Reset optimize tab
+            const optimizeLoading = document.getElementById('optimizeLoading');
+            if (optimizeLoading) optimizeLoading.style.display = 'none';
+            
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) progressBar.style.width = '0%';
+            
+            const progressPercent = document.getElementById('progressPercent');
+            if (progressPercent) progressPercent.textContent = '0%';
+            
+            // Remove any alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+            
+            console.log('✅ Fresh start complete');
+        }
+        
+        function updateInputButtonStyles() {
+            const btnSample = document.getElementById('btnSample');
+            const btnText = document.getElementById('btnText');
+            const btnFile = document.getElementById('btnFile');
+            
+            // Reset all buttons
+            [btnSample, btnText, btnFile].forEach(btn => {
+                if (btn) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.opacity = '1';
+                }
+            });
+            
+            // Highlight active method
+            if (activeInputMethod === 'sample' && btnSample) {
+                btnSample.style.background = '#16a34a';
+            } else if (activeInputMethod === 'text' && btnText) {
+                btnText.style.background = '#16a34a';
+            } else if (activeInputMethod === 'file' && btnFile) {
+                btnFile.style.background = '#16a34a';
+            }
+        }
+        
+        function lockInputMethods() {
+            const notice = document.getElementById('inputMethodLockNotice');
+            const buttons = document.getElementById('inputMethodButtons');
+            
+            if (notice) notice.style.display = 'block';
+            if (buttons) {
+                buttons.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                });
+            }
+            
+            // Also disable text input and file upload areas
+            const textArea = document.getElementById('portfolioText');
+            const fileInput = document.getElementById('portfolioFile');
+            const parseBtn = document.querySelector('#textInput .btn-success');
+            const uploadBtn = document.querySelector('#fileUpload .btn-success');
+            
+            if (textArea) textArea.disabled = true;
+            if (fileInput) fileInput.disabled = true;
+            if (parseBtn) { parseBtn.disabled = true; parseBtn.style.opacity = '0.5'; }
+            if (uploadBtn) { uploadBtn.disabled = true; uploadBtn.style.opacity = '0.5'; }
+        }
+        
+        function unlockInputMethods() {
+            const notice = document.getElementById('inputMethodLockNotice');
+            const buttons = document.getElementById('inputMethodButtons');
+            
+            if (notice) notice.style.display = 'none';
+            if (buttons) {
+                buttons.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
+            }
+            
+            // Re-enable text input and file upload areas
+            const textArea = document.getElementById('portfolioText');
+            const fileInput = document.getElementById('portfolioFile');
+            const parseBtn = document.querySelector('#textInput .btn-success');
+            const uploadBtn = document.querySelector('#fileUpload .btn-success');
+            
+            if (textArea) textArea.disabled = false;
+            if (fileInput) fileInput.disabled = false;
+            if (parseBtn) { parseBtn.disabled = false; parseBtn.style.opacity = '1'; }
+            if (uploadBtn) { uploadBtn.disabled = false; uploadBtn.style.opacity = '1'; }
+            
+            updateInputButtonStyles();
+        }
+        
+        async function loadSample() {
+            // Check if optimization is running
+            if (isOptimizationRunning) {
+                showAlert('error', '🔒 Cannot load new portfolio while optimization is running');
+                return;
+            }
+            
+            // If switching from a different active method, clear everything
+            if (activeInputMethod && activeInputMethod !== 'sample') {
+                clearForFreshStart();
+            }
+            
+            activeInputMethod = 'sample';
+            updateInputButtonStyles();
+            
+            // Hide text and file inputs
+            document.getElementById('textInput').style.display = 'none';
+            document.getElementById('fileUpload').style.display = 'none';
+            
+            try {
+                const response = await fetch('/load_sample', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPortfolio = data.portfolio;
+                    displayPortfolio(data.portfolio);
+                    
+                    // Show recommendation if available
+                    if (data.recommendation) {
+                        displayRecommendation(data.recommendation);
+                    }
+                    
+                    // Show countdown alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success';
+                    alertDiv.id = 'countdown-alert';
+                    alertDiv.innerHTML = '✅ Sample portfolio loaded successfully!<br><strong>Going to strategy selection in <span id="countdown">5</span> seconds...</strong> <button onclick="cancelCountdown()" style="margin-left:10px;padding:4px 10px;cursor:pointer;">Cancel</button>';
+                    const main = document.querySelector('.main');
+                    main.insertBefore(alertDiv, main.firstChild);
+                    
+                    // Enable strategy selection
+                    showStrategySelection();
+                    
+                    // Countdown
+                    let seconds = 5;
+                    countdownInterval = setInterval(() => {
+                        seconds--;
+                        const countdownSpan = document.getElementById('countdown');
+                        if (countdownSpan) {
+                            countdownSpan.textContent = seconds;
+                        }
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            countdownInterval = null;
+                        }
+                    }, 1000);
+                    
+                    // Auto-switch to strategy tab
+                    setTimeout(() => {
+                        if (countdownInterval === null) return; // Was cancelled
+                        if (alertDiv) alertDiv.remove();
+                        showTab('strategy');
+                    }, 5000);
+                } else {
+                    showAlert('error', '❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                showAlert('error', '❌ Error loading sample: ' + error.message);
+            }
+        }
+        
+        function cancelCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            const alertDiv = document.getElementById('countdown-alert');
+            if (alertDiv) {
+                alertDiv.innerHTML = '✅ Portfolio loaded. <strong>Auto-optimization cancelled.</strong> Click "Optimize" tab when ready.';
+                setTimeout(() => alertDiv.remove(), 3000);
+            }
+        }
+        
+        async function parseText() {
+            // Check if optimization is running
+            if (isOptimizationRunning) {
+                showAlert('error', '🔒 Cannot parse while optimization is running');
+                return;
+            }
+            
+            const text = document.getElementById('portfolioText').value;
+            if (!text.trim()) {
+                showAlert('error', '❌ Please enter a portfolio description');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/parse_text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentPortfolio = data.portfolio;
+                    displayPortfolio(data.portfolio);
+                    
+                    // Show recommendation if available
+                    if (data.recommendation) {
+                        displayRecommendation(data.recommendation);
+                    }
+                    
+                    // Enable strategy selection
+                    showStrategySelection();
+                    
+                    // Show countdown alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success';
+                    alertDiv.id = 'countdown-alert';
+                    alertDiv.innerHTML = '✅ Portfolio parsed successfully!<br><strong>Going to strategy selection in <span id="countdown">5</span> seconds...</strong> <button onclick="cancelCountdown()" style="margin-left:10px;padding:4px 10px;cursor:pointer;">Cancel</button>';
+                    const main = document.querySelector('.main');
+                    main.insertBefore(alertDiv, main.firstChild);
+                    
+                    // Countdown
+                    let seconds = 5;
+                    countdownInterval = setInterval(() => {
+                        seconds--;
+                        const countdownSpan = document.getElementById('countdown');
+                        if (countdownSpan) {
+                            countdownSpan.textContent = seconds;
+                        }
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            countdownInterval = null;
+                        }
+                    }, 1000);
+                    
+                    // Auto-switch to strategy tab
+                    setTimeout(() => {
+                        if (countdownInterval === null) return; // Was cancelled
+                        if (alertDiv) alertDiv.remove();
+                        showTab('strategy');
+                    }, 5000);
+                } else {
+                    showAlert('error', '❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                showAlert('error', '❌ Error parsing text: ' + error.message);
+            }
+        }
+        
+        async function uploadFile() {
+            // Check if optimization is running
+            if (isOptimizationRunning) {
+                showAlert('error', '🔒 Cannot upload while optimization is running');
+                return;
+            }
+            
+            const fileInput = document.getElementById('portfolioFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('error', '❌ Please select a file');
+                return;
+            }
+            
+            // Validate file extension
+            const validExtensions = ['csv', 'json', 'yaml', 'yml'];
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            if (!validExtensions.includes(fileExt)) {
+                showAlert('error', '❌ Invalid file type. Use CSV, JSON, or YAML');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            document.getElementById('uploadProgress').style.display = 'block';
+            
+            try {
+                const response = await fetch('/upload_file', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                document.getElementById('uploadProgress').style.display = 'none';
+                
+                if (data.success) {
+                    currentPortfolio = data.portfolio;
+                    displayPortfolio(data.portfolio, data.warnings);
+                    
+                    // Show recommendation if available
+                    if (data.recommendation) {
+                        displayRecommendation(data.recommendation);
+                    }
+                    
+                    // Show countdown alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success';
+                    alertDiv.id = 'countdown-alert';
+                    
+                    let message = `✅ Portfolio loaded from ${file.name}!<br><strong>Going to strategy selection in <span id="countdown">5</span> seconds...</strong> <button onclick="cancelCountdown()" style="margin-left:10px;padding:4px 10px;cursor:pointer;">Cancel</button>`;
+                    if (data.warnings && data.warnings.length > 0) {
+                        message += '<br><small>⚠️ Warnings: ' + data.warnings.join(', ') + '</small>';
+                    }
+                    alertDiv.innerHTML = message;
+                    
+                    // Enable strategy selection
+                    showStrategySelection();
+                    
+                    const main = document.querySelector('.main');
+                    main.insertBefore(alertDiv, main.firstChild);
+                    
+                    // Countdown
+                    let seconds = 5;
+                    countdownInterval = setInterval(() => {
+                        seconds--;
+                        const countdownSpan = document.getElementById('countdown');
+                        if (countdownSpan) {
+                            countdownSpan.textContent = seconds;
+                        }
+                        if (seconds <= 0) {
+                            clearInterval(countdownInterval);
+                            countdownInterval = null;
+                        }
+                    }, 1000);
+                    
+                    // Auto-switch to strategy tab
+                    setTimeout(() => {
+                        if (countdownInterval === null) return; // Was cancelled
+                        if (alertDiv) alertDiv.remove();
+                        showTab('strategy');
+                    }, 5000);
+                } else {
+                    showAlert('error', '❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                document.getElementById('uploadProgress').style.display = 'none';
+                showAlert('error', '❌ Error uploading file: ' + error.message);
+            }
+        }
+        
+        function displayPortfolio(portfolio, warnings = null) {
+            const display = document.getElementById('portfolioDisplay');
+            let html = '';
+            
+            // Portfolio Summary Section
+            html += '<div style="background:#f8fafc; padding:20px; border-radius:8px; border-left:4px solid #3b82f6; margin-bottom:25px;">';
+            html += '<h3 style="margin-top:0; color:#1e293b;">📊 Portfolio Overview</h3>';
+            html += `<p style="color:#475569; line-height:1.6; margin:10px 0;">`;
+            html += `Portfolio contains <strong>${portfolio.num_positions} positions</strong> with a total value of <strong>$${portfolio.total_value.toLocaleString()}</strong>. `;
+            html += `The portfolio has a beta of <strong>${portfolio.beta.toFixed(2)}</strong> and an average ESG score of <strong>${portfolio.esg_score.toFixed(1)}</strong>.`;
+            if (portfolio.cash && portfolio.cash > 0) {
+                html += ` Cash balance: <strong>$${portfolio.cash.toLocaleString()}</strong>.`;
+            }
+            html += '</p>';
+            html += '</div>';
+            
+            // Warnings Section (if any)
+            if (warnings && warnings.length > 0) {
+                html += '<div class="alert alert-error" style="margin-bottom:20px;">';
+                html += '<strong>⚠️ Validation Warnings:</strong><ul style="margin:10px 0 0 20px;">';
+                warnings.forEach(w => {
+                    html += `<li>${w}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            // Metrics Cards
+            html += '<div class="metrics">';
+            html += `<div class="metric-card"><div class="label">Total Value</div><div class="value">$${portfolio.total_value.toLocaleString()}</div></div>`;
+            html += `<div class="metric-card"><div class="label">Portfolio Beta</div><div class="value">${portfolio.beta.toFixed(2)}</div></div>`;
+            html += `<div class="metric-card"><div class="label">ESG Score</div><div class="value">${portfolio.esg_score.toFixed(1)}</div></div>`;
+            html += `<div class="metric-card"><div class="label">Positions</div><div class="value">${portfolio.num_positions}</div></div>`;
+            html += '</div>';
+            
+            // Policy Limits Section
+            if (portfolio.policy_limits) {
+                html += '<div style="margin-top:25px; background:#fefce8; padding:15px 20px; border-radius:8px; border-left:4px solid #eab308;">';
+                html += '<h3 style="margin-top:0; color:#713f12;">📋 Investment Policy Limits</h3>';
+                html += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">';
+                
+                const limits = portfolio.policy_limits;
+                if (limits.max_position_size) {
+                    html += `<div><strong>Max Position Size:</strong> ${(limits.max_position_size * 100).toFixed(0)}%</div>`;
+                }
+                if (limits.tech_limit) {
+                    html += `<div><strong>Tech Sector Limit:</strong> ${(limits.tech_limit * 100).toFixed(0)}%</div>`;
+                }
+                if (limits.esg_minimum !== undefined) {
+                    html += `<div><strong>ESG Minimum:</strong> ${limits.esg_minimum}</div>`;
+                }
+                if (limits.max_beta) {
+                    html += `<div><strong>Max Portfolio Beta:</strong> ${limits.max_beta}</div>`;
+                }
+                
+                html += '</div></div>';
+            }
+            
+            // Sector Allocation Section with Pie Chart
+            if (portfolio.sector_allocation && Object.keys(portfolio.sector_allocation).length > 0) {
+                html += '<div style="margin-top:25px;">';
+                html += '<h3>🏢 Sector Allocation</h3>';
+                
+                // Chart and bars container
+                html += '<div style="display:grid; grid-template-columns:300px 1fr; gap:30px; margin-top:15px; align-items:start;">';
+                
+                // Pie Chart Container
+                html += '<div style="background:#f8fafc; padding:20px; border-radius:12px; text-align:center;">';
+                html += '<canvas id="sectorPieChart" width="260" height="260"></canvas>';
+                html += '</div>';
+                
+                // Bar representations
+                html += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">';
+                
+                const sectors = Object.entries(portfolio.sector_allocation).sort((a, b) => b[1] - a[1]);
+                sectors.forEach(([sector, percentage]) => {
+                    const pct = percentage.toFixed(1);  // Already a percentage from Python
+                    const barColor = percentage > 40 ? '#ef4444' : (percentage > 25 ? '#f59e0b' : '#22c55e');
+                    html += `<div style="background:#f8fafc; padding:12px; border-radius:6px;">
+                        <div style="font-weight:600; margin-bottom:6px;">${sector}</div>
+                        <div style="background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                            <div style="background:${barColor}; height:100%; width:${Math.min(pct, 100)}%;"></div>
+                        </div>
+                        <div style="margin-top:4px; color:#64748b; font-size:0.9rem;">${pct}%</div>
+                    </div>`;
+                });
+                
+                html += '</div></div></div>';
+                
+                // Store sector data for chart rendering
+                window.sectorChartData = portfolio.sector_allocation;
+            }
+            
+            // Positions Table
+            html += '<h3 style="margin-top:30px;">📈 Positions</h3>';
+            html += '<table class="positions-table"><thead><tr><th>Ticker</th><th>Shares</th><th>Price</th><th>Market Value</th><th>Sector</th><th>ESG</th></tr></thead><tbody>';
+            
+            portfolio.positions.forEach(pos => {
+                html += `<tr>
+                    <td><strong>${pos.ticker}</strong></td>
+                    <td>${pos.shares.toLocaleString()}</td>
+                    <td>$${pos.current_price.toFixed(2)}</td>
+                    <td>$${pos.market_value.toLocaleString()}</td>
+                    <td>${pos.sector}</td>
+                    <td>${pos.esg_score}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            display.innerHTML = html;
+            
+            // Render the sector pie chart after DOM is updated
+            setTimeout(() => {
+                if (window.sectorChartData) {
+                    renderSectorPieChart(window.sectorChartData);
+                }
+            }, 100);
+        }
+        
+        // Sector Pie Chart colors
+        const sectorColors = {
+            'Technology': '#3b82f6',
+            'Healthcare': '#22c55e',
+            'Finance': '#f59e0b',
+            'Financial': '#f59e0b',
+            'Consumer': '#8b5cf6',
+            'Consumer Discretionary': '#8b5cf6',
+            'Energy': '#ef4444',
+            'Industrial': '#6366f1',
+            'Industrials': '#6366f1',
+            'Materials': '#14b8a6',
+            'Utilities': '#f97316',
+            'Real Estate': '#ec4899',
+            'Communication': '#06b6d4',
+            'Automotive': '#84cc16',
+            'Retail': '#a855f7',
+            'Other': '#94a3b8'
+        };
+        
+        function renderSectorPieChart(sectorData) {
+            const canvas = document.getElementById('sectorPieChart');
+            if (!canvas) return;
+            
+            // Destroy existing chart if any
+            if (window.sectorChart) {
+                window.sectorChart.destroy();
+            }
+            
+            const sectors = Object.entries(sectorData).sort((a, b) => b[1] - a[1]);
+            const labels = sectors.map(([sector, _]) => sector);
+            const data = sectors.map(([_, pct]) => pct.toFixed(1));  // Already a percentage from Python
+            const colors = labels.map(sector => sectorColors[sector] || sectorColors['Other']);
+            
+            window.sectorChart = new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function displayRecommendation(rec) {
+            // Remove any existing recommendation banner
+            const existing = document.getElementById('recommendation-banner');
+            if (existing) existing.remove();
+            
+            // Create recommendation banner
+            const banner = document.createElement('div');
+            banner.id = 'recommendation-banner';
+            banner.style.cssText = 'background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; padding:20px; border-radius:10px; margin:20px 0; box-shadow:0 4px 6px rgba(0,0,0,0.1);';
+            
+            let reasoningHtml = '';
+            if (rec.reasoning && rec.reasoning.length > 0) {
+                reasoningHtml = '<ul style="margin:10px 0 10px 20px; font-size:0.9rem; opacity:0.95;">';
+                rec.reasoning.forEach(reason => {
+                    reasoningHtml += `<li>${reason}</li>`;
+                });
+                reasoningHtml += '</ul>';
+            }
+            
+            banner.innerHTML = `
+                <div style="display:flex; align-items:start; justify-content:space-between; gap:20px;">
+                    <div style="flex:1;">
+                        <h3 style="margin:0 0 10px 0; font-size:1.3rem;">💡 AI Recommendation: ${rec.strategy}</h3>
+                        <p style="margin:0 0 10px 0; opacity:0.95;">${rec.explanation}</p>
+                        ${reasoningHtml}
+                        <div style="display:flex; gap:20px; margin-top:15px; font-size:1.1rem;">
+                            <div><strong>Consensus Threshold:</strong> ${(rec.recommended_threshold * 100).toFixed(0)}%</div>
+                            <div><strong>Max Iterations:</strong> ${rec.recommended_iterations}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <button onclick="applyRecommendation(${rec.recommended_threshold}, ${rec.recommended_iterations})" 
+                                style="background:white; color:#667eea; border:none; padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; font-size:1rem; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                            ✨ Apply Settings
+                        </button>
+                        <div style="margin-top:10px; font-size:0.85rem; opacity:0.9;">Click to auto-configure</div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert before portfolio display
+            const portfolioDisplay = document.getElementById('portfolioDisplay');
+            if (portfolioDisplay && portfolioDisplay.parentNode) {
+                portfolioDisplay.parentNode.insertBefore(banner, portfolioDisplay);
+            }
+        }
+        
+        function applyRecommendation(threshold, iterations) {
+            // Apply threshold
+            document.getElementById('consensusThreshold').value = threshold;
+            updateRangeValue('consensusThreshold', threshold);
+            
+            // Apply iterations
+            document.getElementById('maxIterations').value = iterations;
+            updateRangeValue('maxIterations', iterations);
+            
+            // Show confirmation
+            showAlert('success', `✅ Applied recommended settings: ${(threshold*100).toFixed(0)}% consensus threshold, ${iterations} max iterations`);
+            
+            // Flash the recommendation banner
+            const banner = document.getElementById('recommendation-banner');
+            if (banner) {
+                banner.style.animation = 'pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                    banner.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        async function runOptimization() {
+            if (!currentPortfolio) {
+                showAlert('error', '❌ Please load a portfolio first');
+                return;
+            }
+            
+            // Check if optimization is already running
+            if (isOptimizationRunning) {
+                console.log('⚠️ Stopping previous optimization...');
+                showAlert('warning', '⚠️ Stopping previous optimization and starting new one...');
+                
+                // Stop the current optimization
+                currentOptimizationAborted = true;
+                stopProgressPolling();
+                
+                // Wait a bit for cleanup
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Mark optimization as running
+            isOptimizationRunning = true;
+            currentOptimizationAborted = false;
+            
+            // Lock input methods during optimization
+            lockInputMethods();
+            
+            // Update UI to show running state
+            const statusDiv = document.getElementById('optimizationStatus');
+            const runBtn = document.getElementById('runOptimizationBtn');
+            if (statusDiv) statusDiv.style.display = 'block';
+            if (runBtn) runBtn.innerHTML = '⌛ Running Optimization...';
+            
+            const question = document.getElementById('optimizeQuestion').value;
+            const config = {
+                question,
+                max_iterations: parseInt(document.getElementById('maxIterations').value),
+                min_iterations: parseInt(document.getElementById('minIterations').value),
+                consensus_threshold: parseFloat(document.getElementById('consensusThreshold').value),
+                use_market: document.getElementById('useMarket').checked,
+                use_risk: document.getElementById('useRisk').checked,
+                use_tax: document.getElementById('useTax').checked,
+                use_esg: document.getElementById('useEsg').checked,
+                use_trading: document.getElementById('useTrading').checked,
+                strategy_type: selectedStrategy
+            };
+            
+            document.getElementById('optimizeLoading').style.display = 'block';
+            
+            // Start progress polling
+            startProgressPolling();
+            
+            try {
+                const response = await fetch('/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                const data = await response.json();
+                
+                // Check if this optimization was aborted
+                if (currentOptimizationAborted) {
+                    console.log('⚠️ Optimization was aborted, ignoring results');
+                    // Still need to unlock and reset UI
+                    isOptimizationRunning = false;
+                    unlockInputMethods();
+                    stopProgressPolling();
+                    document.getElementById('optimizeLoading').style.display = 'none';
+                    const statusDiv = document.getElementById('optimizationStatus');
+                    const runBtn = document.getElementById('runOptimizationBtn');
+                    if (statusDiv) statusDiv.style.display = 'none';
+                    if (runBtn) runBtn.innerHTML = '🚀 Run Optimization';
+                    return;
+                }
+                
+                // Stop progress polling
+                stopProgressPolling();
+                document.getElementById('optimizeLoading').style.display = 'none';
+                
+                // Mark optimization as complete
+                isOptimizationRunning = false;
+                
+                // Unlock input methods
+                unlockInputMethods();
+                
+                // Update UI to show stopped state
+                const statusDiv = document.getElementById('optimizationStatus');
+                const runBtn = document.getElementById('runOptimizationBtn');
+                if (statusDiv) statusDiv.style.display = 'none';
+                if (runBtn) runBtn.innerHTML = '🚀 Run Optimization';
+                
+                if (data.error) {
+                    showAlert('error', '❌ Optimization failed: ' + data.error);
+                } else {
+                    displayResults(data);
+                    showTab('results', true); // Skip clearing since we just populated results
+                }
+            } catch (error) {
+                // Only show error if not aborted
+                if (!currentOptimizationAborted) {
+                    stopProgressPolling();
+                    document.getElementById('optimizeLoading').style.display = 'none';
+                    showAlert('error', '❌ Error: ' + error.message);
+                }
+                
+                // Mark optimization as complete
+                isOptimizationRunning = false;
+                
+                // Unlock input methods
+                unlockInputMethods();
+                
+                // Update UI to show stopped state
+                const statusDiv = document.getElementById('optimizationStatus');
+                const runBtn = document.getElementById('runOptimizationBtn');
+                if (statusDiv) statusDiv.style.display = 'none';
+                if (runBtn) runBtn.innerHTML = '🚀 Run Optimization';
+            }
+        }
+        
+        let progressPollInterval = null;
+        
+        function startProgressPolling() {
+            // Reset display
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('progressSteps').innerHTML = `
+                <div style="color:#475569; font-weight:600; margin-bottom:10px;">⏳ Initializing optimization...</div>
+                <div id="currentPhase" style="color:#64748b; font-size:0.95rem;"></div>
+            `;
+            
+            // Poll every 500ms
+            progressPollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/optimization_progress');
+                    const data = await response.json();
+                    
+                    if (data.success && data.progress) {
+                        const p = data.progress;
+                        
+                        // Update progress bar
+                        const progressPercent = p.progress_percent || 0;
+                        document.getElementById('progressBar').style.width = progressPercent + '%';
+                        document.getElementById('progressPercent').textContent = Math.round(progressPercent) + '%';
+                        
+                        // Update phase info
+                        const stepsDiv = document.getElementById('progressSteps');
+                        if (stepsDiv) {
+                            stepsDiv.innerHTML = `
+                                <div style="color:#475569; font-weight:600; margin-bottom:10px;">
+                                    🤖 Iteration ${p.iteration}/${p.max_iterations} - ${p.phase}
+                                </div>
+                                <div id="currentPhase" style="color:#64748b; font-size:0.95rem;">
+                                    ${p.details}
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Progress polling error:', error);
+                }
+            }, 500);
+        }
+        
+        function stopProgressPolling() {
+            if (progressPollInterval) {
+                clearInterval(progressPollInterval);
+                progressPollInterval = null;
+                console.log('✅ Progress polling stopped');
+            }
+            // Complete the progress bar only if optimization completed successfully
+            if (isOptimizationRunning && !currentOptimizationAborted) {
+                const progressBar = document.getElementById('progressBar');
+                const progressPercent = document.getElementById('progressPercent');
+                if (progressBar) progressBar.style.width = '100%';
+                if (progressPercent) progressPercent.textContent = '100%';
+            }
+        }
+        
+        function startProgressAnimation() {
+            // Legacy function - now replaced by startProgressPolling
+            startProgressPolling();
+        }
+        
+        function stopProgressAnimation() {
+            // Legacy function - now replaced by stopProgressPolling
+            stopProgressPolling();
+        }
+        
+        function displayResults(data) {
+            // Ensure polling is completely stopped when displaying results
+            stopProgressPolling();
+            isOptimizationRunning = false;
+            currentOptimizationAborted = false;
+            
+            // Always unlock input methods when results are displayed
+            unlockInputMethods();
+            
+            // Update UI to show stopped state
+            const statusDiv = document.getElementById('optimizationStatus');
+            const runBtn = document.getElementById('runOptimizationBtn');
+            if (statusDiv) statusDiv.style.display = 'none';
+            if (runBtn) runBtn.innerHTML = '🚀 Run Optimization';
+            
+            const display = document.getElementById('resultsDisplay');
+            
+            let html = '<div class="metrics">';
+            html += `<div class="metric-card"><div class="label">Consensus Reached</div><div class="value">${data.success ? '✅ Yes' : '❌ No'}</div></div>`;
+            html += `<div class="metric-card"><div class="label">Time Taken</div><div class="value">${data.elapsed_time ? data.elapsed_time.toFixed(1) + 's' : 'N/A'}</div></div>`;
+            
+            // Show iterations with context
+            const iterText = data.max_iterations ? `${data.iterations || 0}/${data.max_iterations}` : (data.iterations || 0);
+            html += `<div class="metric-card"><div class="label">Iterations</div><div class="value">${iterText}</div></div>`;
+            html += `<div class="metric-card"><div class="label">Consensus Score</div><div class="value">${((data.consensus_score || 0) * 100).toFixed(0)}%</div></div>`;
+            html += '</div>';
+            
+            // Show optimization insights
+            if (!data.success) {
+                const quotaErrors = data.votes ? data.votes.filter(v => v.rationale.toLowerCase().includes('quota') || v.rationale.toLowerCase().includes('api')).length : 0;
+                if (quotaErrors > 0) {
+                    html += '<div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:15px; border-radius:8px; margin:20px 0;">';
+                    html += '<h3 style="margin:0 0 10px 0; color:#92400e;">⚠️ API Quota Issue Detected</h3>';
+                    html += `<p style="margin:0 0 10px 0; color:#78350f;">${quotaErrors} out of ${data.votes.length} agents hit API quota limits. This prevents proper optimization.</p>`;
+                    html += '<p style="margin:0; color:#78350f;"><strong>Solutions:</strong></p>';
+                    html += '<ul style="margin:5px 0 0 20px; color:#78350f;">';
+                    html += '<li>Wait for daily quota reset (free tier: 20 requests/day)</li>';
+                    html += '<li>Reduce agents: Uncheck 2-3 agents in the sidebar</li>';
+                    html += '<li>Lower iterations: Set to 3-5 instead of 10</li>';
+                    html += '<li>Upgrade Gemini API plan for unlimited usage</li>';
+                    html += '</ul>';
+                    html += '</div>';
+                } else if (data.iterations >= data.max_iterations) {
+                    html += '<div style="background:#fef3c7; border-left:4px solid #f59e0b; padding:15px; border-radius:8px; margin:20px 0;">';
+                    html += '<h3 style="margin:0 0 10px 0; color:#92400e;">ℹ️ Max Iterations Reached</h3>';
+                    html += '<p style="margin:0; color:#78350f;">Agents could not reach consensus after ' + data.max_iterations + ' iterations. Try:</p>';
+                    html += '<ul style="margin:5px 0 0 20px; color:#78350f;">';
+                    html += '<li>Lower consensus threshold (currently needs higher approval rate)</li>';
+                    html += '<li>Increase max iterations to allow more debate rounds</li>';
+                    html += '<li>Simplify portfolio to reduce complexity</li>';
+                    html += '</ul>';
+                    html += '</div>';
+                }
+            } else if (data.iterations <= 3) {
+                html += '<div style="background:#d1fae5; border-left:4px solid #10b981; padding:15px; border-radius:8px; margin:20px 0;">';
+                html += '<h3 style="margin:0 0 10px 0; color:#065f46;">✨ Quick Consensus! ' + renderStars(5) + '</h3>';
+                html += `<p style="margin:0; color:#047857;">Agents reached consensus in just ${data.iterations} iteration(s). This indicates strong agreement on the optimal strategy.</p>`;
+                html += '<details style="margin-top:12px; cursor:pointer;">';
+                html += '<summary style="color:#065f46; font-size:0.9rem; font-weight:600;">ℹ️ Why so fast? (click to expand)</summary>';
+                html += '<div style="margin-top:8px; padding:10px; background:#ecfdf5; border-radius:6px; font-size:0.85rem; color:#047857;">';
+                html += '<p style="margin:0 0 8px 0;"><strong>This is normal!</strong> When a portfolio is well-structured and the strategy fits, agents agree quickly.</p>';
+                html += '<p style="margin:0 0 8px 0;"><strong>Want to see more debate?</strong> Try these:</p>';
+                html += '<ul style="margin:0; padding-left:20px;">';
+                html += '<li>Select a <strong>low-rated strategy</strong> (e.g., Aggressive Growth for a conservative portfolio)</li>';
+                html += '<li>Increase <strong>Consensus Threshold</strong> to 90%+ (requires more agents to agree)</li>';
+                html += '<li>Add <strong>conflicting positions</strong> (high-beta + low-beta stocks)</li>';
+                html += '<li>Enable <strong>all 5 agents</strong> - more perspectives = more debate</li>';
+                html += '</ul>';
+                html += '</div></details>';
+                html += '</div>';
+            }
+            
+            if (data.votes && data.votes.length > 0) {
+                html += '<h3 style="margin-top:30px;">🗳️ Agent Votes</h3>';
+                console.log('Displaying votes:', data.votes); // Debug log
+                
+                let approveCount = 0;
+                let rejectCount = 0;
+                let abstainCount = 0;
+                
+                data.votes.forEach(vote => {
+                    console.log('Vote data:', vote.agent, vote.vote, vote.rationale); // Debug log
+                    const voteValue = (vote.vote || '').toLowerCase();
+                    const isApprove = voteValue === 'approve';
+                    const isReject = voteValue === 'reject';
+                    const isAbstain = voteValue === 'abstain';
+                    
+                    if (isApprove) approveCount++;
+                    else if (isReject) rejectCount++;
+                    else if (isAbstain) abstainCount++;
+                    
+                    let icon = '❓';
+                    let cssClass = 'vote-card';
+                    if (isApprove) {
+                        icon = '✅';
+                        cssClass = 'vote-card vote-approve';
+                    } else if (isReject) {
+                        icon = '❌';
+                        cssClass = 'vote-card vote-reject';
+                    } else if (isAbstain) {
+                        icon = '⚪';
+                        cssClass = 'vote-card';
+                    }
+                    
+                    html += `<div class="${cssClass}">
+                        <strong>${icon} ${vote.agent}</strong>
+                        <small style="opacity:0.7;font-size:0.85rem;display:block;margin:5px 0;">[Vote: ${vote.vote}]</small>
+                        <p>${vote.rationale || 'No rationale provided'}</p>
+                    </div>`;
+                });
+                
+                // Add vote summary
+                html += `<div style="margin-top:15px;padding:12px;background:#f8fafc;border-radius:6px;font-size:0.9rem;color:#475569;">`;
+                html += `<strong>Vote Summary:</strong> `;
+                html += `✅ ${approveCount} Approve, `;
+                html += `❌ ${rejectCount} Reject, `;
+                html += `⚪ ${abstainCount} Abstain`;
+                html += `</div>`;
+            } else {
+                html += '<p style="margin-top:20px;color:#64748b;">⚠️ No agent votes recorded. This may indicate an initialization or consensus issue.</p>';
+            }
+            
+            if (data.trades && data.trades.length > 0) {
+                html += '<h3 style="margin-top:30px;">📋 Approved Trades</h3>';
+                data.trades.forEach((trade, index) => {
+                    // Calculate trade quality rating
+                    const tradeRating = getTradeRating(trade);
+                    const tradeStars = renderStars(tradeRating.score);
+                    
+                    html += `<div class="trade-row" style="position:relative;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${trade.action.toUpperCase()}</strong> ${trade.ticker} - ${trade.shares.toLocaleString()} shares @ $${trade.price.toFixed(2)}
+                            </div>
+                            <div style="font-size:1rem;" title="${tradeRating.label}">
+                                ${tradeStars}
+                                <span style="font-size:0.75rem; color:#64748b; margin-left:4px;">${tradeRating.label}</span>
+                            </div>
+                        </div>
+                        <small>${trade.rationale}</small>
+                    </div>`;
+                });
+                
+                // Add trade rating legend
+                html += '<div style="margin-top:15px; padding:12px; background:#f8fafc; border-radius:6px; font-size:0.85rem; color:#64748b;">';
+                html += '<strong>Trade Rating Legend:</strong> ';
+                html += '⭐⭐⭐⭐⭐ Strong Buy/Sell | ';
+                html += '⭐⭐⭐⭐☆ Recommended | ';
+                html += '⭐⭐⭐☆☆ Moderate | ';
+                html += '⭐⭐☆☆☆ Cautious';
+                html += '</div>';
+                
+                if (data.trade_plan_summary) {
+                    html += '<div class="metrics" style="margin-top:20px;">';
+                    html += `<div class="metric-card"><div class="label">Tax Liability</div><div class="value">$${(data.trade_plan_summary.tax_liability || 0).toLocaleString()}</div></div>`;
+                    html += `<div class="metric-card"><div class="label">Execution Cost</div><div class="value">$${(data.trade_plan_summary.execution_cost || 0).toLocaleString()}</div></div>`;
+                    html += `<div class="metric-card"><div class="label">Net Cost</div><div class="value">$${(data.trade_plan_summary.net_cost || 0).toLocaleString()}</div></div>`;
+                    html += `<div class="metric-card"><div class="label">Timeline</div><div class="value">${data.trade_plan_summary.timeline_days || 0} days</div></div>`;
+                    html += '</div>';
+                }
+                
+                // Display AI cost tracking
+                if (data.ai_cost_tracking) {
+                    html += '<div style="margin-top:30px;padding:20px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">';
+                    html += '<h4 style="margin:0 0 15px 0;color:#334155;font-size:14px;font-weight:600;">🤖 AI Usage Cost</h4>';
+                    html += '<div class="metrics">';
+                    html += `<div class="metric-card"><div class="label">API Requests</div><div class="value">${data.ai_cost_tracking.total_requests}</div></div>`;
+                    html += `<div class="metric-card"><div class="label">Total Tokens</div><div class="value">${data.ai_cost_tracking.total_tokens.toLocaleString()}</div></div>`;
+                    html += `<div class="metric-card"><div class="label">Cost</div><div class="value">$${data.ai_cost_tracking.cost_usd.toFixed(6)}</div></div>`;
+                    html += '</div>';
+                    html += '<p style="margin:10px 0 0 0;font-size:12px;color:#64748b;">💡 Powered by Google Gemini AI</p>';
+                    html += '</div>';
+                }
+            } else {
+                html += '<p style="margin-top:20px;color:#64748b;">⚠️ No trades proposed. The agents could not reach consensus on a rebalancing plan.</p>';
+                html += '<p style="color:#64748b;">💡 Try lowering the consensus threshold or adjusting the portfolio constraints.</p>';
+            }
+            
+            // ========== AGENT DEBATE TIMELINE ==========
+            if (data.iteration_history && data.iteration_history.length > 0) {
+                html += '<h3 style="margin-top:40px;">📊 Agent Debate Timeline</h3>';
+                html += '<div style="position:relative; padding:20px 0; margin-left:20px;">';
+                
+                // Timeline line
+                html += '<div style="position:absolute; left:10px; top:0; bottom:0; width:3px; background:linear-gradient(to bottom, #3b82f6, #8b5cf6);"></div>';
+                
+                data.iteration_history.forEach((iter, index) => {
+                    const isLast = index === data.iteration_history.length - 1;
+                    const approveCount = iter.votes.filter(v => v.vote === 'approve').length;
+                    const totalVotes = iter.votes.length;
+                    const approvalPct = (iter.approval_rate * 100).toFixed(0);
+                    
+                    // Determine color based on consensus
+                    const dotColor = iter.consensus_reached ? '#22c55e' : (approvalPct >= 50 ? '#f59e0b' : '#ef4444');
+                    const bgColor = iter.consensus_reached ? '#f0fdf4' : (approvalPct >= 50 ? '#fffbeb' : '#fef2f2');
+                    
+                    html += `<div style="position:relative; padding-left:40px; margin-bottom:20px;">`;
+                    
+                    // Timeline dot
+                    html += `<div style="position:absolute; left:3px; top:5px; width:18px; height:18px; border-radius:50%; background:${dotColor}; border:3px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.2);"></div>`;
+                    
+                    // Iteration card
+                    html += `<div style="background:${bgColor}; padding:15px 20px; border-radius:10px; border-left:4px solid ${dotColor};">`;
+                    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
+                    html += `<strong style="color:#1e293b;">Iteration ${iter.iteration}</strong>`;
+                    html += `<span style="background:${dotColor}; color:white; padding:3px 10px; border-radius:12px; font-size:0.8rem;">${approvalPct}% approval</span>`;
+                    html += `</div>`;
+                    
+                    // Vote summary
+                    html += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">`;
+                    iter.votes.forEach(v => {
+                        const voteIcon = v.vote === 'approve' ? '✅' : (v.vote === 'reject' ? '❌' : '⚪');
+                        const voteColor = v.vote === 'approve' ? '#22c55e' : (v.vote === 'reject' ? '#ef4444' : '#94a3b8');
+                        html += `<span style="font-size:0.85rem; color:${voteColor};">${voteIcon} ${v.agent}</span>`;
+                    });
+                    html += `</div>`;
+                    
+                    // Key concerns (if any)
+                    if (iter.key_concerns && iter.key_concerns.length > 0) {
+                        html += `<div style="font-size:0.85rem; color:#64748b; margin-top:8px;">`;
+                        html += `<strong>Key Issues:</strong> ${iter.key_concerns.join(' | ')}`;
+                        html += `</div>`;
+                    }
+                    
+                    // Consensus indicator
+                    if (iter.consensus_reached) {
+                        html += `<div style="margin-top:8px; color:#15803d; font-weight:600;">✨ Consensus Reached!</div>`;
+                    }
+                    
+                    html += `</div></div>`;
+                });
+                
+                html += '</div>';
+            }
+            
+            // ========== BEFORE/AFTER COMPARISON ==========
+            if (data.portfolio_before && data.trades && data.trades.length > 0) {
+                html += '<h3 style="margin-top:40px;">🔄 Before/After Comparison</h3>';
+                html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">';
+                
+                // BEFORE column
+                html += '<div style="background:#fef2f2; padding:20px; border-radius:10px; border:2px solid #fecaca;">';
+                html += '<h4 style="margin:0 0 15px 0; color:#991b1b;">📊 Before (Current)</h4>';
+                
+                if (data.portfolio_before.positions) {
+                    const beforePositions = data.portfolio_before.positions.slice(0, 6);
+                    beforePositions.forEach(pos => {
+                        const value = pos.market_value || (pos.shares * pos.current_price);
+                        html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #fecaca;">`;
+                        html += `<span style="font-weight:500;">${pos.ticker}</span>`;
+                        html += `<span style="color:#64748b;">${pos.shares?.toLocaleString() || 0} shares · $${value?.toLocaleString() || 0}</span>`;
+                        html += `</div>`;
+                    });
+                    if (data.portfolio_before.positions.length > 6) {
+                        html += `<div style="color:#94a3b8; font-size:0.9rem; margin-top:8px;">... and ${data.portfolio_before.positions.length - 6} more positions</div>`;
+                    }
+                }
+                html += `<div style="margin-top:15px; padding-top:15px; border-top:2px solid #fecaca;">`;
+                html += `<strong>Total Value:</strong> $${(data.portfolio_before.total_value || 0).toLocaleString()}`;
+                html += `</div>`;
+                html += '</div>';
+                
+                // AFTER column
+                html += '<div style="background:#f0fdf4; padding:20px; border-radius:10px; border:2px solid #bbf7d0;">';
+                html += '<h4 style="margin:0 0 15px 0; color:#166534;">📈 After (Proposed Changes)</h4>';
+                
+                data.trades.forEach(trade => {
+                    const icon = trade.action.toLowerCase() === 'buy' ? '🟢' : '🔴';
+                    html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #bbf7d0;">`;
+                    html += `<span>${icon} <strong>${trade.action.toUpperCase()}</strong> ${trade.ticker}</span>`;
+                    html += `<span style="color:#64748b;">${trade.shares?.toLocaleString() || 0} shares · $${trade.value?.toLocaleString() || 0}</span>`;
+                    html += `</div>`;
+                });
+                
+                // Calculate net change
+                let buyTotal = 0, sellTotal = 0;
+                data.trades.forEach(t => {
+                    if (t.action.toLowerCase() === 'buy') buyTotal += (t.value || 0);
+                    else sellTotal += (t.value || 0);
+                });
+                const netChange = sellTotal - buyTotal;
+                
+                html += `<div style="margin-top:15px; padding-top:15px; border-top:2px solid #bbf7d0;">`;
+                html += `<div style="display:flex; justify-content:space-between;"><span>Sells:</span><span style="color:#22c55e;">+$${sellTotal.toLocaleString()}</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between;"><span>Buys:</span><span style="color:#ef4444;">-$${buyTotal.toLocaleString()}</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; font-weight:600; margin-top:8px;"><span>Net Cash Change:</span><span style="${netChange >= 0 ? 'color:#22c55e' : 'color:#ef4444'}">$${netChange.toLocaleString()}</span></div>`;
+                html += `</div>`;
+                html += '</div>';
+                
+                html += '</div>';  // End grid
+            }
+            
+            // ========== EXPORT PDF BUTTON ==========
+            html += '<div style="margin-top:40px; padding:20px; background:#f8fafc; border-radius:10px; text-align:center;">';
+            html += '<h4 style="margin:0 0 15px 0; color:#334155;">📄 Export Results</h4>';
+            html += '<button onclick="exportToPDF()" style="background:linear-gradient(135deg, #3b82f6, #8b5cf6); color:white; padding:12px 30px; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; margin-right:10px; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'">📥 Download PDF Report</button>';
+            html += '<button onclick="copyResultsToClipboard()" style="background:#475569; color:white; padding:12px 30px; border:none; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'">📋 Copy to Clipboard</button>';
+            html += '</div>';
+            
+            // Store results for export
+            window.lastOptimizationResults = data;
+            
+            display.innerHTML = html;
+        }
+        
+        // ========== PDF EXPORT FUNCTION ==========
+        function exportToPDF() {
+            const data = window.lastOptimizationResults;
+            if (!data) {
+                showAlert('error', '❌ No results to export');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Title
+                doc.setFontSize(20);
+                doc.setTextColor(30, 64, 175);
+                doc.text('Portfolio Optimization Report', 20, 20);
+                
+                // Date
+                doc.setFontSize(10);
+                doc.setTextColor(100, 116, 139);
+                doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 28);
+                
+                // Summary section
+                doc.setFontSize(14);
+                doc.setTextColor(30, 41, 59);
+                doc.text('Summary', 20, 42);
+                
+                doc.setFontSize(11);
+                doc.setTextColor(71, 85, 105);
+                let y = 52;
+                doc.text(`Consensus Reached: ${data.success ? 'Yes' : 'No'}`, 25, y); y += 8;
+                doc.text(`Iterations: ${data.iterations}/${data.max_iterations}`, 25, y); y += 8;
+                doc.text(`Approval Rate: ${(data.consensus_score * 100).toFixed(0)}%`, 25, y); y += 8;
+                doc.text(`Time Taken: ${data.elapsed_time?.toFixed(1) || 0}s`, 25, y); y += 15;
+                
+                // Agent Votes
+                if (data.votes && data.votes.length > 0) {
+                    doc.setFontSize(14);
+                    doc.setTextColor(30, 41, 59);
+                    doc.text('Agent Votes', 20, y); y += 10;
+                    
+                    doc.setFontSize(10);
+                    data.votes.forEach(vote => {
+                        const icon = vote.vote === 'approve' ? '[APPROVE]' : (vote.vote === 'reject' ? '[REJECT]' : '[ABSTAIN]');
+                        doc.setTextColor(vote.vote === 'approve' ? '#22c55e' : (vote.vote === 'reject' ? '#ef4444' : '#64748b'));
+                        doc.text(`${icon} ${vote.agent}`, 25, y); y += 6;
+                        
+                        // Truncate rationale
+                        doc.setTextColor(100, 116, 139);
+                        const rationale = vote.rationale?.substring(0, 80) || '';
+                        doc.text(`  ${rationale}${vote.rationale?.length > 80 ? '...' : ''}`, 25, y); y += 8;
+                        
+                        if (y > 270) { doc.addPage(); y = 20; }
+                    });
+                    y += 5;
+                }
+                
+                // Trades
+                if (data.trades && data.trades.length > 0) {
+                    if (y > 230) { doc.addPage(); y = 20; }
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(30, 41, 59);
+                    doc.text('Approved Trades', 20, y); y += 10;
+                    
+                    doc.setFontSize(10);
+                    data.trades.forEach(trade => {
+                        doc.setTextColor(trade.action.toLowerCase() === 'buy' ? '#22c55e' : '#ef4444');
+                        doc.text(`${trade.action.toUpperCase()} ${trade.ticker}: ${trade.shares?.toLocaleString() || 0} shares @ $${trade.price?.toFixed(2) || 0}`, 25, y); y += 6;
+                        doc.setTextColor(100, 116, 139);
+                        const rationale = trade.rationale?.substring(0, 70) || '';
+                        doc.text(`  ${rationale}${trade.rationale?.length > 70 ? '...' : ''}`, 25, y); y += 8;
+                        
+                        if (y > 270) { doc.addPage(); y = 20; }
+                    });
+                }
+                
+                // Footer
+                doc.setFontSize(8);
+                doc.setTextColor(148, 163, 184);
+                doc.text('Generated by Portfolio Swarm Optimizer - Powered by Google Gemini AI', 20, 285);
+                
+                // Save
+                doc.save(`portfolio_report_${new Date().toISOString().split('T')[0]}.pdf`);
+                showAlert('success', '✅ PDF report downloaded!');
+                
+            } catch (error) {
+                console.error('PDF export error:', error);
+                showAlert('error', '❌ Failed to generate PDF. Try copying to clipboard instead.');
+            }
+        }
+        
+        // ========== COPY TO CLIPBOARD FUNCTION ==========
+        function copyResultsToClipboard() {
+            const data = window.lastOptimizationResults;
+            if (!data) {
+                showAlert('error', '❌ No results to copy');
+                return;
+            }
+            
+            let text = '=== PORTFOLIO OPTIMIZATION REPORT ===\n';
+            text += `Generated: ${new Date().toLocaleString()}\n\n`;
+            
+            text += '--- SUMMARY ---\n';
+            text += `Consensus Reached: ${data.success ? 'Yes' : 'No'}\n`;
+            text += `Iterations: ${data.iterations}/${data.max_iterations}\n`;
+            text += `Approval Rate: ${(data.consensus_score * 100).toFixed(0)}%\n`;
+            text += `Time Taken: ${data.elapsed_time?.toFixed(1) || 0}s\n\n`;
+            
+            if (data.votes && data.votes.length > 0) {
+                text += '--- AGENT VOTES ---\n';
+                data.votes.forEach(vote => {
+                    text += `[${vote.vote.toUpperCase()}] ${vote.agent}\n`;
+                    text += `  ${vote.rationale || 'No rationale'}\n\n`;
+                });
+            }
+            
+            if (data.trades && data.trades.length > 0) {
+                text += '--- APPROVED TRADES ---\n';
+                data.trades.forEach(trade => {
+                    text += `${trade.action.toUpperCase()} ${trade.ticker}: ${trade.shares?.toLocaleString() || 0} shares @ $${trade.price?.toFixed(2) || 0}\n`;
+                    text += `  Rationale: ${trade.rationale || 'N/A'}\n\n`;
+                });
+            }
+            
+            text += '\n--- Generated by Portfolio Swarm Optimizer ---\n';
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('success', '✅ Results copied to clipboard!');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                showAlert('error', '❌ Failed to copy to clipboard');
+            });
+        }
+        
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const main = document.querySelector('.main');
+            main.insertBefore(alertDiv, main.firstChild);
+            
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+        
+        // Initialize slider displays and event listeners on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Initializing sliders...');
+            
+            // Setup Max Iterations slider
+            const maxIterSlider = document.getElementById('maxIterations');
+            console.log('Max Iterations slider:', maxIterSlider);
+            if (maxIterSlider) {
+                updateRangeValue('maxIterations', maxIterSlider.value);
+                maxIterSlider.addEventListener('input', function() {
+                    console.log('📊 Max Iterations changed to:', this.value);
+                    updateRangeValue('maxIterations', this.value);
+                });
+                console.log('✅ Max Iterations listener attached');
+            }
+            
+            // Setup Min Iterations slider
+            const minIterSlider = document.getElementById('minIterations');
+            console.log('Min Iterations slider:', minIterSlider);
+            if (minIterSlider) {
+                updateRangeValue('minIterations', minIterSlider.value);
+                minIterSlider.addEventListener('input', function() {
+                    console.log('📊 Min Iterations changed to:', this.value);
+                    updateRangeValue('minIterations', this.value);
+                });
+                console.log('✅ Min Iterations listener attached');
+            }
+            
+            // Setup Consensus Threshold slider
+            const consensusSlider = document.getElementById('consensusThreshold');
+            console.log('Consensus Threshold slider:', consensusSlider);
+            if (consensusSlider) {
+                updateRangeValue('consensusThreshold', consensusSlider.value);
+                consensusSlider.addEventListener('input', function() {
+                    console.log('📊 Consensus Threshold changed to:', this.value);
+                    updateRangeValue('consensusThreshold', this.value);
+                });
+                console.log('✅ Consensus Threshold listener attached');
+            }
+            
+            console.log('✅ Slider initialization complete');
+        });
+    </script>
+</body>
+</html>

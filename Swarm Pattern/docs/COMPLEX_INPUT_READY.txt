@@ -1,0 +1,48 @@
+Portfolio Crisis Analysis - Multi-Scenario Optimization
+
+500 MSFT shares at 420, bought for 350
+150 NVDA shares at 880, bought for 420  
+400 GOOGL shares at 165, bought for 140
+300 AAPL shares at 185, bought for 155
+100 META shares at 475, bought for 380
+
+200 JPM shares at 195, bought for 150
+130 V shares at 285, bought for 240
+
+60 UNH shares at 520, bought for 485
+90 JNJ shares at 160, bought for 155
+
+300 KO shares at 62, bought for 58
+180 PG shares at 165, bought for 155
+
+150 BABA shares at 95, bought for 115
+35 TSM shares at 145, bought for 130
+120 XOM shares at 108, bought for 95
+
+Cash 50000
+Tech limit 40%
+ESG minimum 55
+
+ANALYSIS REQUIRED:
+
+Crisis Scenario 1 - AI Bubble Burst: Tech crashes 35%. NVDA down 40%,MSFT down 30%, GOOGL down 25%. Analyze total impact.
+
+Crisis Scenario 2 - Taiwan Invasion: TSM drops 60%, semiconductor supply disrupted. Impact on NVDA, AAPL.
+
+Crisis Scenario 3 - Banking Crisis: JPM drops 30%, V drops 20%, credit freeze.
+
+Crisis Scenario 4 - Healthcare Reform: UNH drops 40%, JNJ drops 15%.
+
+Crisis Scenario 5 - Energy Surge: XOM and other energy stocks up 50%, tech down.
+
+Crisis Scenario 6 - China Sanctions: BABA goes to zero.
+
+Optimization Goals:
+- Reduce tech from 60% to 40%
+- Fix ESG violations (META 52, BABA 45)
+- Tax-efficient rebalancing
+- Lower portfolio beta to 1.2
+- Add hedging for crises
+- Recommend new positions
+
+Provide detailed analysis with specific trades, timelines, and risk projections for 12-month horizon.

@@ -1,0 +1,187 @@
+# Sample Questions for Portfolio Input
+# Use these prompts to guide users through portfolio creation
+
+## Basic Portfolio Questions
+
+Q1: What is the total value of your portfolio?
+Example: $50,000,000
+
+Q2: How much cash do you currently hold?
+Example: $3,000,000
+
+Q3: Do you have any sector concentration limits?
+Example: Maximum 30% in Technology sector
+
+## Position Questions (Repeat for each holding)
+
+Q4: What stock do you own? (Ticker symbol)
+Example: AAPL
+
+Q5: How many shares do you own?
+Example: 15,000
+
+Q6: What is the current market price per share?
+Example: $200.00
+
+Q7: What was your original purchase price (cost basis)?
+Example: $170.00
+
+Q8: When did you purchase this stock?
+Options:
+  a) Enter date (YYYY-MM-DD): 2023-03-20
+  b) Enter days ago: 680
+  c) Enter approximate: "about 2 years ago"
+
+Q9: What sector does this stock belong to?
+Options: Technology, Healthcare, Financials, Consumer Staples, Energy, 
+         Industrials, Utilities, Real Estate, Materials, Communication Services
+
+Q10: What is the ESG (Environmental, Social, Governance) score?
+Range: 0-100 (higher is better)
+Example: 72
+Note: If unknown, enter 70 as default
+
+Q11: What is the stock's Beta (market sensitivity)?
+Range: Typically 0.5-2.0 (1.0 = market average)
+Example: 1.2
+Note: If unknown, enter 1.0 as default
+
+## Policy & Constraint Questions
+
+Q12: Do you have a maximum percentage limit for any sector?
+Example: 
+  - Technology: Maximum 30%
+  - Financials: Maximum 25%
+  - No individual stock over 10%
+
+Q13: Do you have a minimum ESG score requirement?
+Example: All holdings must have ESG score above 60
+
+Q14: What is your risk tolerance?
+Options: Conservative / Moderate / Aggressive
+
+Q15: Do you prioritize tax efficiency?
+Options: High / Medium / Low priority
+
+Q16: Do you have ESG (sustainability) requirements?
+Options: Strict / Moderate / Flexible
+
+## Swarm Configuration Questions
+
+Q17: How many rounds of agent debate do you want? (1-20)
+Default: 10
+Recommendation: Use 10 for thorough analysis, 3-5 for quick decisions
+
+Q18: What consensus threshold do you require? (50%-100%)
+Default: 60%
+Options:
+  - 51%: Simple majority
+  - 60%: Strong majority (recommended)
+  - 75%: Supermajority
+  - 100%: Unanimous (all agents must agree)
+
+Q19: Do you require ALL agents to approve? (Unanimous consent)
+Default: No
+Note: Setting this to Yes may result in no consensus
+
+Q20: Which agents should participate in the optimization?
+Default: All
+Options:
+  ☑ Market Analysis Agent (valuations, trends)
+  ☑ Risk Assessment Agent (compliance, limits)
+  ☑ Tax Strategy Agent (tax efficiency)
+  ☑ ESG Compliance Agent (sustainability)
+  ☑ Algorithmic Trading Agent (execution)
+
+---
+
+## Sample Complete Answers (Copy-Paste Ready)
+
+### Conservative Investor Profile:
+- Risk Tolerance: Conservative
+- Tax Priority: High
+- ESG Priority: Strict
+- Consensus Threshold: 75%
+- Sector Limits: Max 20% per sector
+- ESG Minimum: 70
+- Time Horizon: 15+ years
+
+### Growth Investor Profile:
+- Risk Tolerance: Aggressive
+- Tax Priority: Low
+- ESG Priority: Flexible
+- Consensus Threshold: 60%
+- Sector Limits: Max 40% per sector
+- ESG Minimum: 50
+- Time Horizon: 5-10 years
+
+### Balanced Investor Profile:
+- Risk Tolerance: Moderate
+- Tax Priority: High
+- ESG Priority: Moderate
+- Consensus Threshold: 60%
+- Sector Limits: Max 30% per sector
+- ESG Minimum: 60
+- Time Horizon: 10-15 years
+
+---
+
+## Quick Input Template (Fill in the blanks)
+
+Portfolio Name: _______________________
+Total Value: $_________________________
+Cash Balance: $________________________
+
+Position 1:
+  Ticker: ______ Shares: ______ Price: $______ Cost: $______ Date: __________
+  Sector: _____________ ESG: ____ Beta: ____
+
+Position 2:
+  Ticker: ______ Shares: ______ Price: $______ Cost: $______ Date: __________
+  Sector: _____________ ESG: ____ Beta: ____
+
+Position 3:
+  Ticker: ______ Shares: ______ Price: $______ Cost: $______ Date: __________
+  Sector: _____________ ESG: ____ Beta: ____
+
+Sector Limits:
+  Technology: ____%  Healthcare: ____%  Financials: ____%
+
+ESG Minimum: ____
+Risk Tolerance: ____________
+Tax Priority: ____________
+
+---
+
+## API-Style Request (JSON Format)
+
+Copy and modify this JSON for API calls:
+
+```json
+{
+  "portfolio": {
+    "positions": [
+      {
+        "ticker": "AAPL",
+        "shares": 15000,
+        "current_price": 200.00,
+        "cost_basis": 170.00,
+        "acquisition_date": "2023-03-20",
+        "sector": "Technology",
+        "esg_score": 72,
+        "beta": 1.2
+      }
+    ],
+    "cash": 3000000,
+    "policy_limits": {
+      "technology_limit": 30.0,
+      "esg_minimum": 60
+    }
+  },
+  "config": {
+    "max_iterations": 10,
+    "consensus_threshold": 0.6,
+    "require_unanimous": false
+  }
+}
+```
