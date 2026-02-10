@@ -306,7 +306,6 @@ export {
 } from './config/google-adk-config';
 export { getAvailableFeatures, initializeServices, isSystemReady } from './config/init';
 export { generateContent, getActiveProvider, LLMConfig } from './config/llm-config';
-export { getInitStatus, initialize } from './index';
 export * from './types/campaign';
 export * from './types/database';
 

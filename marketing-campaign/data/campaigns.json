@@ -62,5 +62,62 @@
       }
     },
     "id": "campaign-1769999006458-3y5w9fuz5"
+  },
+  {
+    "campaignName": "Test Campaign",
+    "channels": [
+      "email"
+    ],
+    "status": "completed",
+    "recipientType": "single",
+    "recipientCount": 1,
+    "recipientInfo": "test@example.com",
+    "executedAt": "2026-02-10T16:16:38.143Z",
+    "results": {
+      "emailsSent": 0,
+      "emailsFailed": 0,
+      "smsSent": 0,
+      "smsFailed": 0,
+      "instagramPosts": 0
+    },
+    "campaignData": {
+      "budget": 100,
+      "brandVoice": "Professional",
+      "targetAudience": {
+        "painPoints": [
+          "Efficiency"
+        ],
+        "demographics": "All ages",
+        "interests": [
+          "Tech"
+        ]
+      },
+      "channels": [
+        "email"
+      ],
+      "campaignName": "Test Campaign",
+      "product": {
+        "description": "A test product",
+        "name": "Test Product",
+        "features": [
+          "Feature 1"
+        ],
+        "pricing": "$10"
+      },
+      "goals": [
+        "Test goal"
+      ],
+      "timeline": {
+        "startDate": "2026-02-10",
+        "endDate": "2026-02-20"
+      }
+    },
+    "recipientData": {
+      "singleContact": {
+        "name": "Test User",
+        "email": "test@example.com"
+      }
+    },
+    "id": "campaign-1770740198147-3hr25wnpa"
   }
 ]
