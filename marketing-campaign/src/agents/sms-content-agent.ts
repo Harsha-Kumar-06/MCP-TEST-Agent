@@ -138,8 +138,15 @@ export class SMSContentAgent {
   }
 
   private generateShortUrl(request: CampaignRequest): string {
-    // In production, integrate with URL shortening service (bit.ly, tinyurl, etc.)
-    return `https://short.link/${request.campaignId}`;
+    // Use campaign's landing URL if provided, otherwise fall back to company website or placeholder
+    if (request.landingUrl) {
+      return request.landingUrl;
+    }
+    if (request.companyInfo?.website) {
+      return request.companyInfo.website;
+    }
+    // Fallback placeholder - warn user to set a landing URL
+    return `https://yoursite.com/${request.campaignId}`;
   }
 
   /**

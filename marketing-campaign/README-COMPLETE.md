@@ -27,12 +27,12 @@
 - ✅ Unsubscribe links
 - ✅ Open/click tracking
 
-### 4. **SMS Sending (Twilio)**
-- ✅ Send SMS via Twilio API
+### 4. SMS Sending (Multi-Provider)
+- ✅ Multiple providers: Textbelt, Vonage, Plivo, Twilio
+- ✅ Textbelt: FREE (1 SMS/day, no account needed)
 - ✅ Character optimization (160 char limit)
 - ✅ Personalization
 - ✅ Opt-in management
-- ✅ Free trial available ($15 credit)
 
 ### 5. **Instagram Posting**
 - ✅ Facebook Graph API integration
@@ -88,16 +88,26 @@
    FROM_NAME=Your Company Name
    ```
 
-### Step 3: (Optional) Configure Twilio
+### Step 3: (Optional) Configure SMS Provider
 
+**Easiest Option - Textbelt (NO SIGNUP):**
+```env
+SMS_PROVIDER=textbelt
+TEXTBELT_API_KEY=textbelt
+```
+
+**Or Twilio:**
 1. **Sign up for free trial**: https://www.twilio.com/try-twilio
 2. **Get credentials** from dashboard
 3. **Add to `.env`**:
    ```env
+   SMS_PROVIDER=twilio
    TWILIO_ACCOUNT_SID=ACxxxxx...
    TWILIO_AUTH_TOKEN=your_token
    TWILIO_PHONE_NUMBER=+15551234567
    ```
+
+**Or Vonage/Plivo** - see SETUP-GUIDE.md for details
 
 ### Step 4: Run the App
 
@@ -202,7 +212,7 @@ Run: `npx ts-node send-campaign.ts`
 5. **Analytics Agent** sets up tracking URLs
 6. **Sending Agents** send to recipients:
    - **Email**: Via Gmail SMTP with personalization
-   - **SMS**: Via Twilio with character optimization
+   - **SMS**: Via your configured provider (Textbelt/Vonage/Plivo/Twilio)
 7. **Results** are logged with success/failure counts
 
 ---
@@ -259,10 +269,12 @@ john@ex.com,+15551234567,John,Doe,Acme,lead;tech,true,true
    - ✅ 2FA must be enabled
    - ✅ Sending limits: ~500 emails/day (free), 2000/day (paid)
 
-2. **Twilio**
-   - ✅ Free trial: $15 credit (~500 SMS)
-   - ✅ Trial mode: Can only send to verified numbers
-   - ✅ Upgrade for production use
+2. **SMS Providers**
+   - ✅ Textbelt (FREE): 1 SMS/day, no signup needed
+   - ✅ Vonage: €2 free credit, good international coverage
+   - ✅ Plivo: $0.50 free credit, best pricing
+   - ✅ Twilio: $15 free credit, trial limitations
+   - ✅ Switch providers via `SMS_PROVIDER` env variable
 
 3. **Privacy**
    - ✅ Contacts stored locally in `data/` folder

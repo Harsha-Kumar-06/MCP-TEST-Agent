@@ -42,6 +42,7 @@ export default function CreateCampaign() {
     replyToEmail: '',
     companyPhone: '',
     companyWebsite: '',
+    landingUrl: '', // URL for SMS/email links
     bookingLink: '',
     twitter: '',
     linkedin: '',
@@ -203,6 +204,7 @@ export default function CreateCampaign() {
         },
         goals: formData.goals.split('\n').filter(g => g.trim()),
         brandVoice: formData.brandVoice,
+        landingUrl: formData.landingUrl || undefined,
       };
 
       // Add company info if provided
@@ -792,6 +794,18 @@ export default function CreateCampaign() {
                     placeholder="https://acmecorp.com"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Landing Page URL (for SMS/Email links) *</label>
+                <input
+                  type="url"
+                  value={formData.landingUrl}
+                  onChange={(e) => setFormData({...formData, landingUrl: e.target.value})}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                  placeholder="https://yoursite.com/promo or https://bit.ly/yourlink"
+                />
+                <p className="text-xs text-gray-500 mt-1">This URL will be included in SMS messages. Use a short URL for best results.</p>
               </div>
 
               <div>

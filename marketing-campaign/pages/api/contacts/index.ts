@@ -18,6 +18,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       res.status(500).json({ success: false, error: 'Failed to create contact' });
     }
+  } else if (req.method === 'PUT') {
+    // Update contact
+    try {
+      const { id } = req.query;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ success: false, error: 'Contact ID required' });
+      }
+      const updated = await contactDB.updateContact(id, req.body);
+      if (!updated) {
+        return res.status(404).json({ success: false, error: 'Contact not found' });
+      }
+      res.status(200).json({ success: true, data: updated });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Failed to update contact' });
+    }
+  } else if (req.method === 'DELETE') {
+    // Delete contact
+    try {
+      const { id } = req.query;
+      if (!id || typeof id !== 'string') {
+        return res.status(400).json({ success: false, error: 'Contact ID required' });
+      }
+      const deleted = await contactDB.deleteContact(id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, error: 'Contact not found' });
+      }
+      res.status(200).json({ success: true, message: 'Contact deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Failed to delete contact' });
+    }
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }

@@ -7,6 +7,8 @@ export default function ContactsPage() {
   const [lists, setLists] = useState([]);
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingContact, setEditingContact] = useState<any>(null);
+  const [editingList, setEditingList] = useState<any>(null);
 
   useEffect(() => {
     fetchContacts();
@@ -34,6 +36,106 @@ export default function ContactsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch lists:', error);
+    }
+  };
+
+  const handleDeleteList = async (listId: string, listName: string) => {
+    if (!confirm(`Delete list "${listName}"? This cannot be undone.`)) return;
+    
+    try {
+      const res = await fetch(`/api/contacts/lists?id=${listId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('List deleted successfully');
+        fetchLists();
+      } else {
+        alert('Failed to delete: ' + data.error);
+      }
+    } catch (error) {
+      alert('Failed to delete list');
+    }
+  };
+
+  const handleDeleteContact = async (contactId: string) => {
+    if (!confirm('Delete this contact?')) return;
+    
+    try {
+      const res = await fetch(`/api/contacts?id=${contactId}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchContacts();
+        fetchLists(); // Refresh lists too as they contain contacts
+      } else {
+        alert('Failed to delete: ' + data.error);
+      }
+    } catch (error) {
+      alert('Failed to delete contact');
+    }
+  };
+
+  const handleUpdateContact = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingContact) return;
+
+    const formData = new FormData(e.currentTarget);
+    const updates = {
+      firstName: formData.get('firstName'),
+      lastName: formData.get('lastName'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      company: formData.get('company'),
+      optInEmail: formData.get('optInEmail') === 'on',
+      optInSMS: formData.get('optInSMS') === 'on',
+    };
+
+    try {
+      const res = await fetch(`/api/contacts?id=${editingContact.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingContact(null);
+        fetchContacts();
+        fetchLists();
+      } else {
+        alert('Failed to update: ' + data.error);
+      }
+    } catch (error) {
+      alert('Failed to update contact');
+    }
+  };
+
+  const handleUpdateList = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingList) return;
+
+    const formData = new FormData(e.currentTarget);
+    const updates = {
+      name: formData.get('name'),
+      description: formData.get('description'),
+    };
+
+    try {
+      const res = await fetch(`/api/contacts/lists?id=${editingList.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingList(null);
+        fetchLists();
+      } else {
+        alert('Failed to update: ' + data.error);
+      }
+    } catch (error) {
+      alert('Failed to update list');
     }
   };
 
@@ -88,9 +190,6 @@ export default function ContactsPage() {
               </Link>
               <Link href="/campaigns/create" className="text-gray-700 hover:text-gray-900">
                 New Campaign
-              </Link>
-              <Link href="/contacts" className="text-blue-600 font-medium">
-                Contacts
               </Link>
               <Link href="/contacts" className="text-blue-600 font-medium">
                 Contacts
@@ -174,12 +273,26 @@ export default function ContactsPage() {
                           {list.contacts.length} contacts • Created {new Date(list.createdAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <Link
-                        href={`/campaigns/create?listId=${list.id}`}
-                        className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-                      >
-                        Create Campaign
-                      </Link>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setEditingList(list)}
+                          className="text-blue-600 hover:text-blue-800 px-3 py-1 text-sm border border-blue-600 rounded"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteList(list.id, list.name)}
+                          className="text-red-600 hover:text-red-800 px-3 py-1 text-sm border border-red-600 rounded"
+                        >
+                          🗑️ Delete
+                        </button>
+                        <Link
+                          href={`/campaigns/create?listId=${list.id}`}
+                          className="bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700"
+                        >
+                          Create Campaign
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -187,6 +300,51 @@ export default function ContactsPage() {
             )}
           </div>
         </div>
+
+        {/* Edit List Modal */}
+        {editingList && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-xl font-semibold mb-4">Edit List</h2>
+              <form onSubmit={handleUpdateList}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    defaultValue={editingList.name}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <input
+                    type="text"
+                    name="description"
+                    defaultValue={editingList.description}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingList(null)}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* All Contacts */}
         <div className="bg-white rounded-lg shadow">
@@ -202,12 +360,13 @@ export default function ContactsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Opt-In</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {contacts.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                       No contacts yet
                     </td>
                   </tr>
@@ -230,6 +389,20 @@ export default function ContactsPage() {
                         {contact.optInEmail && <span className="text-green-600">✉️ </span>}
                         {contact.optInSMS && <span className="text-green-600">📱</span>}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <button
+                          onClick={() => setEditingContact(contact)}
+                          className="text-blue-600 hover:text-blue-800 mr-3"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteContact(contact.id)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -237,6 +410,100 @@ export default function ContactsPage() {
             </table>
           </div>
         </div>
+
+        {/* Edit Contact Modal */}
+        {editingContact && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+              <h2 className="text-xl font-semibold mb-4">Edit Contact</h2>
+              <form onSubmit={handleUpdateContact}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      defaultValue={editingContact.firstName}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      defaultValue={editingContact.lastName}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    defaultValue={editingContact.email}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    defaultValue={editingContact.phone}
+                    placeholder="+1234567890"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                  <input
+                    type="text"
+                    name="company"
+                    defaultValue={editingContact.company}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="mt-4 flex space-x-6">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="optInEmail"
+                      defaultChecked={editingContact.optInEmail}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Email Opt-In</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="optInSMS"
+                      defaultChecked={editingContact.optInSMS}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">SMS Opt-In</span>
+                  </label>
+                </div>
+                <div className="flex justify-end space-x-2 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setEditingContact(null)}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

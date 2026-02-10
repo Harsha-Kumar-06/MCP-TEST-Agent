@@ -10,7 +10,7 @@
 ### ✅ Backend (Node.js/TypeScript)
 - **Multi-agent coordinator system** with dynamic routing
 - **6 specialized agents**: Audience Segmentation, Email Content, SMS Content, Instagram Posting, Compliance, Analytics
-- **3 sending agents**: Email (Gmail SMTP), SMS (Twilio), Instagram (Graph API)
+- **3 sending agents**: Email (Gmail SMTP), SMS (Twilio/Vonage/Plivo/Textbelt), Instagram (Graph API)
 - **Contact database** (file-based, easily replaceable with PostgreSQL/MongoDB)
 - **CSV import** functionality
 
@@ -69,16 +69,52 @@ LLM_PROVIDER=auto
 3. Click "Generate"
 4. Copy the 16-character password
 
-### 3. Configure Twilio (Optional - Free Trial)
+### 3. Configure SMS Provider (Optional)
 
-#### Step 1: Sign Up
-1. Go to [Twilio Free Trial](https://www.twilio.com/try-twilio)
-2. Sign up (get $15 credit = ~500 SMS)
+Choose one provider. **Textbelt is recommended for testing** (no account needed).
 
-#### Step 2: Get Credentials
-1. Copy **Account SID** from dashboard
-2. Copy **Auth Token** from dashboard
-3. Get a **phone number** (or use trial number)
+#### Option A: Textbelt (Easiest - NO SIGNUP REQUIRED)
+- Free tier: 1 SMS/day (no account needed)
+- Paid tier: $0.05/SMS - https://textbelt.com/
+
+```env
+SMS_PROVIDER=textbelt
+TEXTBELT_API_KEY=textbelt
+```
+
+#### Option B: Vonage (Good International Coverage)
+1. Sign up: https://dashboard.nexmo.com/sign-up
+2. Get €2 free credit
+3. Copy API Key and Secret from dashboard
+
+```env
+SMS_PROVIDER=vonage
+VONAGE_API_KEY=your_key
+VONAGE_API_SECRET=your_secret
+VONAGE_FROM_NUMBER=your_number
+```
+
+#### Option C: Plivo (Best Pricing)
+1. Sign up: https://console.plivo.com/accounts/register/
+2. Get $0.50 free credit
+
+```env
+SMS_PROVIDER=plivo
+PLIVO_AUTH_ID=your_auth_id
+PLIVO_AUTH_TOKEN=your_token
+PLIVO_FROM_NUMBER=your_number
+```
+
+#### Option D: Twilio
+1. Sign up: https://www.twilio.com/try-twilio
+2. Get $15 free credit (~500 SMS)
+
+```env
+SMS_PROVIDER=twilio
+TWILIO_ACCOUNT_SID=ACxxxx
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_PHONE_NUMBER=+15551234567
+```
 
 ### 5. Create .env File
 
@@ -103,10 +139,27 @@ GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-16-char-app-password
 FROM_NAME=Your Company Name
 
-# Twilio (optional)
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=your_auth_token_here
-TWILIO_PHONE_NUMBER=+15551234567
+# SMS Provider (choose one: textbelt, vonage, plivo, twilio)
+SMS_PROVIDER=textbelt
+TEXTBELT_API_KEY=textbelt
+
+# OR Twilio
+# SMS_PROVIDER=twilio
+# TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# TWILIO_AUTH_TOKEN=your_auth_token_here
+# TWILIO_PHONE_NUMBER=+15551234567
+
+# OR Vonage
+# SMS_PROVIDER=vonage
+# VONAGE_API_KEY=your_key
+# VONAGE_API_SECRET=your_secret
+# VONAGE_FROM_NUMBER=your_number
+
+# OR Plivo
+# SMS_PROVIDER=plivo
+# PLIVO_AUTH_ID=your_auth_id
+# PLIVO_AUTH_TOKEN=your_token
+# PLIVO_FROM_NUMBER=your_number
 
 # Instagram (optional)
 INSTAGRAM_ACCESS_TOKEN=EAA...
@@ -236,7 +289,7 @@ Agents     Agent
    ↓           ↓
 Email       SMS
 Sending     Sending
-(Gmail)     (Twilio)
+(Gmail)  (Multi-Provider)
    ↓           ↓
 Recipients receive messages
 ```

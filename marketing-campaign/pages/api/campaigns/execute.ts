@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const emailsFailed = results.sendingResults?.emailResults?.failed || 0;
     const smsSent = results.sendingResults?.smsResults?.sent || 0;
     const smsFailed = results.sendingResults?.smsResults?.failed || 0;
-    const instagramPosts = results.sendingResults?.instagramResults?.success ? 1 : 0;
+    const instagramPosts = results.sendingResults?.instagramResults?.feedPost?.success ? 1 : 0;
 
     // Save campaign to database with recipient data for resend
     const campaignRecord = await campaignDB.createCampaign({

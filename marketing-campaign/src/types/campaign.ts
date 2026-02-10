@@ -26,6 +26,7 @@ export interface CampaignRequest {
   };
   goals: string[];
   brandVoice?: 'professional' | 'casual' | 'friendly' | 'authoritative';
+  landingUrl?: string; // URL to include in SMS/email campaigns
   // Company/Contact Information (per campaign)
   companyInfo?: {
     companyName?: string;

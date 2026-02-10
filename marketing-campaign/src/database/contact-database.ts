@@ -63,6 +63,22 @@ export class ContactDatabase {
       updatedAt: new Date(),
     };
     fs.writeFileSync(CONTACTS_FILE, JSON.stringify(contacts, null, 2));
+    
+    // Sync update to contact lists
+    const lists = await this.getAllLists();
+    let listsUpdated = false;
+    for (const list of lists) {
+      const contactIndex = list.contacts.findIndex(c => c.id === id);
+      if (contactIndex !== -1) {
+        list.contacts[contactIndex] = contacts[index];
+        list.updatedAt = new Date();
+        listsUpdated = true;
+      }
+    }
+    if (listsUpdated) {
+      fs.writeFileSync(LISTS_FILE, JSON.stringify(lists, null, 2));
+    }
+    
     return contacts[index];
   }
 
@@ -71,6 +87,22 @@ export class ContactDatabase {
     const filtered = contacts.filter(c => c.id !== id);
     if (filtered.length === contacts.length) return false;
     fs.writeFileSync(CONTACTS_FILE, JSON.stringify(filtered, null, 2));
+    
+    // Remove contact from all lists
+    const lists = await this.getAllLists();
+    let listsUpdated = false;
+    for (const list of lists) {
+      const originalLength = list.contacts.length;
+      list.contacts = list.contacts.filter(c => c.id !== id);
+      if (list.contacts.length !== originalLength) {
+        list.updatedAt = new Date();
+        listsUpdated = true;
+      }
+    }
+    if (listsUpdated) {
+      fs.writeFileSync(LISTS_FILE, JSON.stringify(lists, null, 2));
+    }
+    
     return true;
   }
 
@@ -110,6 +142,14 @@ export class ContactDatabase {
     };
     fs.writeFileSync(LISTS_FILE, JSON.stringify(lists, null, 2));
     return lists[index];
+  }
+
+  async deleteList(id: string): Promise<boolean> {
+    const lists = await this.getAllLists();
+    const filtered = lists.filter(l => l.id !== id);
+    if (filtered.length === lists.length) return false;
+    fs.writeFileSync(LISTS_FILE, JSON.stringify(filtered, null, 2));
+    return true;
   }
 
   // CSV Import

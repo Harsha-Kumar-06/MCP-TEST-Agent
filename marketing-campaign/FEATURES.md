@@ -31,10 +31,10 @@
   - Professional HTML templates
   
 - 📱 **SMS Campaigns**
-  - Twilio integration
-  - A2P 10DLC compliant
+  - Multi-provider support: Textbelt, Vonage, Plivo, Twilio
+  - Textbelt: FREE (1 SMS/day, no signup needed)
+  - A2P 10DLC compliant (on supported providers)
   - Opt-out handling
-  - Cost: ~$0.0079/message
   
 - 📸 **Instagram Posts**
   - Facebook Graph API integration
@@ -75,7 +75,7 @@
 │   └── UTM parameter generation
 └── 🚀 Sending Agents
     ├── Email delivery (nodemailer)
-    ├── SMS delivery (Twilio)
+    ├── SMS delivery (Textbelt/Vonage/Plivo/Twilio)
     └── Instagram posting (Graph API)
 ```
 
@@ -470,26 +470,56 @@ All contact methods are clickable in emails:
 ## 📱 SMS Features
 
 ### 12. SMS Campaign Management
-**Status: ✅ WORKING (Twilio Required)**
+**Status: ✅ WORKING (Multi-Provider)**
+
+**Supported Providers:**
+
+| Provider | Signup Required | Free Tier | Best For |
+|----------|-----------------|-----------|----------|
+| Textbelt | NO | 1 SMS/day | Testing |
+| Vonage | Yes | €2 credit | International |
+| Plivo | Yes | $0.50 credit | High Volume |
+| Twilio | Yes | $15 credit | Enterprise |
 
 **Features:**
 - 160-character optimization
 - Automatic content truncation
 - Link shortening support
 - Opt-out handling
-- A2P 10DLC compliant
+- A2P 10DLC compliant (Twilio)
 
-**Configuration Required:**
+**Configuration:**
 ```env
-TWILIO_ACCOUNT_SID=ACxxxxx
-TWILIO_AUTH_TOKEN=xxxxx
-TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
+# Choose provider: textbelt | vonage | plivo | twilio
+SMS_PROVIDER=textbelt
+
+# Textbelt (FREE - no signup)
+TEXTBELT_API_KEY=textbelt
+
+# OR Twilio
+# SMS_PROVIDER=twilio
+# TWILIO_ACCOUNT_SID=ACxxxxx
+# TWILIO_AUTH_TOKEN=xxxxx
+# TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
+
+# OR Vonage
+# SMS_PROVIDER=vonage
+# VONAGE_API_KEY=xxxxx
+# VONAGE_API_SECRET=xxxxx
+# VONAGE_FROM_NUMBER=+1xxxxxxxxxx
+
+# OR Plivo
+# SMS_PROVIDER=plivo
+# PLIVO_AUTH_ID=xxxxx
+# PLIVO_AUTH_TOKEN=xxxxx
+# PLIVO_FROM_NUMBER=+1xxxxxxxxxx
 ```
 
-**Cost Structure:**
-- $0.0079 per SMS (USA)
-- $4/month A2P 10DLC fee
-- $10 one-time registration
+**Cost Comparison:**
+- Textbelt: FREE (1/day) or $0.05/SMS (paid)
+- Vonage: ~$0.0067/SMS (USA)
+- Plivo: ~$0.0050/SMS (USA)
+- Twilio: ~$0.0079/SMS (USA)
 
 **Compliance:**
 - Only sends to optInSMS=true contacts

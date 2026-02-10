@@ -145,7 +145,7 @@ src/
 │   ├── email-content-agent.ts         # Email generation
 │   ├── email-sending-agent.ts         # Email delivery (Gmail SMTP)
 │   ├── sms-content-agent.ts           # SMS generation
-│   ├── sms-sending-agent.ts           # SMS delivery (Twilio)
+│   ├── sms-sending-agent.ts           # SMS delivery (Twilio/Vonage/Plivo/Textbelt)
 │   ├── instagram-posting-agent.ts     # Instagram posting (Graph API)
 │   ├── compliance-agent.ts            # Legal compliance
 │   └── analytics-setup-agent.ts       # Tracking setup
@@ -211,10 +211,26 @@ GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-16-char-app-password
 FROM_NAME=Your Company Name
 
-# Twilio (for SMS - optional)
+# SMS Provider (choose one: twilio | vonage | plivo | textbelt)
+SMS_PROVIDER=textbelt
+
+# Textbelt (FREE - no account needed, 1 SMS/day)
+TEXTBELT_API_KEY=textbelt
+
+# OR Twilio (optional)
 TWILIO_ACCOUNT_SID=ACxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_PHONE_NUMBER=+15551234567
+
+# OR Vonage (optional)
+VONAGE_API_KEY=your_key
+VONAGE_API_SECRET=your_secret
+VONAGE_FROM_NUMBER=+15551234567
+
+# OR Plivo (optional)
+PLIVO_AUTH_ID=your_auth_id
+PLIVO_AUTH_TOKEN=your_token
+PLIVO_FROM_NUMBER=+15551234567
 
 # Instagram (for posting - optional)
 INSTAGRAM_ACCESS_TOKEN=EAA...

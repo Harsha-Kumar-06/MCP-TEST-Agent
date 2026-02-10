@@ -3,8 +3,12 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
+  "/contacts": "pages/contacts.js",
+  "/api/campaigns": "pages/api/campaigns.js",
   "/campaigns": "pages/campaigns.js",
+  "/api/contacts": "pages/api/contacts.js",
+  "/api/campaigns/templates": "pages/api/campaigns/templates.js",
+  "/campaigns/templates": "pages/campaigns/templates.js",
   "/api/contacts/lists": "pages/api/contacts/lists.js",
-  "/campaigns/create": "pages/campaigns/create.js",
-  "/contacts": "pages/contacts.js"
+  "/campaigns/create": "pages/campaigns/create.js"
 }

@@ -111,7 +111,7 @@ export class CampaignScheduler {
           emailsFailed: results.sendingResults?.emailResults?.failed || 0,
           smsSent: results.sendingResults?.smsResults?.sent || 0,
           smsFailed: results.sendingResults?.smsResults?.failed || 0,
-          instagramPosts: results.sendingResults?.instagramResults?.success ? 1 : 0,
+          instagramPosts: results.sendingResults?.instagramResults?.feedPost?.success ? 1 : 0,
         },
       });
 
