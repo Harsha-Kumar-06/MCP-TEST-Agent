@@ -29,10 +29,15 @@ self.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/campaigns.js"
     ],
-    "/campaigns/create": [
+    "/campaigns/[id]": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/campaigns/create.js"
+      "static/chunks/pages/campaigns/[id].js"
+    ],
+    "/campaigns/edit/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/campaigns/edit/[id].js"
     ]
   },
   "ampFirstPages": []

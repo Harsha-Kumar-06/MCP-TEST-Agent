@@ -359,29 +359,6 @@ export default function CampaignDetail() {
             )}
 
             {/* Campaign Data */}
-                    <div className="text-sm text-gray-600">SMS Sent</div>
-                  </div>
-                )}
-                {campaign.results.smsFailed !== undefined && campaign.results.smsFailed > 0 && (
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-red-600">
-                      {campaign.results.smsFailed}
-                    </div>
-                    <div className="text-sm text-gray-600">SMS Failed</div>
-                  </div>
-                )}
-                {campaign.results.instagramPosts !== undefined && campaign.results.instagramPosts > 0 && (
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {campaign.results.instagramPosts}
-                    </div>
-                    <div className="text-sm text-gray-600">Instagram Posts</div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Campaign Data */}
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">Campaign Details</h3>
               <div className="bg-gray-50 p-4 rounded-lg">

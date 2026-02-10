@@ -2,10 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/api/campaigns/execute": "pages/api/campaigns/execute.js",
-  "/campaigns/create": "pages/campaigns/create.js",
   "/campaigns": "pages/campaigns.js",
-  "/api/contacts/lists": "pages/api/contacts/lists.js",
-  "/api/campaigns": "pages/api/campaigns.js"
+  "/campaigns/[id]": "pages/campaigns/[id].js",
+  "/api/campaigns": "pages/api/campaigns.js",
+  "/api/campaigns/analytics": "pages/api/campaigns/analytics.js",
+  "/": "pages/index.js",
+  "/campaigns/edit/[id]": "pages/campaigns/edit/[id].js"
 }
