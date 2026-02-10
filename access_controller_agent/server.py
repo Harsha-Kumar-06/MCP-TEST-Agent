@@ -137,16 +137,20 @@ Is Follow-up Reply: {is_followup}
 
 === YOUR TASK ===
 1. Parse this email to understand what the user is requesting
-2. If this is a Jira access request (grant, revoke, list, invite), delegate to JiraAgent to execute it
+2. Execute the appropriate action by delegating to the right sub-agent(s) (JiraAgent, ConfluenceAgent, BitbucketAgent)
 3. After the action completes (or if you need more information), you MUST send a reply email using EmailAgent
 
-IMPORTANT RULES:
+IMPORTANT RULES FOR EMAIL THREADING:
 - ALWAYS send a reply email to {from_email} when done
+- CRITICAL: Pass the Email ID ({email_data.get('id', 'Unknown')}) to EmailAgent so it can use email_reply to maintain the thread
+- This ensures your reply appears in the same conversation thread in the user's email client
 - If the action was successful: Send a confirmation email with details of what was done
-- If more information is needed: Send a follow-up email asking for the specific missing details
+- If more information is needed: Send a follow-up email asking for the specific missing details  
 - If there was an error: Send an email explaining the issue
-- Use subject "Re: {subject}" to keep the email thread
 - Keep the reply professional and concise
+
+Example transfer to EmailAgent:
+"Transfer to EmailAgent to send reply. Original Email ID: {email_data.get('id', 'Unknown')}. Recipient: {from_email}. Message: [your message here]"
 """
         response = await run_agent(email_message)
         
@@ -165,12 +169,30 @@ IMPORTANT RULES:
     except Exception as e:
         logger.exception("Failed to process email %s: %s", email_data.get('id'), e)
         
-        # Try to send an error notification email
+        # Try to send an error notification email with threading
         try:
-            email_svc.send_email(
-                to=from_email,
-                subject=f"Re: {subject}",
-                body=f"""Hi,
+            email_id = email_data.get('id')
+            if email_id:
+                # Use email_reply to maintain thread
+                from .tools import email_reply
+                email_reply(
+                    original_email_id=email_id,
+                    reply_body=f"""Hi,
+
+We encountered an error processing your request. Please try again or contact support.
+
+Error: {str(e)}
+
+Best regards,
+Access Controller Bot""",
+                    include_original=False
+                )
+            else:
+                # Fallback to send_email if no email ID
+                email_svc.send_email(
+                    to=from_email,
+                    subject=f"Re: {subject}",
+                    body=f"""Hi,
 
 We encountered an error processing your request. Please try again or contact support.
 
@@ -178,7 +200,7 @@ Error: {str(e)}
 
 Best regards,
 Access Controller Bot"""
-            )
+                )
             # Still mark as read to avoid reprocessing
             email_svc.mark_as_read(email_data.get('id'))
         except:

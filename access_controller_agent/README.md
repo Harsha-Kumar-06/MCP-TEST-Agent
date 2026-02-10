@@ -8,8 +8,10 @@ AI-powered organizational access authority agent built with **Google ADK**. It a
 1. Reads incoming emails from Gmail
 2. Parses the request to understand the intent and target platform
 3. Executes the appropriate action (grant/revoke access, etc.)
-4. Sends a reply with the result
+4. **Sends a reply that maintains the email thread** (using Message-ID and In-Reply-To headers)
 5. Asks follow-up questions if more information is needed
+
+**Email Threading:** All replies are properly threaded, so the entire conversation history with the agent appears in a single email thread in your email client. This makes it easy to track the context of requests and responses.
 
 ## Architecture (Hierarchical, ADK)
 

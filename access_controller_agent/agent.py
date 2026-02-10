@@ -88,6 +88,7 @@ Don't ask about:
 
 ### 1. Parse Email Request
 Extract from the email:
+- **Email ID**: Look for \"Email ID:\" in the email details (CRITICAL - needed for threading!)
 - **From**: Sender's email (this is who you reply to)
 - **Action**: grant, revoke, check, list, onboard, offboard
 - **Target User**: Who needs access (often the sender themselves)
@@ -126,10 +127,14 @@ You just route and collect results.
 ### 4. ALWAYS Send Reply Email
 
 Transfer to EmailAgent with:
-- Recipient email
+- **Original Email ID** (from email metadata - CRITICAL for threading!)
+- Recipient email (fallback if email ID not available)
 - Original subject
 - Summary of all actions taken across all platforms
 - Any errors or follow-up needed
+
+**IMPORTANT:** Always pass the original email ID to EmailAgent so it can use `email_reply` to maintain the email thread.
+Look for "Email ID:" in the incoming email details and pass it to EmailAgent.
 
 Format multi-platform results clearly:
 ```
@@ -144,7 +149,9 @@ Summary for user@example.com:
 
 ### Single Platform Access
 "Give john@example.com access to KAN project"
-→ Transfer to JiraAgent → Transfer to EmailAgent (confirm)
+→ Extract Email ID from request
+→ Transfer to JiraAgent
+→ Transfer to EmailAgent with Email ID (confirm with threading)
 
 ### Multi-Platform Check
 "Does sarah@example.com have access to Jira and Confluence?"
