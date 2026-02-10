@@ -8,8 +8,214 @@ import logging
 from typing import Any
 
 from .jira_service import get_jira_service
+from .bitbucket_service import get_atlassian_admin_service
+from .confluence_service import get_confluence_service
 
 logger = logging.getLogger(__name__)
+
+
+# ---------- Organization-level tools ----------
+
+def invite_user_to_org(email: str, products: str = None) -> dict[str, Any]:
+    """
+    Invite a user to the Atlassian organization with access to products.
+    This grants IMMEDIATE access without requiring admin approval.
+    
+    Use this FIRST when a user doesn't exist in Jira/Confluence/Bitbucket.
+    After invitation, the user can be added to groups or granted specific project/space/repo access.
+    
+    email: The email address of the user to invite.
+    products: Comma-separated list of products (e.g., "jira,confluence,bitbucket").
+              If not specified, grants access to ALL available products.
+    
+    Returns: status, message, and list of products user was granted access to.
+    """
+    logger.info(f"invite_user_to_org(email={email}, products={products})")
+    
+    # Parse products list
+    product_list = None
+    if products:
+        product_list = [p.strip().lower() for p in products.split(",")]
+    
+    # Try Admin API first (immediate access)
+    admin_svc = get_atlassian_admin_service()
+    if admin_svc:
+        # Check if user is already in org
+        check_result = admin_svc.is_user_in_org(email)
+        if check_result.get("status") == "success" and check_result.get("in_org"):
+            return {
+                "status": "success",
+                "message": f"User {email} is already in the organization.",
+                "already_member": True,
+                "account_id": check_result.get("account_id"),
+                "name": check_result.get("name")
+            }
+        
+        # Try Admin API invite
+        result = admin_svc.invite_user_to_org(email, product_list)
+        if result.get("status") == "success":
+            logger.info(f"invite_user_to_org via Admin API: {result}")
+            return result
+        
+        # Admin API failed - log and fall back to product-specific APIs
+        logger.warning(f"Admin API invite failed: {result.get('error')}. Falling back to product APIs...")
+    
+    # Fallback: Use product-specific APIs (Jira and Confluence)
+    invited_products = []
+    errors = []
+    
+    target_products = product_list or ["jira", "confluence"]
+    
+    if "jira" in target_products:
+        jira_svc = get_jira_service()
+        if jira_svc and jira_svc.base_url:
+            jira_result = jira_svc.invite_user(email)
+            if jira_result.get("status") == "success":
+                invited_products.append("jira")
+                logger.info(f"Invited {email} to Jira via product API")
+            elif not jira_result.get("already_exists"):
+                errors.append(f"Jira: {jira_result.get('error')}")
+    
+    if "confluence" in target_products:
+        confluence_svc = get_confluence_service()
+        if confluence_svc and confluence_svc.base_url:
+            confluence_result = confluence_svc.invite_user(email)
+            if confluence_result.get("status") == "success":
+                invited_products.append("confluence")
+                logger.info(f"Invited {email} to Confluence via product API")
+            elif not confluence_result.get("already_exists"):
+                errors.append(f"Confluence: {confluence_result.get('error')}")
+    
+    if invited_products:
+        # Auto-approve any pending access request for this user
+        if admin_svc:
+            import time
+            time.sleep(3)  # Give the system time to create the request
+            approve_result = admin_svc.auto_approve_user_request(email, product_list)
+            if approve_result.get("status") == "success":
+                return {
+                    "status": "success",
+                    "message": f"✓ Invited {email} and auto-approved access to: {', '.join(invited_products)}. User has immediate access.",
+                    "invited_products": invited_products,
+                    "auto_approved": True,
+                    "method": "product_api_with_auto_approve"
+                }
+        
+        return {
+            "status": "success",
+            "message": f"Invited {email} to: {', '.join(invited_products)}. User will receive an email invitation.",
+            "invited_products": invited_products,
+            "method": "product_api",
+            "note": "User may need to click 'Join team' and wait for approval, or run approve_pending_user_request."
+        }
+    
+    if errors:
+        return {
+            "status": "error",
+            "error": f"Could not invite user. Errors: {'; '.join(errors)}"
+        }
+    
+    return {
+        "status": "error",
+        "error": "No products configured to invite user to. Configure Jira or Confluence credentials."
+    }
+
+
+def check_user_in_org(email: str) -> dict[str, Any]:
+    """
+    Check if a user is already in the Atlassian organization.
+    
+    email: The email address to check.
+    
+    Returns: status, in_org (boolean), and account_id if found.
+    """
+    logger.info(f"check_user_in_org(email={email})")
+    
+    admin_svc = get_atlassian_admin_service()
+    if not admin_svc:
+        return {
+            "status": "error",
+            "error": "Atlassian Admin API not configured.",
+            "not_configured": True
+        }
+    
+    result = admin_svc.is_user_in_org(email)
+    logger.info(f"check_user_in_org result: {result}")
+    return result
+
+
+def list_pending_access_requests(email: str = None) -> dict[str, Any]:
+    """
+    List pending user access requests in the organization.
+    These are users who have clicked "Join team" but haven't been approved yet.
+    
+    email: Optional - filter to find a specific user's pending request.
+    
+    Returns: List of pending access requests with IDs for approval.
+    """
+    logger.info(f"list_pending_access_requests(email={email})")
+    
+    admin_svc = get_atlassian_admin_service()
+    if not admin_svc:
+        return {
+            "status": "error",
+            "error": "Atlassian Admin API not configured. Set ATLASSIAN_ORG_ID and ATLASSIAN_API_KEY.",
+            "not_configured": True
+        }
+    
+    result = admin_svc.get_pending_access_requests(email=email)
+    logger.info(f"list_pending_access_requests result: {result}")
+    return result
+
+
+def approve_pending_user_request(email: str, products: str = None) -> dict[str, Any]:
+    """
+    Find and approve any pending access request for a user.
+    Use this to immediately grant access to users who clicked "Join team".
+    
+    email: The email address of the user whose request should be approved.
+    products: Comma-separated list of products to grant (e.g., "jira,confluence").
+              If not specified, grants access to all available products.
+    
+    Returns: status and list of approved request IDs.
+    """
+    logger.info(f"approve_pending_user_request(email={email}, products={products})")
+    
+    admin_svc = get_atlassian_admin_service()
+    if not admin_svc:
+        return {
+            "status": "error",
+            "error": "Atlassian Admin API not configured. Set ATLASSIAN_ORG_ID and ATLASSIAN_API_KEY.",
+            "not_configured": True
+        }
+    
+    product_list = None
+    if products:
+        product_list = [p.strip().lower() for p in products.split(",")]
+    
+    result = admin_svc.auto_approve_user_request(email, product_list)
+    logger.info(f"approve_pending_user_request result: {result}")
+    return result
+
+
+def _auto_invite_user_if_needed(email: str, products: list[str] = None) -> dict[str, Any]:
+    """
+    Internal helper: Automatically invite user to org if they don't exist.
+    Returns the invitation result, or None if user already exists.
+    """
+    admin_svc = get_atlassian_admin_service()
+    if not admin_svc:
+        return None  # Fall back to old behavior if Admin API not configured
+    
+    # Check if user is in org
+    check_result = admin_svc.is_user_in_org(email)
+    if check_result.get("status") == "success" and check_result.get("in_org"):
+        return None  # User exists, no invitation needed
+    
+    # User not in org, invite them
+    logger.info(f"Auto-inviting {email} to org with products: {products}")
+    invite_result = admin_svc.invite_user_to_org(email, products)
+    return invite_result
 
 
 # ---------- Jira tools (used by Jira agent) ----------
@@ -52,49 +258,57 @@ def jira_invite_user(email: str) -> dict[str, Any]:
 
 
 def jira_invite_and_grant_access(
-    user_email: str, project_key: str, role_name: str
+    user_email: str, project_key: str, role_name: str = "Member"
 ) -> dict[str, Any]:
     """
     Invite a user to Jira AND grant them access to a project in one step.
-    Use this when you want to invite a new user and immediately give them project access.
+    Automatically handles user invitation if they don't exist - no approval required.
     If the user already exists, it will just grant them the project role.
     
     user_email: The email address of the user to invite.
     project_key: Jira project key (e.g. KAN).
-    role_name: e.g. Administrator, Member, Viewer. REQUIRED.
+    role_name: Project role (default: "Member"). Options: Administrator, Member, Viewer.
     """
     logger.info(f"jira_invite_and_grant_access(user_email={user_email}, project_key={project_key}, role_name={role_name})")
     svc = get_jira_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Jira not configured; no change made."}
     
-    # 1. Check if user exists, if not invite them
+    # 1. Check if user exists, if not invite them via Admin API (immediate access)
     user = svc.get_user_by_email(user_email)
     invited = False
     
     if user.get("status") != "success":
-        # User doesn't exist, try to invite them
-        logger.info(f"User {user_email} not found, sending invitation...")
-        invite_result = svc.invite_user(user_email)
+        # User doesn't exist, try to invite via Admin API first (immediate access)
+        logger.info(f"User {user_email} not found, attempting Admin API invitation for immediate access...")
         
-        if invite_result.get("status") != "success":
-            return {
-                "status": "error",
-                "error": f"Could not invite user {user_email}. Error: {invite_result.get('error')}",
-                "invite_error": invite_result.get("error")
-            }
+        admin_invite_result = _auto_invite_user_if_needed(user_email, ["jira"])
+        if admin_invite_result and admin_invite_result.get("status") == "success":
+            invited = True
+            logger.info(f"User invited via Admin API: {admin_invite_result}")
+        else:
+            # Fall back to Jira-specific invite
+            logger.info(f"Admin API not available, falling back to Jira invite...")
+            invite_result = svc.invite_user(user_email)
+            
+            if invite_result.get("status") != "success":
+                return {
+                    "status": "error",
+                    "error": f"Could not invite user {user_email}. Error: {invite_result.get('error')}",
+                    "invite_error": invite_result.get("error")
+                }
+            invited = True
         
-        invited = True
         # Re-fetch the user after invitation
         import time
-        time.sleep(1)  # Give Jira a moment to process the invitation
+        time.sleep(2)  # Give the system a moment to process the invitation
         user = svc.get_user_by_email(user_email)
         
         if user.get("status") != "success":
-            # User was invited but not yet in the system - this is expected
+            # User was invited but not yet in the system - return success with pending info
             return {
                 "status": "success",
-                "message": f"Invitation sent to {user_email}. Once they accept the invitation and create their account, you can grant them access to the project.",
+                "message": f"✓ Invited {user_email} to Jira. Access to {project_key} project with {role_name} role will be granted once they activate their account.",
                 "invited": True,
                 "pending_access": True,
                 "project_key": project_key,
@@ -176,30 +390,48 @@ def jira_invite_and_grant_access(
 
 
 def jira_grant_access(
-    user_email: str, project_key: str, role_name: str
+    user_email: str, project_key: str, role_name: str = "Member"
 ) -> dict[str, Any]:
     """
     Grant a user access to a Jira project by adding them to a project role.
-    The user must already exist in Jira. If they don't exist, use jira_invite_and_grant_access instead.
+    Automatically invites user to the organization if they don't exist.
     
     user_email: User's email.
     project_key: Jira project key (e.g. KAN). If a name is provided (e.g. "Space 1"), it tries to resolve it.
-    role_name: e.g. Administrator, Member, Viewer. REQUIRED.
+    role_name: Project role (default: "Member"). Options: Administrator, Member, Viewer.
     """
     logger.info(f"jira_grant_access(user_email={user_email}, project_key={project_key}, role_name={role_name})")
     svc = get_jira_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Jira not configured; no change made."}
     
-    # 1. Resolve User
+    # 1. Resolve User - auto-invite if not found
     user = svc.get_user_by_email(user_email)
+    invited = False
+    
     if user.get("status") != "success":
-        logger.warning(f"jira_grant_access user lookup failed: {user}")
-        return {
-            "status": "error",
-            "error": f"User '{user_email}' not found in Jira. Use jira_invite_and_grant_access to invite them first.",
-            "user_not_found": True
-        }
+        logger.info(f"User {user_email} not found, attempting auto-invite...")
+        
+        invite_result = _auto_invite_user_if_needed(user_email, ["jira"])
+        if invite_result and invite_result.get("status") == "success":
+            invited = True
+            logger.info(f"User auto-invited: {invite_result}")
+            
+            # Wait and re-check
+            import time
+            time.sleep(2)
+            user = svc.get_user_by_email(user_email)
+        
+        if user.get("status") != "success":
+            return {
+                "status": "success" if invited else "error",
+                "message": f"✓ Invited {user_email} to organization. Access to {project_key} will be granted once they activate their account." if invited else f"User '{user_email}' not found. Use invite_user_to_org to invite them first.",
+                "invited": invited,
+                "pending_project": project_key if invited else None,
+                "pending_role": role_name if invited else None,
+                "user_not_found": not invited
+            }
+    
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
     
@@ -648,12 +880,18 @@ def jira_get_group_members(group_name: str, max_results: int = 50) -> dict[str, 
 
 def jira_add_user_to_group(user_email: str, group_name: str) -> dict[str, Any]:
     """
-    Add a user to a Jira group.
+    Add a user to a Jira/Atlassian group.
+    Automatically invites user to the organization if they don't exist.
     
     This is the RECOMMENDED way to manage access at scale:
     - Groups can be assigned to multiple projects at once
     - Adding a user to a group automatically gives them access to all projects the group has access to
     - Easier to manage than individual project role assignments
+    
+    Common groups:
+    - jira-users-<site>: Basic Jira access
+    - confluence-users-<site>: Basic Confluence access  
+    - bitbucket-users-<site>: Basic Bitbucket access
     
     user_email: The email of the user to add.
     group_name: The name of the group (e.g., "developers", "jira-software-users").
@@ -663,14 +901,40 @@ def jira_add_user_to_group(user_email: str, group_name: str) -> dict[str, Any]:
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Jira not configured; no change made."}
     
-    # 1. Resolve user
+    # 1. Resolve user - auto-invite if not found
     user = svc.get_user_by_email(user_email)
+    invited = False
+    
     if user.get("status") != "success":
-        return {
-            "status": "error",
-            "error": f"User '{user_email}' not found in Jira. Invite them first using jira_invite_user.",
-            "user_not_found": True
-        }
+        # Try to auto-invite via Admin API
+        logger.info(f"User {user_email} not found, attempting auto-invite...")
+        
+        # Determine which product based on group name
+        products = ["jira"]  # Default to Jira
+        group_lower = group_name.lower()
+        if "confluence" in group_lower:
+            products = ["confluence"]
+        elif "bitbucket" in group_lower:
+            products = ["bitbucket"]
+        
+        invite_result = _auto_invite_user_if_needed(user_email, products)
+        if invite_result and invite_result.get("status") == "success":
+            invited = True
+            logger.info(f"User auto-invited: {invite_result}")
+            
+            # Wait and re-check
+            import time
+            time.sleep(2)
+            user = svc.get_user_by_email(user_email)
+        
+        if user.get("status") != "success":
+            return {
+                "status": "success" if invited else "error",
+                "message": f"✓ Invited {user_email} to organization. They will be added to '{group_name}' once they activate their account." if invited else f"User '{user_email}' not found. Use invite_user_to_org to invite them first.",
+                "invited": invited,
+                "pending_group": group_name if invited else None,
+                "user_not_found": not invited
+            }
     
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
@@ -679,7 +943,7 @@ def jira_add_user_to_group(user_email: str, group_name: str) -> dict[str, Any]:
     if svc.is_user_in_group(account_id, group_name):
         return {
             "status": "success",
-            "message": f"'{display_name}' is already a member of group '{group_name}'.",
+            "message": f"✓ '{display_name}' is already a member of group '{group_name}'.",
             "already_member": True
         }
     
@@ -690,7 +954,8 @@ def jira_add_user_to_group(user_email: str, group_name: str) -> dict[str, Any]:
     if res.get("status") == "success":
         if svc.is_user_in_group(account_id, group_name):
             res["verified"] = True
-            res["message"] = f"Successfully added '{display_name}' to group '{group_name}'."
+            res["message"] = f"✓ Added '{display_name}' to group '{group_name}'." + (" (newly invited)" if invited else "")
+            res["invited"] = invited
         else:
             res["verified"] = False
             res["warning"] = "API returned success but user not found in group."
@@ -1021,8 +1286,6 @@ Access Controller Bot"""
 # CONFLUENCE TOOLS
 # ==========================================================================
 
-from .confluence_service import get_confluence_service
-
 
 # ---------- Confluence Space Tools ----------
 
@@ -1080,28 +1343,47 @@ def confluence_get_space_permissions(space_key: str) -> dict[str, Any]:
 
 
 def confluence_grant_space_access(
-    user_email: str, space_key: str, permission: str = "read"
+    user_email: str, space_key: str, permission: str = "write"
 ) -> dict[str, Any]:
     """
     Grant a user access to a Confluence space.
+    Automatically invites user to the organization if they don't exist.
     
     user_email: The user's email address.
     space_key: The space key (e.g., "DEV", "TEAM").
-    permission: Permission level - "read" (view), "write" (edit), or "admin" (full control).
+    permission: Permission level - "read" (view), "write" (edit - default), or "admin" (full control).
     """
     logger.info(f"confluence_grant_space_access(user_email={user_email}, space_key={space_key}, permission={permission})")
     svc = get_confluence_service()
     if not svc.base_url or not svc._session.auth:
         return {"status": "skipped", "message": "Confluence not configured."}
     
-    # Resolve user
+    # Resolve user - auto-invite if not found
     user = svc.get_user_by_email(user_email)
+    invited = False
+    
     if user.get("status") != "success":
-        return {
-            "status": "error",
-            "error": f"User '{user_email}' not found. They may need to be invited to Atlassian first.",
-            "user_not_found": True
-        }
+        logger.info(f"User {user_email} not found, attempting auto-invite...")
+        
+        invite_result = _auto_invite_user_if_needed(user_email, ["confluence"])
+        if invite_result and invite_result.get("status") == "success":
+            invited = True
+            logger.info(f"User auto-invited: {invite_result}")
+            
+            # Wait and re-check
+            import time
+            time.sleep(2)
+            user = svc.get_user_by_email(user_email)
+        
+        if user.get("status") != "success":
+            return {
+                "status": "success" if invited else "error",
+                "message": f"✓ Invited {user_email} to organization. Access to space '{space_key}' will be granted once they activate their account." if invited else f"User '{user_email}' not found. Use invite_user_to_org to invite them first.",
+                "invited": invited,
+                "pending_space": space_key if invited else None,
+                "pending_permission": permission if invited else None,
+                "user_not_found": not invited
+            }
     
     account_id = user.get("account_id")
     display_name = user.get("display_name", user_email)
@@ -1109,8 +1391,9 @@ def confluence_grant_space_access(
     res = svc.add_space_permission(space_key, account_id, permission)
     
     if res.get("status") == "success":
-        res["message"] = f"Granted {permission} access to '{display_name}' for space '{space_key}'."
+        res["message"] = f"✓ Granted {permission} access to '{display_name}' for space '{space_key}'." + (" (newly invited)" if invited else "")
         res["user"] = display_name
+        res["invited"] = invited
     
     logger.info(f"confluence_grant_space_access result: {res}")
     return res
@@ -1423,7 +1706,7 @@ def bitbucket_get_repository_permissions(repo_slug: str, workspace: str = None) 
 
 
 def bitbucket_grant_repository_access(
-    user_email: str, repo_slug: str, permission: str = "read", workspace: str = None
+    user_email: str, repo_slug: str, permission: str = "write", workspace: str = None
 ) -> dict[str, Any]:
     """
     Grant a user access to a Bitbucket repository.
@@ -1437,7 +1720,7 @@ def bitbucket_grant_repository_access(
     
     user_email: The user's email address.
     repo_slug: The repository slug.
-    permission: "read", "write", or "admin".
+    permission: Permission level (default: "write" for developers). Options: "read", "write", "admin".
     workspace: The workspace slug. If not provided, uses the default workspace.
     """
     logger.info(f"bitbucket_grant_repository_access(user_email={user_email}, repo_slug={repo_slug}, permission={permission})")

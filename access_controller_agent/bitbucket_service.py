@@ -81,6 +81,287 @@ class AtlassianAdminService:
             logger.error(f"Admin API error: {error_msg}")
             return None, error_msg
 
+    def get_org_users(self, email: str = None) -> dict[str, Any]:
+        """Get users in the organization, optionally filtering by email."""
+        params = {"limit": 100}
+        if email:
+            params["email"] = email
+        
+        data, err = self._request(
+            "GET",
+            f"v1/orgs/{self.org_id}/users",
+            params=params
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        users = []
+        for user in data.get("data", []):
+            users.append({
+                "account_id": user.get("account_id"),
+                "email": user.get("email"),
+                "name": user.get("name"),
+                "status": user.get("account_status"),
+            })
+        
+        return {"status": "success", "users": users}
+    
+    def is_user_in_org(self, email: str) -> dict[str, Any]:
+        """Check if a user is already in the organization."""
+        result = self.get_org_users(email=email)
+        if result.get("status") != "success":
+            return {"status": "error", "error": result.get("error", "Failed to check org users")}
+        
+        users = result.get("users", [])
+        for user in users:
+            if user.get("email", "").lower() == email.lower():
+                return {
+                    "status": "success",
+                    "in_org": True,
+                    "account_id": user.get("account_id"),
+                    "name": user.get("name"),
+                }
+        
+        return {"status": "success", "in_org": False}
+
+    def get_all_products(self) -> dict[str, Any]:
+        """Get all products (Jira, Confluence, Bitbucket) in the organization."""
+        data, err = self._request(
+            "POST",
+            f"v2/orgs/{self.org_id}/workspaces",
+            json={"limit": 100}
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        products = {"jira": [], "confluence": [], "bitbucket": []}
+        
+        for item in data.get("data", []):
+            attrs = item.get("attributes", {})
+            type_key = attrs.get("typeKey", "").lower()
+            product_info = {
+                "id": item.get("id"),  # This is the ARI
+                "name": attrs.get("name"),
+                "url": attrs.get("hostUrl"),
+            }
+            
+            if type_key == "jira-software" or type_key == "jira-core" or "jira" in type_key:
+                products["jira"].append(product_info)
+            elif type_key == "confluence" or "confluence" in type_key:
+                products["confluence"].append(product_info)
+            elif type_key == "bitbucket":
+                products["bitbucket"].append(product_info)
+        
+        return {"status": "success", "products": products}
+
+    def invite_user_to_org(self, email: str, products: list[str] = None) -> dict[str, Any]:
+        """
+        Invite a user to the organization with access to specified products.
+        This grants IMMEDIATE access - no approval workflow required.
+        
+        Args:
+            email: User's email address
+            products: List of products to grant access to (e.g., ["jira", "confluence", "bitbucket"])
+                     If None, grants access to all available products.
+        
+        Returns:
+            dict with status, message, and granted_products
+        """
+        logger.info(f"Inviting {email} to org with products: {products}")
+        
+        # Get all available products
+        all_products = self.get_all_products()
+        if all_products.get("status") != "success":
+            return all_products
+        
+        # Build permission rules for each product
+        permission_rules = []
+        granted_products = []
+        
+        product_map = all_products.get("products", {})
+        target_products = products if products else ["jira", "confluence", "bitbucket"]
+        
+        for product_name in target_products:
+            product_list = product_map.get(product_name, [])
+            if product_list:
+                # Use the first (usually only) instance of each product
+                product = product_list[0]
+                permission_rules.append({
+                    "resource": product["id"],  # ARI
+                    "role": "atlassian/user"
+                })
+                granted_products.append(product_name)
+                logger.info(f"Adding access rule for {product_name}: {product['id']}")
+        
+        if not permission_rules:
+            return {
+                "status": "error",
+                "error": f"No products found for: {target_products}. Available: {list(product_map.keys())}"
+            }
+        
+        # Send invitation with all product access
+        payload = {
+            "emails": [email],
+            "permissionRules": permission_rules,
+            "sendNotification": True,
+            "notificationText": f"You've been granted access to: {', '.join(granted_products)}."
+        }
+        
+        data, err = self._request(
+            "POST",
+            f"v2/orgs/{self.org_id}/users/invite",
+            json=payload
+        )
+        
+        if err:
+            # Check if user already has access
+            if "already" in str(err).lower():
+                return {
+                    "status": "success",
+                    "message": f"User {email} already has access to the organization.",
+                    "already_member": True,
+                    "granted_products": granted_products
+                }
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"Invited {email} to organization with access to: {', '.join(granted_products)}.",
+            "granted_products": granted_products,
+            "data": data
+        }
+
+    def get_pending_access_requests(self, email: str = None) -> dict[str, Any]:
+        """
+        Get pending user access requests for the organization.
+        Optionally filter by email to find a specific user's request.
+        """
+        logger.info(f"Getting pending access requests (filter email: {email})")
+        
+        data, err = self._request(
+            "GET",
+            f"v1/orgs/{self.org_id}/requests",
+            params={"limit": 100}
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        requests = []
+        for req in data.get("data", []):
+            req_email = req.get("email", "")
+            if email and req_email.lower() != email.lower():
+                continue
+            requests.append({
+                "id": req.get("id"),
+                "email": req_email,
+                "created": req.get("created"),
+                "status": req.get("status"),
+            })
+        
+        return {"status": "success", "requests": requests, "total": len(requests)}
+
+    def approve_access_request(self, request_id: str, products: list[str] = None) -> dict[str, Any]:
+        """
+        Approve a pending user access request.
+        This grants the user immediate access without waiting for admin action.
+        
+        Args:
+            request_id: The ID of the pending request
+            products: List of products to grant access to (defaults to all)
+        """
+        logger.info(f"Approving access request: {request_id}")
+        
+        # Get product rules if specified
+        all_products = self.get_all_products()
+        permission_rules = []
+        
+        if all_products.get("status") == "success":
+            product_map = all_products.get("products", {})
+            target_products = products if products else ["jira", "confluence", "bitbucket"]
+            
+            for product_name in target_products:
+                product_list = product_map.get(product_name, [])
+                if product_list:
+                    product = product_list[0]
+                    permission_rules.append({
+                        "resource": product["id"],
+                        "role": "atlassian/user"
+                    })
+        
+        payload = {}
+        if permission_rules:
+            payload["permissionRules"] = permission_rules
+        
+        data, err = self._request(
+            "POST",
+            f"v1/orgs/{self.org_id}/requests/{request_id}/approve",
+            json=payload if payload else None
+        )
+        
+        if err:
+            return {"status": "error", "error": err}
+        
+        return {
+            "status": "success",
+            "message": f"Access request {request_id} approved.",
+            "data": data
+        }
+
+    def auto_approve_user_request(self, email: str, products: list[str] = None, max_retries: int = 3) -> dict[str, Any]:
+        """
+        Find and approve any pending access request for a user.
+        This is called after inviting a user to immediately grant them access.
+        
+        Args:
+            email: User's email to find their pending request
+            products: Products to grant access to
+            max_retries: Number of times to check for pending request (with delay)
+        """
+        import time
+        
+        logger.info(f"Auto-approving access request for {email}")
+        
+        for attempt in range(max_retries):
+            # Wait a bit for the request to appear in the system
+            if attempt > 0:
+                time.sleep(2)
+            
+            # Find pending requests for this user
+            pending = self.get_pending_access_requests(email=email)
+            if pending.get("status") != "success":
+                continue
+            
+            requests = pending.get("requests", [])
+            if not requests:
+                logger.info(f"No pending requests found for {email} (attempt {attempt + 1}/{max_retries})")
+                continue
+            
+            # Approve all pending requests for this user
+            approved = []
+            for req in requests:
+                req_id = req.get("id")
+                if req_id:
+                    result = self.approve_access_request(req_id, products)
+                    if result.get("status") == "success":
+                        approved.append(req_id)
+                        logger.info(f"Approved request {req_id} for {email}")
+            
+            if approved:
+                return {
+                    "status": "success",
+                    "message": f"Auto-approved {len(approved)} access request(s) for {email}.",
+                    "approved_requests": approved
+                }
+        
+        return {
+            "status": "warning",
+            "message": f"No pending access requests found for {email} after {max_retries} attempts.",
+            "note": "User may already have access or hasn't requested yet."
+        }
+
     def get_workspaces(self) -> dict[str, Any]:
         """Get all Bitbucket workspaces in the organization."""
         data, err = self._request(

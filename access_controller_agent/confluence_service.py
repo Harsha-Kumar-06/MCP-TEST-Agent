@@ -630,6 +630,24 @@ class ConfluenceService:
             "email": user.get("email") or email,
         }
 
+    def invite_user(self, email: str) -> dict[str, Any]:
+        """
+        Invite a user to Confluence by email.
+        Uses the same user creation endpoint as Jira (shared Atlassian Cloud directory).
+        """
+        logger.info(f"Inviting user to Confluence: {email}")
+        
+        # Confluence uses the same user directory as Jira
+        # Use Jira's user creation endpoint which works for all Atlassian products
+        from .jira_service import get_jira_service
+        jira = get_jira_service()
+        result = jira.invite_user(email)
+        
+        if result.get("status") == "success":
+            result["message"] = f"Invitation sent to {email}. User will have access to Confluence upon activation."
+        
+        return result
+
     def get_user_space_permissions(self, account_id: str) -> dict[str, Any]:
         """
         Get all spaces a user has access to.
