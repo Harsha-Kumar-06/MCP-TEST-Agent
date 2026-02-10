@@ -254,40 +254,6 @@ export class EmailContentAgent {
 </body>
 </html>
     `;
-          <a href="${bookingLink}" class="secondary-cta">📅 Book a Demo</a>
-          <a href="mailto:${replyEmail}" class="secondary-cta">✉️ Email Us</a>
-        </div>
-        
-        <div class="contact-item">
-          📞 <a href="tel:${companyPhone}" style="color: #667eea; text-decoration: none;">${companyPhone}</a>
-        </div>
-        <div class="contact-item">
-          🌐 <a href="${companyWebsite}" style="color: #667eea; text-decoration: none;">Visit Website</a>
-        </div>
-        
-        <div class="social-links">
-          ${social.twitter ? `<a href="${social.twitter}" title="Twitter">𝕏</a>` : ''}
-          ${social.linkedin ? `<a href="${social.linkedin}" title="LinkedIn">in</a>` : ''}
-          ${social.facebook ? `<a href="${social.facebook}" title="Facebook">f</a>` : ''}
-          ${social.instagram ? `<a href="${social.instagram}" title="Instagram">📷</a>` : ''}
-        </div>
-      </div>
-      
-      <p style="text-align: center; color: #666; font-size: 14px; margin-top: 30px;">
-        <strong>💡 Quick Tip:</strong> Reply directly to this email - we read every message!
-      </p>
-    </div>
-    <div class="footer">
-      <p><strong>Stay in Touch</strong></p>
-      <p>📧 Reply to this email or call us at ${companyPhone}</p>
-      <p style="margin: 15px 0;">You're receiving this because you subscribed to our mailing list.</p>
-      <p><a href="{{UNSUBSCRIBE_URL}}" style="color: #667eea;">Unsubscribe</a> | <a href="{{PREFERENCES_URL}}" style="color: #667eea;">Update Preferences</a></p>
-      <p>&copy; 2026 ${companyName}. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-    `;
   }
 
   private generateBodyHtmlVariantA(request: CampaignRequest): string {
@@ -314,44 +280,48 @@ export class EmailContentAgent {
     const companyWebsite = request.companyInfo?.website || process.env.COMPANY_WEBSITE || 'https://example.com';
     const companyName = request.companyInfo?.companyName || request.product.name;
     
-    return `
-${request.product.name}
-
-Hello {{firstName}}!
-
-${request.product.description}
-
-Key Features:
-${request.product.features.map((f, i) => `${i + 1}. ${f}`).join('\n')}
-
-Join thousands of ${request.targetAudience.demographics} who are already benefiting from ${request.product.name}.
-
-🎯 Get Started Today: {{CTA_URL}}
-
-${request.product.pricing || ''}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 LET'S CONNECT!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Have questions? We're here to help!
-
-📅 Book a Demo: ${bookingLink}
-✉️ Email: ${replyEmail}
-📞 Phone: ${companyPhone}
-🌐 Website: ${process.env.COMPANY_WEBSITE || 'https://example.com'}
-
-💡 Quick Tip: Reply directly to this email - we read every message!
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-You're receiving this email because you subscribed to our mailing list.
-
-Unsubscribe: {{UNSUBSCRIBE_URL}}
-Update Preferences: {{PREFERENCES_URL}}
-
-© 2026 ${request.product.name}. All rights reserved.
-    `.trim();
+    const features = request.product.features.map((f, i) => `${i + 1}. ${f}`).join('\n');
+    const pricing = request.product.pricing || '';
+    const websiteUrl = process.env.COMPANY_WEBSITE || 'https://example.com';
+    
+    return [
+      request.product.name,
+      '',
+      'Hello {{firstName}}!',
+      '',
+      request.product.description,
+      '',
+      'Key Features:',
+      features,
+      '',
+      `Join thousands of ${request.targetAudience.demographics} who are already benefiting from ${request.product.name}.`,
+      '',
+      'Get Started Today: {{CTA_URL}}',
+      '',
+      pricing,
+      '',
+      '========================================',
+      'LET\'S CONNECT!',
+      '========================================',
+      '',
+      'Have questions? We\'re here to help!',
+      '',
+      `Book a Demo: ${bookingLink}`,
+      `Email: ${replyEmail}`,
+      `Phone: ${companyPhone}`,
+      `Website: ${websiteUrl}`,
+      '',
+      'Quick Tip: Reply directly to this email - we read every message!',
+      '',
+      '========================================',
+      '',
+      'You\'re receiving this email because you subscribed to our mailing list.',
+      '',
+      'Unsubscribe: {{UNSUBSCRIBE_URL}}',
+      'Update Preferences: {{PREFERENCES_URL}}',
+      '',
+      `(c) 2026 ${request.product.name}. All rights reserved.`
+    ].join('\n').trim();
   }
 
   private generateCTA(goal: string): string {
