@@ -160,11 +160,18 @@ Upload campaign briefs and auto-populate forms:
 **CSV Import Features:**
 - Upload via UI or backend
 - Validates email/phone formats
+- **Multiple emails per row** - automatically creates separate contacts
 - **Automatic duplicate prevention** (by email or phone)
 - Shows count of duplicates skipped
 - Creates contact lists automatically
 - Supports up to 10,000 contacts per upload
 - Progress indicator during upload
+
+**Multiple Emails Support:**
+- Separate emails with: semicolon (`;`), pipe (`|`), comma (`,`), or space
+- Example: `"john@test.com; jane@test.com; team@test.com"`
+- Each email creates a separate contact with shared name/phone/company
+- Tags include `multi-email-row-X` to identify split contacts
 
 **Duplicate Detection:**
 - Email matching (case-insensitive)
@@ -176,6 +183,7 @@ Upload campaign briefs and auto-populate forms:
 ```csv
 email,firstName,lastName,phone,company,optInEmail,optInSMS
 john@example.com,John,Doe,+1234567890,Acme Corp,true,true
+"team@example.com; sales@example.com",Team,Sales,+1234567890,Acme Corp,true,true
 ```
 
 **Files:**

@@ -66,7 +66,7 @@ Bare minimum campaign info. Great for quick tests.
 ## 👥 Contact Lists (For CSV Import)
 
 ### 4. `sample-contacts.csv` 📋 **Starter List**
-5 contacts with basic information.
+6 contacts with basic information (including multi-email example).
 
 **Columns:** email, phone, firstName, lastName, company, tags, optInEmail, optInSMS
 
@@ -76,6 +76,17 @@ Bare minimum campaign info. Great for quick tests.
 - Bob Johnson (Enterprise Inc)
 - Alice Williams (Small Business)
 - Charlie Brown (Freelance)
+- Team MultiEmail (Multi Corp) - **3 emails in one row!**
+
+**Multiple Emails Support:**
+You can include multiple emails in a single row separated by:
+- Semicolon: `email1@test.com; email2@test.com`
+- Pipe: `email1@test.com | email2@test.com`
+- Space: `email1@test.com email2@test.com`
+
+Use quotes if including separators: `"email1@test.com; email2@test.com"`
+
+Each email will create a separate contact with the same name/phone/company.
 
 **Import steps:**
 1. Go to `/contacts`

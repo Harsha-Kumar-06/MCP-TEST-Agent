@@ -62,7 +62,7 @@ export class ContactDatabase {
     
     const newContact: Contact = {
       ...contact,
-      id: `contact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `contact-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -157,7 +157,7 @@ export class ContactDatabase {
     const lists = await this.getAllLists();
     const newList: ContactList = {
       ...list,
-      id: `list-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `list-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -275,18 +275,24 @@ export class ContactDatabase {
 
       const emailField = row.email || '';
       const phoneField = row.phone || '';
-      const firstName = row.firstname || row.first_name || '';
+      const firstName = row.firstname || row.first_name || row.name || '';
       const lastName = row.lastname || row.last_name || '';
       const company = row.company || '';
       const tags = row.tags ? row.tags.split(';').map((t: string) => t.trim()).filter((t: string) => t) : [];
-      const optInEmail = row.optin_email !== 'false' && row.optin_email !== '0';
-      const optInSMS = row.optin_sms !== 'false' && row.optin_sms !== '0';
+      
+      // Handle various column name formats for opt-in fields
+      const optInEmailValue = row.optinemail || row.optin_email || row.opt_in_email || row.email_optin || '';
+      const optInSMSValue = row.optinsms || row.optin_sms || row.opt_in_sms || row.sms_optin || '';
+      const optInEmail = optInEmailValue !== 'false' && optInEmailValue !== '0' && optInEmailValue !== 'no';
+      const optInSMS = optInSMSValue !== 'false' && optInSMSValue !== '0' && optInSMSValue !== 'no';
 
-      // Handle multiple emails (semicolon, pipe, or space separated)
+      // Handle multiple emails (semicolon, pipe, comma, or space separated)
       const emails = emailField
         .split(/[;|,\s]+/)
         .map((e: string) => e.trim())
         .filter((e: string) => e && e.includes('@'));
+      
+      console.log(`Row ${i}: emailField="${emailField}" → parsed ${emails.length} emails: ${emails.join(', ')}`);
 
       // Handle multiple phones (semicolon or pipe separated)
       const phones = phoneField
@@ -385,7 +391,7 @@ export class ContactDatabase {
       
       const newContact: Contact = {
         ...contact,
-        id: `contact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `contact-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         createdAt: now,
         updatedAt: now,
       };

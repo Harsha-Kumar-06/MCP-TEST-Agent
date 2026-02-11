@@ -59,7 +59,7 @@ export class CampaignDatabase {
     const campaigns = await this.getAllCampaigns();
     const newCampaign: CampaignRecord = {
       ...campaign,
-      id: `campaign-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `campaign-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
     };
     campaigns.push(newCampaign);
     fs.writeFileSync(CAMPAIGNS_FILE, JSON.stringify(campaigns, null, 2));

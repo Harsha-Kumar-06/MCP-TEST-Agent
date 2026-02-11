@@ -200,8 +200,15 @@ export class MarketingCampaignOrchestrator {
       const smsRecipients = contacts.filter(c => c.phone && c.optInSMS);
 
       console.log(`\n📊 Recipient Summary:`);
-      console.log(`   Email recipients: ${emailRecipients.length}`);
-      console.log(`   SMS recipients: ${smsRecipients.length}`);
+      console.log(`   Total contacts: ${contacts.length}`);
+      console.log(`   Email recipients (with email + optInEmail): ${emailRecipients.length}`);
+      console.log(`   SMS recipients (with phone + optInSMS): ${smsRecipients.length}`);
+      
+      // Debug: Show all email addresses that will receive
+      if (emailRecipients.length > 0) {
+        console.log(`\n📧 Emails will be sent to:`);
+        emailRecipients.forEach((c, i) => console.log(`   ${i + 1}. ${c.email} (${c.firstName || 'Unknown'} ${c.lastName || ''})`));
+      }
 
       // Send Emails
       if (request.channels.includes('email') && emailRecipients.length > 0) {

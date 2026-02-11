@@ -34,7 +34,7 @@ export class TrackingDatabase {
     const events = await this.getAllEvents();
     const newEvent: TrackingEvent = {
       ...event,
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `event-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       timestamp: new Date(),
     };
     events.push(newEvent);
