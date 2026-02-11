@@ -16,7 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const contact = await contactDB.createContact(req.body);
       res.status(201).json({ success: true, data: contact });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to create contact' });
+      const message = error instanceof Error ? error.message : 'Failed to create contact';
+      res.status(400).json({ success: false, error: message });
     }
   } else if (req.method === 'PUT') {
     // Update contact
@@ -31,7 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       res.status(200).json({ success: true, data: updated });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to update contact' });
+      const message = error instanceof Error ? error.message : 'Failed to update contact';
+      res.status(400).json({ success: false, error: message });
     }
   } else if (req.method === 'DELETE') {
     // Delete contact

@@ -83,6 +83,8 @@ Bare minimum campaign info. Great for quick tests.
 3. Select this file
 4. Contacts import automatically!
 
+**Note:** Duplicate contacts (same email or phone) are automatically skipped.
+
 ---
 
 ### 5. `sample-contacts-extended.csv` 📊 **Full Dataset**

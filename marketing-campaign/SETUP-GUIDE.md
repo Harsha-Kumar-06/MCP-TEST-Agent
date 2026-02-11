@@ -194,6 +194,12 @@ Open:
 3. Select `sample-contacts.csv` (or your own)
 4. Give it a name (e.g., "Q1 Leads")
 5. Click "Upload"
+6. Duplicates (same email/phone) are automatically skipped
+
+**Contact List Features:**
+- Paginated display (50 per page)
+- Quick jump navigation (Page 1: #1-50, Page 2: #51-100, etc.)
+- Delete list also removes associated contacts
 
 ### Option 2: API Request (Backend)
 Create a file `test-campaign.ts`:

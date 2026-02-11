@@ -160,8 +160,17 @@ Upload campaign briefs and auto-populate forms:
 **CSV Import Features:**
 - Upload via UI or backend
 - Validates email/phone formats
-- Checks for duplicates
+- **Automatic duplicate prevention** (by email or phone)
+- Shows count of duplicates skipped
 - Creates contact lists automatically
+- Supports up to 10,000 contacts per upload
+- Progress indicator during upload
+
+**Duplicate Detection:**
+- Email matching (case-insensitive)
+- Phone matching (digits only, ignores formatting)
+- Skips duplicates within same upload batch
+- Reports: "Imported 950 contacts (50 duplicates skipped)"
 
 **Required CSV Columns:**
 ```csv
@@ -645,12 +654,16 @@ TEXTBELT_API_KEY=textbelt
 **Status: ✅ FULLY WORKING**
 
 **Features:**
-- CSV bulk import
+- CSV bulk import (up to 10,000 contacts)
 - Manual entry form
 - Edit contacts
-- Delete contacts
+- Delete contacts (with list sync)
 - Contact lists
 - Opt-in tracking
+- **Duplicate prevention** (email/phone)
+- **Paginated display** (50 per page)
+- **Quick page navigation** with contact ranges
+- Loading states for large datasets
 
 **Contact Fields:**
 ```typescript
@@ -678,8 +691,16 @@ TEXTBELT_API_KEY=textbelt
 **Validation:**
 - Email format checking
 - Phone format validation
-- Duplicate detection
+- **Duplicate prevention** (blocks same email or phone)
 - Required field enforcement
+- Error messages for duplicate attempts
+
+**Pagination & Performance:**
+- 50 contacts per page
+- Quick jump to any page
+- Shows contact range per page (e.g., "Page 1: #1-50")
+- Loading indicator during data fetch
+- Non-blocking UI updates with React transitions
 
 **Files:**
 - `/pages/contacts.tsx`

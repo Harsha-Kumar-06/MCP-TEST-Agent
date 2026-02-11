@@ -91,9 +91,15 @@ src/config/
 ```
 data/
 ├── campaigns.json       # Campaign records with results
-├── contacts.json        # Individual contacts
+├── contacts.json        # Individual contacts (with duplicate prevention)
 └── contact-lists.json   # Contact lists with members
 ```
+
+**Contact Management Features:**
+- Duplicate prevention by email (case-insensitive) and phone (digits only)
+- Pagination (50 contacts per page)
+- Quick page navigation with contact ranges
+- List deletion syncs to remove associated contacts
 
 ## 🔄 Data Flow Architecture
 

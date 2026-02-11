@@ -34,17 +34,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ success: false, error: 'Failed to update list' });
     }
   } else if (req.method === 'DELETE') {
-    // Delete contact list
+    // Delete contact list(s)
     try {
-      const { id } = req.query;
+      const { id, deleteAll } = req.query;
+      
+      // Delete all lists
+      if (deleteAll === 'true') {
+        const result = await contactDB.deleteAllLists(true);
+        return res.status(200).json({ 
+          success: true, 
+          message: `Deleted ${result.listsDeleted} lists and ${result.contactsDeleted} contacts`,
+          ...result
+        });
+      }
+      
+      // Delete single list
       if (!id || typeof id !== 'string') {
         return res.status(400).json({ success: false, error: 'List ID required' });
       }
-      const deleted = await contactDB.deleteList(id);
-      if (!deleted) {
+      const result = await contactDB.deleteList(id, true);
+      if (!result.deleted) {
         return res.status(404).json({ success: false, error: 'List not found' });
       }
-      res.status(200).json({ success: true, message: 'List deleted successfully' });
+      res.status(200).json({ 
+        success: true, 
+        message: `List deleted successfully along with ${result.contactsDeleted} contacts`,
+        contactsDeleted: result.contactsDeleted
+      });
     } catch (error) {
       res.status(500).json({ success: false, error: 'Failed to delete list' });
     }

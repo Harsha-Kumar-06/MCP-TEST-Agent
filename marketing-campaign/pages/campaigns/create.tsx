@@ -1,7 +1,9 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+const FORM_STORAGE_KEY = 'campaign_form_draft';
 
 export default function CreateCampaign() {
   const router = useRouter();
@@ -14,6 +16,9 @@ export default function CreateCampaign() {
   const [showUploadSection, setShowUploadSection] = useState(true);
   const [scheduleNow, setScheduleNow] = useState(true);
   const [scheduledDateTime, setScheduledDateTime] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showDraftRecoveryModal, setShowDraftRecoveryModal] = useState(false);
+  const isInitialized = useRef(false);
   
   const [formData, setFormData] = useState({
     campaignName: '',
@@ -49,6 +54,106 @@ export default function CreateCampaign() {
     facebook: '',
     instagram: '',
   });
+
+  // Check for saved draft on mount
+  useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+    
+    const savedDraft = localStorage.getItem(FORM_STORAGE_KEY);
+    if (savedDraft && !templateId) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        // Check if draft has meaningful data
+        if (draft.campaignName || draft.productName || draft.productDescription) {
+          setShowDraftRecoveryModal(true);
+        }
+      } catch (e) {
+        localStorage.removeItem(FORM_STORAGE_KEY);
+      }
+    }
+  }, [templateId]);
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    if (!isInitialized.current) return;
+    
+    // Don't save if form is empty
+    const hasData = formData.campaignName || formData.productName || formData.productDescription;
+    if (hasData) {
+      localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({
+        ...formData,
+        recipientMode,
+        scheduleNow,
+        scheduledDateTime,
+        savedAt: new Date().toISOString()
+      }));
+      setHasUnsavedChanges(true);
+    }
+  }, [formData, recipientMode, scheduleNow, scheduledDateTime]);
+
+  // Warn before leaving page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && !executing) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    const handleRouteChange = (url: string) => {
+      if (hasUnsavedChanges && !executing && !url.includes('/campaigns')) {
+        if (!window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+          router.events.emit('routeChangeError');
+          throw 'Route change aborted';
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [hasUnsavedChanges, executing, router.events]);
+
+  // Recover draft from localStorage
+  const recoverDraft = useCallback(() => {
+    const savedDraft = localStorage.getItem(FORM_STORAGE_KEY);
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        setFormData(prev => ({
+          ...prev,
+          ...draft,
+          contactListId: listId || draft.contactListId || '',
+        }));
+        if (draft.recipientMode) setRecipientMode(draft.recipientMode);
+        if (draft.scheduleNow !== undefined) setScheduleNow(draft.scheduleNow);
+        if (draft.scheduledDateTime) setScheduledDateTime(draft.scheduledDateTime);
+        setShowUploadSection(false);
+      } catch (e) {
+        console.error('Failed to recover draft:', e);
+      }
+    }
+    setShowDraftRecoveryModal(false);
+  }, [listId]);
+
+  // Discard draft and start fresh
+  const discardDraft = useCallback(() => {
+    localStorage.removeItem(FORM_STORAGE_KEY);
+    setShowDraftRecoveryModal(false);
+    setHasUnsavedChanges(false);
+  }, []);
+
+  // Clear draft after successful campaign execution
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(FORM_STORAGE_KEY);
+    setHasUnsavedChanges(false);
+  }, []);
 
   useEffect(() => {
     fetchLists();
@@ -258,6 +363,7 @@ export default function CreateCampaign() {
         const data = await res.json();
         
         if (data.success) {
+          clearDraft();
           alert(`Campaign scheduled successfully for ${new Date(scheduledDateTime).toLocaleString()}!`);
           router.push('/campaigns');
         } else {
@@ -274,6 +380,7 @@ export default function CreateCampaign() {
         const data = await res.json();
         
         if (data.success) {
+          clearDraft();
           alert('Campaign executed successfully!');
           router.push('/campaigns');
         } else {
@@ -292,6 +399,39 @@ export default function CreateCampaign() {
       <Head>
         <title>Create Campaign - Campaign Manager</title>
       </Head>
+
+      {/* Draft Recovery Modal */}
+      {showDraftRecoveryModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">📝 Recover Draft?</h3>
+            <p className="text-gray-600 mb-4">
+              You have an unsaved campaign draft. Would you like to continue where you left off?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={discardDraft}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Start Fresh
+              </button>
+              <button
+                onClick={recoverDraft}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Recover Draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unsaved Changes Indicator */}
+      {hasUnsavedChanges && (
+        <div className="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg text-sm z-40 shadow-lg">
+          💾 Draft auto-saved
+        </div>
+      )}
 
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

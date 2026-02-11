@@ -2,13 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
   "/contacts": "pages/contacts.js",
-  "/api/campaigns": "pages/api/campaigns.js",
-  "/campaigns": "pages/campaigns.js",
-  "/api/contacts": "pages/api/contacts.js",
-  "/api/campaigns/templates": "pages/api/campaigns/templates.js",
-  "/campaigns/templates": "pages/campaigns/templates.js",
+  "/": "pages/index.js",
   "/api/contacts/lists": "pages/api/contacts/lists.js",
-  "/campaigns/create": "pages/campaigns/create.js"
+  "/api/contacts": "pages/api/contacts.js"
 }
