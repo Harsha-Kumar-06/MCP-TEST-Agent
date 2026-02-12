@@ -7,6 +7,9 @@
 export interface InstagramPost {
   caption: string;
   imageUrl?: string;
+  imageUrls?: string[];  // For carousel posts
+  videoUrl?: string;
+  postType?: 'image' | 'video' | 'carousel' | 'story';
   hashtags: string[];
   callToAction?: string;
 }
@@ -15,6 +18,7 @@ interface FacebookGraphError {
   message: string;
   type: string;
   code: number;
+  error_subcode?: number;
 }
 
 interface ContainerResponse {
@@ -82,7 +86,7 @@ ${hashtags.join(' ')}
   }
 
   /**
-   * Post to Instagram Feed
+   * Post to Instagram Feed (supports image, video/reels, and carousel)
    */
   async postToFeed(content: InstagramPost): Promise<{ success: boolean; postId?: string; error?: string }> {
     if (!this.isConfigured()) {
@@ -94,57 +98,55 @@ ${hashtags.join(' ')}
       };
     }
 
+    // Check for media
+    const hasCarouselImages = content.imageUrls && content.imageUrls.length >= 2;
+    const hasSingleImage = !!content.imageUrl;
+    const hasVideo = !!content.videoUrl;
+
+    if (!hasCarouselImages && !hasSingleImage && !hasVideo) {
+      console.warn('⚠️  Instagram posting skipped - No media URL provided');
+      console.log('   Instagram requires a publicly accessible image or video URL');
+      return {
+        success: false,
+        error: 'Instagram requires a media URL (image or video)'
+      };
+    }
+
     try {
-      console.log('📸 Posting to Instagram feed...');
+      const postType = content.postType || (hasCarouselImages ? 'carousel' : hasVideo ? 'video' : 'image');
+      console.log(`📸 Posting to Instagram feed (${postType})...`);
       console.log('📝 Caption:', content.caption.substring(0, 100) + '...');
       
-      // Step 1: Create container (prepare post)
-      const containerResponse = await fetch(
-        `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            caption: content.caption,
-            access_token: this.accessToken,
-          })
-        }
-      );
+      let creationId: string;
 
-      const containerData = await containerResponse.json() as ContainerResponse;
-
-      if (!containerResponse.ok || containerData.error) {
-        throw new Error(containerData.error?.message || 'Failed to create Instagram container');
+      // Handle different post types
+      if (postType === 'carousel' && hasCarouselImages) {
+        creationId = await this.createCarouselContainer(content);
+      } else if (postType === 'video' && hasVideo) {
+        console.log('🎬 Video URL:', content.videoUrl);
+        creationId = await this.createMediaContainer({
+          video_url: content.videoUrl,
+          caption: content.caption,
+          media_type: 'REELS',
+        });
+      } else {
+        console.log('🖼️  Image URL:', content.imageUrl);
+        creationId = await this.createMediaContainer({
+          image_url: content.imageUrl,
+          caption: content.caption,
+        });
       }
 
-      const creationId = containerData.id;
-      console.log(`   Container created: ${creationId}`);
+      // Wait for media to be ready and publish
+      await this.waitForMediaReady(creationId);
+      const publishResult = await this.publishMedia(creationId);
 
-      // Step 2: Publish the post
-      const publishResponse = await fetch(
-        `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media_publish`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            creation_id: creationId,
-            access_token: this.accessToken,
-          })
-        }
-      );
-
-      const publishData = await publishResponse.json() as PublishResponse;
-
-      if (!publishResponse.ok || publishData.error) {
-        throw new Error(publishData.error?.message || 'Failed to publish Instagram post');
-      }
-
-      console.log(`✅ Instagram post published: ${publishData.id}`);
-      console.log(`   View at: https://www.instagram.com/p/${this.getShortcode(publishData.id)}`);
+      console.log(`✅ Instagram ${postType} post published: ${publishResult.id}`);
+      console.log(`   View at: https://www.instagram.com/p/${this.getShortcode(publishResult.id)}`);
       
       return {
         success: true,
-        postId: publishData.id,
+        postId: publishResult.id,
       };
 
     } catch (error) {
@@ -154,6 +156,180 @@ ${hashtags.join(' ')}
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
+  }
+
+  /**
+   * Create a single media container (image or video)
+   */
+  private async createMediaContainer(params: any): Promise<string> {
+    console.log('   Creating media container...');
+    
+    const response = await fetch(
+      `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...params,
+          access_token: this.accessToken,
+        })
+      }
+    );
+
+    const data = await response.json() as ContainerResponse;
+    console.log('   Container response:', JSON.stringify(data, null, 2));
+
+    if (!response.ok || data.error) {
+      throw new Error(data.error?.message || 'Failed to create media container');
+    }
+
+    return data.id;
+  }
+
+  /**
+   * Create carousel container (multiple images)
+   */
+  private async createCarouselContainer(content: InstagramPost): Promise<string> {
+    console.log(`   Creating carousel with ${content.imageUrls!.length} images...`);
+    
+    // Step 1: Create container for each image (without caption)
+    const childContainerIds: string[] = [];
+    
+    for (let i = 0; i < content.imageUrls!.length; i++) {
+      const imageUrl = content.imageUrls![i];
+      console.log(`   Creating child container ${i + 1}/${content.imageUrls!.length}: ${imageUrl}`);
+      
+      const childResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: imageUrl,
+            is_carousel_item: true,
+            access_token: this.accessToken,
+          })
+        }
+      );
+
+      const childData = await childResponse.json() as ContainerResponse;
+      
+      if (!childResponse.ok || childData.error) {
+        throw new Error(`Failed to create carousel item ${i + 1}: ${childData.error?.message}`);
+      }
+      
+      childContainerIds.push(childData.id);
+      console.log(`   ✓ Child container ${i + 1} created: ${childData.id}`);
+      
+      // Wait for each child to be ready
+      await this.waitForMediaReady(childData.id);
+    }
+
+    // Step 2: Create the carousel container
+    console.log('   Creating carousel parent container...');
+    const carouselResponse = await fetch(
+      `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          media_type: 'CAROUSEL',
+          caption: content.caption,
+          children: childContainerIds.join(','),
+          access_token: this.accessToken,
+        })
+      }
+    );
+
+    const carouselData = await carouselResponse.json() as ContainerResponse;
+    console.log('   Carousel container response:', JSON.stringify(carouselData, null, 2));
+
+    if (!carouselResponse.ok || carouselData.error) {
+      throw new Error(carouselData.error?.message || 'Failed to create carousel container');
+    }
+
+    return carouselData.id;
+  }
+
+  /**
+   * Wait for media container to be ready
+   */
+  private async waitForMediaReady(containerId: string): Promise<void> {
+    console.log('   Waiting for media to be ready...');
+    const maxAttempts = 60; // Max 60 seconds
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      
+      const statusResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${containerId}?fields=status_code,status&access_token=${this.accessToken}`
+      );
+      const statusData = await statusResponse.json() as any;
+      
+      if (statusData.status_code === 'FINISHED') {
+        console.log(`   ✅ Media ready (attempt ${attempts})`);
+        // Extra wait for Instagram backend sync
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return;
+      } else if (statusData.status_code === 'ERROR') {
+        throw new Error(`Media processing failed: ${statusData.status || 'Unknown error'}`);
+      }
+      
+      // Log every 5 attempts
+      if (attempts % 5 === 1) {
+        console.log(`   Status check ${attempts}: ${statusData.status_code || 'processing...'}`);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    throw new Error('Timeout waiting for media to be ready');
+  }
+
+  /**
+   * Publish media container with retry logic
+   */
+  private async publishMedia(containerId: string): Promise<{ id: string }> {
+    console.log('   Publishing post...');
+    const maxAttempts = 5;
+    let lastError: string = '';
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(`   Publish attempt ${attempt}/${maxAttempts}...`);
+      
+      const publishResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${this.instagramAccountId}/media_publish`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creation_id: containerId,
+            access_token: this.accessToken,
+          })
+        }
+      );
+
+      const publishData = await publishResponse.json() as PublishResponse;
+      
+      if (publishResponse.ok && !publishData.error) {
+        return { id: publishData.id };
+      }
+      
+      lastError = publishData.error?.message || 'Unknown error';
+      
+      // If "media not ready", wait and retry
+      if (publishData.error?.error_subcode === 2207027) {
+        console.log(`   ⏳ Media not ready, waiting 3 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      } else {
+        // Other error - don't retry
+        console.log('   Publish error:', JSON.stringify(publishData.error, null, 2));
+        break;
+      }
+    }
+    
+    throw new Error(lastError || 'Failed to publish after multiple attempts');
   }
 
   /**
@@ -175,16 +351,37 @@ ${hashtags.join(' ')}
       };
     }
 
+    // Stories require an image or video
+    if (!content.imageUrl && !content.videoUrl) {
+      return {
+        success: false,
+        error: 'Story requires image or video URL'
+      };
+    }
+
     try {
       console.log('📱 Posting to Instagram story...');
       
-      // Note: Stories require an image URL
-      // For now, we'll skip story posting unless an image is provided
-      console.log('   Story posting requires image URL (skipped for text-only campaigns)');
+      // Create story container (no caption for stories)
+      const containerParams: any = {
+        media_type: 'STORIES',
+      };
+
+      if (content.videoUrl) {
+        containerParams.video_url = content.videoUrl;
+      } else {
+        containerParams.image_url = content.imageUrl;
+      }
+
+      const containerId = await this.createMediaContainer(containerParams);
+      await this.waitForMediaReady(containerId);
+      const publishResult = await this.publishMedia(containerId);
+
+      console.log(`✅ Instagram story published: ${publishResult.id}`);
       
       return {
-        success: false,
-        error: 'Story posting requires image URL',
+        success: true,
+        storyId: publishResult.id,
       };
 
     } catch (error) {
@@ -203,10 +400,49 @@ ${hashtags.join(' ')}
     feedPost?: any;
     story?: any;
   }> {
-    const content = this.generatePostContent(campaignData);
+    // Check if campaign has custom Instagram content
+    const instagramContent = campaignData.instagramContent;
+    
+    let content: InstagramPost;
+    
+    if (instagramContent && (instagramContent.caption || instagramContent.mediaUrl || instagramContent.mediaUrls)) {
+      // Use custom content from campaign
+      console.log('📝 Using custom Instagram content from campaign...');
+      content = {
+        caption: instagramContent.caption || this.generatePostContent(campaignData).caption,
+        imageUrl: instagramContent.mediaUrl,
+        imageUrls: instagramContent.mediaUrls,  // For carousel
+        videoUrl: instagramContent.videoUrl,
+        postType: instagramContent.postType,
+        hashtags: instagramContent.hashtags || [],
+        callToAction: campaignData.goals?.[0],
+      };
+      
+      // Append hashtags to caption if they exist
+      if (content.hashtags.length > 0 && !content.caption.includes('#')) {
+        content.caption += '\n\n' + content.hashtags.join(' ');
+      }
+    } else {
+      // Generate content from campaign data (legacy mode)
+      console.log('⚠️  No custom Instagram content provided, generating from campaign data...');
+      content = this.generatePostContent(campaignData);
+    }
 
-    const feedPost = await this.postToFeed(content);
-    const story = await this.postToStory(content);
+    // Post to feed (image, video, or carousel)
+    let feedPost: any = { success: false, error: 'Not attempted' };
+    
+    if (content.postType === 'story') {
+      // Story-only post
+      feedPost = { success: false, error: 'Post type is story, skipping feed' };
+    } else {
+      feedPost = await this.postToFeed(content);
+    }
+    
+    // Post story if requested or if post type is story
+    let story: any = { success: false, error: 'Story not requested' };
+    if (content.postType === 'story' && (content.imageUrl || content.videoUrl)) {
+      story = await this.postToStory(content);
+    }
 
     return {
       feedPost,

@@ -22,14 +22,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
+    // Determine recipient type based on channels
+    const channels = campaignRequest.channels || [];
+    const isInstagramOnly = channels.length === 1 && channels[0] === 'instagram';
+    const defaultRecipientType = isInstagramOnly ? 'none' : 'list';
+
     // Create scheduled campaign
     const scheduled = await campaignDB.createCampaign({
       campaignName: campaignRequest.campaignName,
       channels: campaignRequest.channels,
       status: 'scheduled',
-      recipientType: campaignRequest.recipientType || 'list',
+      recipientType: campaignRequest.recipientType || defaultRecipientType,
       recipientCount: 0,
-      recipientInfo: campaignRequest.recipientInfo || 'Scheduled',
+      recipientInfo: isInstagramOnly ? 'Instagram post (no recipients)' : (campaignRequest.recipientInfo || 'Scheduled'),
       executedAt: new Date(),
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
       results: {},

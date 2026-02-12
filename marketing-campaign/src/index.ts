@@ -284,10 +284,14 @@ export class MarketingCampaignOrchestrator {
       if (sendingResults.instagramResults) {
         console.log(`\n📸 Instagram Results:`);
         if (sendingResults.instagramResults.feedPost?.success) {
-          console.log(`   ✅ Feed Post: Published`);
+          console.log(`   ✅ Feed Post: Published (ID: ${sendingResults.instagramResults.feedPost.postId})`);
+        } else if (sendingResults.instagramResults.feedPost?.error) {
+          console.log(`   ❌ Feed Post Failed: ${sendingResults.instagramResults.feedPost.error}`);
         }
         if (sendingResults.instagramResults.story?.success) {
           console.log(`   ✅ Story: Published`);
+        } else if (sendingResults.instagramResults.story?.error) {
+          console.log(`   ⚠️ Story: ${sendingResults.instagramResults.story.error}`);
         }
       }
 

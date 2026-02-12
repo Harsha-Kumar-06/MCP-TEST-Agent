@@ -2,8 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/contacts": "pages/contacts.js",
+  "/api/campaigns": "pages/api/campaigns.js",
+  "/campaigns": "pages/campaigns.js",
   "/": "pages/index.js",
   "/api/contacts/lists": "pages/api/contacts/lists.js",
-  "/api/contacts": "pages/api/contacts.js"
+  "/campaigns/create": "pages/campaigns/create.js"
 }

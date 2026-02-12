@@ -41,6 +41,15 @@ export interface CampaignRequest {
       instagram?: string;
     };
   };
+  // Instagram specific content (optional - will auto-generate if not provided)
+  instagramContent?: {
+    postType?: 'image' | 'video' | 'carousel' | 'story';
+    caption?: string;
+    mediaUrl?: string;  // Public URL for image
+    videoUrl?: string;  // Public URL for video
+    mediaUrls?: string[]; // For carousel posts
+    hashtags?: string[];
+  };
 }
 
 export interface SubTask {

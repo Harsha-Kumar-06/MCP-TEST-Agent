@@ -15,14 +15,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Missing campaign request' });
     }
 
+    // Check if this is an Instagram-only campaign (no contacts needed)
+    const channels = campaignRequest.channels || [];
+    const isInstagramOnly = channels.length === 1 && channels[0] === 'instagram';
+    const needsContacts = channels.includes('email') || channels.includes('sms');
+
     let contacts = [];
     let recipientInfo = '';
-    let recipientType: 'list' | 'single' = 'single';
+    let recipientType: 'list' | 'single' | 'none' = 'none';
 
     // Option 1: Single contact provided
     if (singleContact) {
       contacts = [singleContact];
-      recipientInfo = singleContact.email;
+      recipientInfo = singleContact.email || singleContact.phone || 'Single recipient';
       recipientType = 'single';
     } 
     // Option 2: Contact list ID provided
@@ -35,9 +40,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       recipientInfo = contactList.name;
       recipientType = 'list';
     }
-    // Neither provided
-    else {
-      return res.status(400).json({ error: 'Must provide either contactListId or singleContact' });
+    // Option 3: Instagram-only campaign - no contacts needed
+    else if (isInstagramOnly) {
+      recipientInfo = 'Instagram post (no recipients)';
+      recipientType = 'none';
+    }
+    // Neither provided but contacts are needed
+    else if (needsContacts) {
+      return res.status(400).json({ error: 'Must provide either contactListId or singleContact for email/SMS campaigns' });
     }
 
     // Execute campaign

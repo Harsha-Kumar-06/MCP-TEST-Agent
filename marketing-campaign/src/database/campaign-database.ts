@@ -6,7 +6,7 @@ export interface CampaignRecord {
   campaignName: string;
   channels: string[];
   status: 'completed' | 'failed' | 'pending' | 'scheduled';
-  recipientType: 'list' | 'single';
+  recipientType: 'list' | 'single' | 'none';  // 'none' for Instagram-only campaigns
   recipientCount: number;
   recipientInfo: string; // List name or contact email
   executedAt: Date;

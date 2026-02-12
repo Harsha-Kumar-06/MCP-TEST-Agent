@@ -552,32 +552,83 @@ TEXTBELT_API_KEY=textbelt
 ## 📸 Instagram Features
 
 ### 13. Instagram Integration
-**Status: ✅ WORKING (Setup Required)**
+**Status: ✅ FULLY WORKING**
+
+**Supported Post Types:**
+
+| Type | Status | Description |
+|------|--------|-------------|
+| **Image** | ✅ Working | Single image with caption |
+| **Video/Reels** | ✅ Working | Video or Reel post |
+| **Carousel** | ✅ Working | Multi-image post (2-10 images) |
+| **Story** | ✅ Working | 24-hour disappearing post |
 
 **Features:**
-- Automated feed posting
-- AI-generated captions
-- Hashtag optimization
-- Link in bio support
-- Post tracking
+- ✅ Automated feed posting (any post type)
+- ✅ AI-generated captions from campaign data
+- ✅ Hashtag optimization
+- ✅ Automatic media processing & retry
+- ✅ No contacts needed for Instagram-only campaigns
+- ✅ Live preview in campaign creation UI
+- ✅ Support for external image/video URLs
+
+**How It Works:**
+
+```
+1. Upload Campaign Document
+         ↓
+2. System auto-generates Instagram content:
+   - Caption from product info
+   - Hashtags from interests
+   - Fetches image URL (or uses AI generation)
+         ↓
+3. Execute Campaign
+         ↓
+4. Instagram Agent:
+   - Creates media container
+   - Waits for media processing
+   - Retries if Instagram backend busy
+   - Publishes post
+         ↓
+5. Post appears on your Instagram feed!
+```
+
+**UI Features:**
+- Post type selector (Image/Video/Carousel/Story)
+- Caption editor with character count
+- Hashtag input
+- Media URL input (single or multiple for carousel)
+- Live preview showing how post will look
 
 **Setup Required:**
-1. Create Facebook app (10 minutes)
-2. Get access token
-3. Get Instagram account ID
-4. Add to `.env` file
+1. Create Facebook app at developers.facebook.com (10 minutes)
+2. Add "Facebook Login for Business" product with Instagram permissions
+3. Get access token from Graph API Explorer (must start with "EAA...")
+4. Get Instagram Business Account ID (format: 17841xxxxxxxxxx)
+5. Add to `.env` file
+
+See: `INSTAGRAM-QUICK-SETUP.md` for detailed instructions.
 
 **Permissions Needed:**
-- instagram_basic
-- instagram_content_publish
-- pages_read_engagement
+- `instagram_basic` - Read account info
+- `instagram_content_publish` - Post content
+- `pages_read_engagement` - Access Page insights
+- `pages_show_list` - List your Pages
+- `business_management` - Business account access
 
-**API Limits:**
-- 200 posts per day (FREE)
-- No cost for posting
+**API Limits (FREE):**
+- 200 posts per 24 hours
+- 25 API calls per hour per user
+- No cost for posting!
+
+**Error Handling:**
+- Automatic retry on "media not ready" errors
+- Waits for image processing to complete
+- Clear error messages in console
 
 **Files:**
 - `/src/agents/instagram-posting-agent.ts`
+- `/pages/campaigns/create.tsx` (UI section)
 - Documentation: `INSTAGRAM-QUICK-SETUP.md`
 
 ---

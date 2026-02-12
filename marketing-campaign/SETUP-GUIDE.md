@@ -161,12 +161,31 @@ TEXTBELT_API_KEY=textbelt
 # PLIVO_AUTH_TOKEN=your_token
 # PLIVO_FROM_NUMBER=your_number
 
-# Instagram (optional)
+# Instagram (for automatic posting - supports Image/Video/Carousel/Story)
+# See INSTAGRAM-QUICK-SETUP.md for detailed instructions
+# Token MUST start with "EAA..." (use Facebook Login method, NOT Instagram Login)
 INSTAGRAM_ACCESS_TOKEN=EAA...
 INSTAGRAM_ACCOUNT_ID=17841234567890123
 ```
 
-### 6. Run the Application
+### 6. Configure Instagram (Optional)
+
+Follow the detailed guide in `INSTAGRAM-QUICK-SETUP.md` or:
+
+1. Create Facebook App at https://developers.facebook.com/apps/create/
+2. Select "Other" → "Business" → Choose "Instagram" use case
+3. Add "Facebook Login for Business" product
+4. Get token from Graph API Explorer (must start with `EAA...`)
+5. Get Instagram Business Account ID (format: `17841xxxxxxxxxx`)
+6. Add to `.env` file
+
+**Supported Post Types:**
+- 📷 Image posts
+- 🎬 Video/Reels
+- 🎠 Carousel (2-10 images)
+- 📱 Stories
+
+### 7. Run the Application
 
 ```bash
 # Start Next.js development server (Web UI)

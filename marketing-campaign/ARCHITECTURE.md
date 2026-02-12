@@ -439,21 +439,36 @@ User Input → SMS Content Agent → SMS Sending Agent
 ```
 
 ### Instagram Channel (Facebook Graph API)
+
+**Supported Post Types:** Image, Video/Reels, Carousel (2-10 images), Stories
+
 ```
 User Input → Instagram Posting Agent
                     │
-                    ├─→ Generate Caption
+                    ├─→ Generate/Use Custom Caption
                     │   ├─→ Product description
                     │   ├─→ Features list
-                    │   ├─→ Hashtags (10 max)
+                    │   ├─→ Hashtags (auto-generated or custom)
                     │   └─→ Call-to-action
                     │
-                    └─→ Facebook Graph API
-                        ├─→ Step 1: Create Media Container
+                    └─→ Facebook Graph API v18.0
+                        ├─→ [Image/Video] Step 1: Create Media Container
                         │   POST /v18.0/{account}/media
                         │   └─→ Returns: creation_id
                         │
-                        └─→ Step 2: Publish Post
+                        ├─→ [Carousel] Step 1a: Create Child Containers
+                        │   POST /v18.0/{account}/media (per image)
+                        │   └─→ Returns: child_ids[]
+                        │
+                        ├─→ [Carousel] Step 1b: Create Carousel Container
+                        │   POST /v18.0/{account}/media
+                        │   └─→ {media_type: CAROUSEL, children: child_ids}
+                        │
+                        ├─→ Step 2: Wait for Media Processing
+                        │   GET /v18.0/{creation_id}?fields=status_code
+                        │   └─→ Loop until status_code = FINISHED
+                        │
+                        └─→ Step 3: Publish Post (with retry)
                             POST /v18.0/{account}/media_publish
                             └─→ Returns: media_id
                             └─→ URL: instagram.com/p/{shortcode}

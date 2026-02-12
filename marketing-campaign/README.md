@@ -232,9 +232,40 @@ PLIVO_AUTH_ID=your_auth_id
 PLIVO_AUTH_TOKEN=your_token
 PLIVO_FROM_NUMBER=+15551234567
 
-# Instagram (for posting - optional)
+# Instagram (for automatic posting)
+# Supports: Image, Video/Reels, Carousel, Stories
+# See INSTAGRAM-QUICK-SETUP.md for setup instructions
 INSTAGRAM_ACCESS_TOKEN=EAA...
 INSTAGRAM_ACCOUNT_ID=17841234567890123
+```
+
+### Instagram Post Types
+
+The system supports all Instagram post types:
+
+| Type | Description | Requirements |
+|------|-------------|--------------|
+| **Image** | Single image post | Public image URL |
+| **Video/Reels** | Video post or Reel | Public video URL |
+| **Carousel** | Multi-image post (2-10 images) | Multiple public image URLs |
+| **Story** | 24-hour story post | Public image or video URL |
+
+```typescript
+// Example: Instagram-only campaign
+const campaignRequest = {
+  channels: ['instagram'],
+  instagramContent: {
+    postType: 'carousel',
+    caption: 'Check out our new products!',
+    mediaUrls: [
+      'https://example.com/image1.jpg',
+      'https://example.com/image2.jpg',
+      'https://example.com/image3.jpg',
+    ],
+    hashtags: ['#newproduct', '#launch', '#mustbuy'],
+  },
+  // ... other campaign fields
+};
 ```
 
 ### LLM Configuration
