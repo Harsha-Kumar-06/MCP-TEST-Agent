@@ -25,7 +25,7 @@ AI-powered organizational access authority agent built with **Google ADK**. It a
 **Flow:** 
 1. Email arrives → Agent fetches unread emails
 2. Coordinator parses intent → Determines target platform(s)
-3. Coordinator delegates to appropriate agent(s) → JiraAgent, ConfluenceAgent, or BitbucketAgent
+3. Coordinator delegates to appropriate agent(s) → JiraAgent, ConfluenceAgent, BitbucketAgent, or GitHubAgent
 4. Agent executes the action → Returns result
 5. Coordinator → Delegates to **EmailAgent** to send reply
 
@@ -36,6 +36,7 @@ AI-powered organizational access authority agent built with **Google ADK**. It a
 | **Jira** | Projects, Roles, Groups | JiraAgent |
 | **Confluence** | Spaces, Permissions | ConfluenceAgent |
 | **Bitbucket** | Repositories, Workspaces, Groups | BitbucketAgent |
+| **GitHub** | Organizations, Repositories, Teams | GitHubAgent |
 
 ## Capabilities
 
@@ -295,7 +296,50 @@ adk web --port 8000
 
 ## Future Integrations (Planned)
 
-- **GitHub**: Organization and repository permissions
 - **Microsoft Teams**: Team membership management
 - **AWS IAM**: Cloud access permissions
 - **Google Workspace**: Shared drive and group management
+
+
+### GitHub Access Management
+
+#### Organization Management
+- **Invite users**: Invite users to GitHub organization by email
+- **Remove users**: Remove org members or outside collaborators
+- **List members**: View organization members
+- **List invitations**: See pending organization invitations
+
+#### Repository Permissions
+- **Grant access**: Add collaborators with pull/push/admin/maintain/triage permissions
+- **Revoke access**: Remove collaborator access
+- **Check user permission**: Get a user's effective repo permission
+- **List collaborators**: See repository collaborators
+
+#### Team Management
+- **List teams**: View all organization teams
+- **Add to team**: Add users to teams as member/maintainer
+- **Remove from team**: Remove users from team memberships
+- **Grant team repo access**: Assign team permissions to repositories
+- **Revoke team repo access**: Remove team permissions from repositories
+
+### Required: GitHub Configuration (GitHub App)
+```bash
+GITHUB_ORG=your-github-org
+GITHUB_APP_ID=123456
+GITHUB_APP_PRIVATE_KEY=your_private_key_pem_with_newlines_escaped
+GITHUB_INSTALLATION_ID=987654321  # optional, auto-resolved if omitted
+GITHUB_API_BASE_URL=https://api.github.com
+GITHUB_API_VERSION=2022-11-28
+```
+
+**GitHub App required permissions:**
+- Organization members: Read and write
+- Repository administration: Read and write
+- Metadata: Read-only
+
+### GitHub Access
+- `"Invite dev.user@company.com to GitHub organization"`
+- `"Give alice write access to the api-service GitHub repository"`
+- `"Remove bob from the platform team in GitHub"`
+- `"Grant platform team admin access to backend-infra repository"`
+- `"What GitHub repositories does alice have access to?"`

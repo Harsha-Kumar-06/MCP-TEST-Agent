@@ -10,6 +10,7 @@ from typing import Any
 from .jira_service import get_jira_service
 from .bitbucket_service import get_atlassian_admin_service
 from .confluence_service import get_confluence_service
+from .github_service import get_github_service
 
 logger = logging.getLogger(__name__)
 
@@ -1597,7 +1598,6 @@ def confluence_add_group_to_space(
         res["space_name"] = space_name
     logger.info(f"confluence_add_group_to_space result: {res}")
     return res
-    return res
 
 
 def confluence_list_user_access(user_email: str) -> dict[str, Any]:
@@ -2170,3 +2170,243 @@ def bitbucket_remove_user_from_group(
     
     logger.info(f"bitbucket_remove_user_from_group result: {res}")
     return res
+
+
+# ============================================================================
+# GITHUB TOOLS
+# ============================================================================
+
+def _normalize_github_repo_permission(permission: str) -> str:
+    p = (permission or "push").strip().lower()
+    mapping = {
+        "read": "pull",
+        "pull": "pull",
+        "write": "push",
+        "push": "push",
+        "admin": "admin",
+        "maintain": "maintain",
+        "triage": "triage",
+    }
+    return mapping.get(p, "push")
+
+
+def _resolve_github_username(user_identifier: str) -> dict[str, Any]:
+    svc = get_github_service()
+    return svc.resolve_user_identifier(user_identifier)
+
+
+def github_invite_user_to_org(user_email: str, role: str = "member") -> dict[str, Any]:
+    """Invite a user to the configured GitHub organization by email."""
+    logger.info(f"github_invite_user_to_org(user_email={user_email}, role={role})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.invite_user_to_org(user_email, role)
+
+
+def github_remove_user_from_org(username: str) -> dict[str, Any]:
+    """Remove a user from GitHub organization membership or outside collaborators."""
+    logger.info(f"github_remove_user_from_org(username={username})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.remove_user_from_org(username)
+
+
+def github_list_org_members(filter: str = "all") -> dict[str, Any]:
+    """List members of the GitHub organization."""
+    logger.info(f"github_list_org_members(filter={filter})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.list_org_members(filter)
+
+
+def github_list_org_invitations() -> dict[str, Any]:
+    """List pending invitations for the GitHub organization."""
+    logger.info("github_list_org_invitations()")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.list_org_invitations()
+
+
+def github_list_org_repositories(limit: int = 100) -> dict[str, Any]:
+    """List repositories in the GitHub organization."""
+    logger.info(f"github_list_org_repositories(limit={limit})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.list_org_repositories(limit)
+
+
+def github_grant_repository_access(user_identifier: str, repo: str, permission: str = "push") -> dict[str, Any]:
+    """
+    Grant repository access in GitHub.
+    Accepts email or username. If email can't be resolved, auto-invites and returns partial.
+    """
+    logger.info(
+        "github_grant_repository_access(user_identifier=%s, repo=%s, permission=%s)",
+        user_identifier,
+        repo,
+        permission,
+    )
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+
+    normalized_permission = _normalize_github_repo_permission(permission)
+    resolved = _resolve_github_username(user_identifier)
+
+    if resolved.get("status") == "success":
+        username = resolved.get("username")
+        member_state = svc.is_org_member(username)
+
+        if member_state.get("status") == "success" and not member_state.get("is_member") and "@" in user_identifier:
+            invite_result = svc.invite_user_to_org(user_identifier, role="member")
+            if invite_result.get("status") == "success":
+                grant_result = svc.grant_repository_access(username, repo, normalized_permission)
+                if grant_result.get("status") == "success":
+                    grant_result["invited"] = True
+                    return grant_result
+                return {
+                    "status": "partial",
+                    "message": (
+                        f"Invited {user_identifier} to GitHub org. Repository access to '{repo}' "
+                        "could not be finalized yet. Retry after membership is active."
+                    ),
+                    "invite_result": invite_result,
+                    "grant_result": grant_result,
+                }
+
+        return svc.grant_repository_access(username, repo, normalized_permission)
+
+    if resolved.get("pending_invitation"):
+        return {
+            "status": "partial",
+            "message": (
+                f"{user_identifier} already has a pending organization invitation. "
+                f"Repository access to '{repo}' will complete after they accept it."
+            ),
+            "pending_invitation": True,
+        }
+
+    if resolved.get("needs_username") and "@" in user_identifier:
+        invite_result = svc.invite_user_to_org(user_identifier, role="member")
+        if invite_result.get("status") == "success":
+            return {
+                "status": "partial",
+                "message": (
+                    f"Invited {user_identifier} to organization. Need their GitHub username "
+                    f"to finalize repository '{repo}' access."
+                ),
+                "needs_username": True,
+            }
+
+    return resolved
+
+
+def github_revoke_repository_access(user_identifier: str, repo: str) -> dict[str, Any]:
+    """Revoke repository collaborator access in GitHub."""
+    logger.info(f"github_revoke_repository_access(user_identifier={user_identifier}, repo={repo})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+
+    resolved = _resolve_github_username(user_identifier)
+    if resolved.get("status") != "success":
+        return resolved
+
+    return svc.revoke_repository_access(resolved.get("username"), repo)
+
+
+def github_get_repository_user_permission(user_identifier: str, repo: str) -> dict[str, Any]:
+    """Get a user's current permission for a GitHub repository."""
+    logger.info(f"github_get_repository_user_permission(user_identifier={user_identifier}, repo={repo})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+
+    resolved = _resolve_github_username(user_identifier)
+    if resolved.get("status") != "success":
+        return resolved
+
+    return svc.get_repository_user_permission(resolved.get("username"), repo)
+
+
+def github_list_repository_collaborators(repo: str, affiliation: str = "all") -> dict[str, Any]:
+    """List collaborators on a GitHub repository."""
+    logger.info(f"github_list_repository_collaborators(repo={repo}, affiliation={affiliation})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.list_repository_collaborators(repo, affiliation)
+
+
+def github_list_teams() -> dict[str, Any]:
+    """List all teams in the GitHub organization."""
+    logger.info("github_list_teams()")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.list_teams()
+
+
+def github_add_user_to_team(user_identifier: str, team_slug: str, role: str = "member") -> dict[str, Any]:
+    """Add a user to a GitHub team by username or email."""
+    logger.info(
+        "github_add_user_to_team(user_identifier=%s, team_slug=%s, role=%s)",
+        user_identifier,
+        team_slug,
+        role,
+    )
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+
+    resolved = _resolve_github_username(user_identifier)
+    if resolved.get("status") != "success":
+        if resolved.get("needs_username") and "@" in user_identifier:
+            invite_result = svc.invite_user_to_org(user_identifier, role="member")
+            if invite_result.get("status") == "success":
+                return {
+                    "status": "partial",
+                    "message": (
+                        f"Invited {user_identifier} to organization. Need GitHub username "
+                        f"to add them to team '{team_slug}'."
+                    ),
+                    "needs_username": True,
+                }
+        return resolved
+
+    normalized_role = "maintainer" if str(role).lower() == "maintainer" else "member"
+    return svc.add_user_to_team(resolved.get("username"), team_slug, normalized_role)
+
+
+def github_remove_user_from_team(username: str, team_slug: str) -> dict[str, Any]:
+    """Remove a user from a GitHub team."""
+    logger.info(f"github_remove_user_from_team(username={username}, team_slug={team_slug})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.remove_user_from_team(username, team_slug)
+
+
+def github_grant_team_repo_access(team_slug: str, repo: str, permission: str = "push") -> dict[str, Any]:
+    """Grant a GitHub team access to a repository."""
+    logger.info(f"github_grant_team_repo_access(team_slug={team_slug}, repo={repo}, permission={permission})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+
+    normalized_permission = _normalize_github_repo_permission(permission)
+    return svc.grant_team_repo_access(team_slug, repo, normalized_permission)
+
+
+def github_revoke_team_repo_access(team_slug: str, repo: str) -> dict[str, Any]:
+    """Revoke a GitHub team's repository access."""
+    logger.info(f"github_revoke_team_repo_access(team_slug={team_slug}, repo={repo})")
+    svc = get_github_service()
+    if not svc.is_configured():
+        return {"status": "skipped", "message": "GitHub not configured."}
+    return svc.revoke_team_repo_access(team_slug, repo)
