@@ -2195,13 +2195,21 @@ def _resolve_github_username(user_identifier: str) -> dict[str, Any]:
     return svc.resolve_user_identifier(user_identifier)
 
 
-def github_invite_user_to_org(user_email: str, role: str = "member") -> dict[str, Any]:
-    """Invite a user to the configured GitHub organization by email."""
-    logger.info(f"github_invite_user_to_org(user_email={user_email}, role={role})")
+def github_invite_user_to_org(user_identifier: str, role: str = "member") -> dict[str, Any]:
+    """
+    Invite a user to the configured GitHub organization.
+    
+    Args:
+        user_identifier: Email address OR GitHub username.
+            - If user has a GitHub account, use their username (preferred)
+            - If user doesn't have GitHub yet, use their email
+        role: 'member' (default) or 'admin'
+    """
+    logger.info(f"github_invite_user_to_org(user_identifier={user_identifier}, role={role})")
     svc = get_github_service()
     if not svc.is_configured():
         return {"status": "skipped", "message": "GitHub not configured."}
-    return svc.invite_user_to_org(user_email, role)
+    return svc.invite_user_to_org(user_identifier, role)
 
 
 def github_remove_user_from_org(username: str) -> dict[str, Any]:

@@ -179,8 +179,21 @@ class GitHubService:
         try:
             payload = resp.json()
             if isinstance(payload, dict):
-                if payload.get("message"):
-                    return payload["message"]
+                message = payload.get("message", "")
+                # GitHub returns detailed errors in 'errors' array for 422 responses
+                errors = payload.get("errors", [])
+                if errors:
+                    error_details = []
+                    for err in errors:
+                        if isinstance(err, dict):
+                            # err can have: resource, field, code, message
+                            err_msg = err.get("message") or err.get("code", "")
+                            if err_msg:
+                                error_details.append(err_msg)
+                    if error_details:
+                        return f"{message}: {'; '.join(error_details)}" if message else "; ".join(error_details)
+                if message:
+                    return message
                 if payload.get("error"):
                     return payload["error"]
             return f"GitHub API error ({resp.status_code})"
@@ -291,19 +304,117 @@ class GitHubService:
             return {"status": "success", "is_member": False}
         return err
 
-    def invite_user_to_org(self, user_email: str, role: str = "member") -> dict[str, Any]:
-        if self._is_user_account:
-            return self._org_only_error("Invite to organization")
-        data, err = self._request(
-            "POST",
-            f"orgs/{self.org}/invitations",
-            json={"email": user_email, "role": role},
-        )
+    def get_user_by_username(self, username: str) -> dict[str, Any]:
+        """Get GitHub user information by username, including their numeric ID."""
+        username = (username or "").strip()
+        if not username:
+            return {"status": "error", "error": "Username is required."}
+        data, err = self._request("GET", f"users/{username}")
         if err:
             return err
         return {
             "status": "success",
-            "message": f"Invited {user_email} to GitHub organization '{self.org}' as {role}.",
+            "user": {
+                "id": data.get("id"),
+                "login": data.get("login"),
+                "name": data.get("name"),
+                "email": data.get("email"),
+                "type": data.get("type"),
+            },
+        }
+
+    def invite_user_to_org(
+        self, user_identifier: str, role: str = "member"
+    ) -> dict[str, Any]:
+        """
+        Invite a user to the GitHub organization.
+        
+        Args:
+            user_identifier: Email address OR GitHub username.
+                - If contains '@', treated as email and uses email-based invitation
+                - Otherwise, treated as username, resolves to user ID, and uses invitee_id
+            role: 'member' (default) or 'admin'
+        """
+        if self._is_user_account:
+            return self._org_only_error("Invite to organization")
+        
+        user_identifier = (user_identifier or "").strip()
+        if not user_identifier:
+            return {"status": "error", "error": "User identifier (email or username) is required."}
+        
+        # GitHub API expects: direct_member, admin, or billing_manager
+        # Map common aliases to the correct API values
+        role_mapping = {
+            "member": "direct_member",
+            "direct_member": "direct_member",
+            "admin": "admin",
+            "billing_manager": "billing_manager",
+        }
+        api_role = role_mapping.get(role.lower().strip(), "direct_member")
+        
+        # Check if it's an email or username
+        if "@" in user_identifier:
+            # Email-based invitation
+            invitation_data = {"email": user_identifier, "role": api_role}
+            display_name = user_identifier
+            username = None
+        else:
+            # Username-based invitation - need to get user ID first
+            username = user_identifier
+            logger.info(f"Looking up GitHub user: {user_identifier}")
+            
+            # First check if user is already a member
+            member_check = self.is_org_member(username)
+            if member_check.get("status") == "success" and member_check.get("is_member"):
+                return {
+                    "status": "success",
+                    "message": f"'{username}' is already a member of organization '{self.org}'.",
+                    "already_member": True,
+                }
+            
+            # Check for pending invitation
+            invitations = self.list_org_invitations()
+            if invitations.get("status") == "success":
+                for inv in invitations.get("invitations", []):
+                    if inv.get("login", "").lower() == username.lower():
+                        return {
+                            "status": "success",
+                            "message": f"'{username}' already has a pending invitation to organization '{self.org}'.",
+                            "pending_invitation": True,
+                            "invitation": inv,
+                        }
+            
+            user_info = self.get_user_by_username(user_identifier)
+            logger.info(f"User lookup result: {user_info}")
+            if user_info.get("status") != "success":
+                return {
+                    "status": "error",
+                    "error": f"Could not find GitHub user '{user_identifier}'. Please verify the username exists.",
+                    "details": user_info.get("error"),
+                }
+            user_id = user_info.get("user", {}).get("id")
+            if not user_id:
+                return {
+                    "status": "error",
+                    "error": f"Could not retrieve user ID for '{user_identifier}'.",
+                }
+            logger.info(f"Found user ID {user_id} for {user_identifier}")
+            invitation_data = {"invitee_id": user_id, "role": api_role}
+            display_name = user_identifier
+        
+        logger.info(f"Sending org invitation with data: {invitation_data}")
+        data, err = self._request(
+            "POST",
+            f"orgs/{self.org}/invitations",
+            json=invitation_data,
+        )
+        if err:
+            logger.error(f"Invitation error: {err}")
+            return err
+        logger.info(f"Invitation successful: {data}")
+        return {
+            "status": "success",
+            "message": f"Invited {display_name} to GitHub organization '{self.org}' as {role}.",
             "invitation": data,
         }
 
@@ -342,6 +453,7 @@ class GitHubService:
         invitations = [
             {
                 "id": i.get("id"),
+                "login": i.get("login"),  # GitHub username if invited by username/id
                 "email": i.get("email"),
                 "role": i.get("role"),
                 "created_at": i.get("created_at"),
