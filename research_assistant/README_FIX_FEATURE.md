@@ -59,7 +59,7 @@ approach for preventing SQL injection vulnerabilities.
 
 ✅ User can immediately copy-paste the fix!
 
----
+-----
 
 ## 🚀 How to Test
 
