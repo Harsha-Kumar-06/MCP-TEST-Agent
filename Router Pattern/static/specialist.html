@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialist Console - CorpAssist</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/specialist.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="specialist-view">
+    <div class="app-container">
+        <!-- Sidebar with Escalation Info -->
+        <aside class="sidebar specialist-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Specialist Console</span>
+                </div>
+            </div>
+            
+            <!-- Connection Status -->
+            <div class="connection-status" id="connectionStatus">
+                <i class="fas fa-circle"></i>
+                <span>Connecting...</span>
+            </div>
+            
+            <!-- Escalation Details -->
+            <div class="escalation-info" id="escalationInfo">
+                <h3><i class="fas fa-ticket-alt"></i> Escalation Details</h3>
+                <div class="info-loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
+            </div>
+            
+            <!-- User Info -->
+            <div class="user-info-panel" id="userInfoPanel" style="display: none;">
+                <h3><i class="fas fa-user"></i> User Information</h3>
+                <div id="userDetails"></div>
+            </div>
+            
+            <!-- Quick Responses -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3>Quick Responses</h3>
+                    <button class="quick-action" onclick="sendQuickResponse('I\'m reviewing your request now.')">
+                        <i class="fas fa-eye"></i> Reviewing
+                    </button>
+                    <button class="quick-action" onclick="sendQuickResponse('I need a few more details. Can you please clarify?')">
+                        <i class="fas fa-question-circle"></i> Need Details
+                    </button>
+                    <button class="quick-action" onclick="sendQuickResponse('I\'ve resolved your issue. Is there anything else I can help with?')">
+                        <i class="fas fa-check-circle"></i> Resolved
+                    </button>
+                    <button class="quick-action" onclick="sendQuickResponse('I\'m escalating this to a senior specialist. Please hold.')">
+                        <i class="fas fa-level-up-alt"></i> Escalate Further
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="close-session-btn" onclick="closeSession()">
+                    <i class="fas fa-times-circle"></i> Close Session
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <!-- Header -->
+            <header class="chat-header specialist-header">
+                <div class="header-info">
+                    <h1>Escalation Chat</h1>
+                    <p class="status" id="chatStatus"><span class="status-dot"></span> Connecting to user...</p>
+                </div>
+                <div class="header-actions">
+                    <span class="specialist-badge">
+                        <i class="fas fa-headset"></i> Specialist Mode
+                    </span>
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages Area -->
+            <div class="messages-container" id="messagesContainer">
+                <!-- Waiting for connection message -->
+                <div class="specialist-welcome" id="specialistWelcome">
+                    <div class="welcome-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h2>Specialist Console</h2>
+                    <p>Connecting to escalation session...</p>
+                    <div class="loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your response to the user..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                        disabled
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="input-hint">Press Enter to send • Shift + Enter for new line</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Invalid Session Modal -->
+    <div class="modal" id="invalidSessionModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-icon error">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Invalid or Expired Session</h2>
+            <p>This escalation link is invalid or has expired. Please use the link from your notification.</p>
+            <button class="modal-btn" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <!-- Resolution Notes Modal -->
+    <div class="modal" id="resolutionModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h2>Close Session</h2>
+            <p>Please document how the issue was resolved before closing.</p>
+            <textarea 
+                id="resolutionNotes" 
+                placeholder="Enter resolution notes (e.g., 'Reset user password and verified access')..."
+                rows="4"
+                style="width: 100%; margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: vertical;"
+            ></textarea>
+            <select id="resolutionCode" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px;">
+                <option value="Solved (Permanently)">Solved (Permanently)</option>
+                <option value="Solved (Work Around)">Solved (Work Around)</option>
+                <option value="Not Solved (Not Reproducible)">Not Solved (Not Reproducible)</option>
+                <option value="Not Solved (Too Costly)">Not Solved (Too Costly)</option>
+                <option value="Closed/Resolved by Caller">Closed/Resolved by Caller</option>
+            </select>
+            <div style="display: flex; gap: 10px;">
+                <button class="modal-btn" style="background: #6c757d;" onclick="hideResolutionModal()">Cancel</button>
+                <button class="modal-btn" onclick="confirmCloseSession()">Close Session</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Closed Modal -->
+    <div class="modal" id="sessionClosedModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Session Closed</h2>
+            <p>The support session has been closed successfully.</p>
+            <button class="modal-btn" onclick="window.close()">Close Window</button>
+        </div>
+    </div>
+
+    <script src="/static/js/specialist.js"></script>
+</body>
+</html>

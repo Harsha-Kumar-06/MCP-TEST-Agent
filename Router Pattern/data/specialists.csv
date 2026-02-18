@@ -1,0 +1,5 @@
+department,name,email,expertise,available,phone,teams_id,servicenow_user
+IT_Support,Alex Chen,alex.chen@company.com,"hardware,network,security",true,+1-555-0101,alex.chen@company.com,alex.chen
+HR,Sarah Johnson,sarah.johnson@company.com,"benefits,payroll,leave",true,+1-555-0201,sarah.johnson@company.com,sarah.johnson
+Sales,David Lee,david.lee@company.com,"enterprise,contracts,pricing",true,+1-555-0301,david.lee@company.com,david.lee
+Legal,Lisa Anderson,lisa.anderson@company.com,"employment_law,policies,disputes",false,+1-555-0402,lisa.anderson@company.com,lisa.anderson

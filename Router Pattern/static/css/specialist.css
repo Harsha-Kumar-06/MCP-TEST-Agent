@@ -1,0 +1,394 @@
+/**
+ * CorpAssist - Specialist Console Styles
+ */
+
+/* Specialist View Specific Styles */
+.specialist-view {
+    --specialist-accent: #9333ea;
+    --specialist-accent-light: #a855f7;
+}
+
+/* Specialist Sidebar */
+.specialist-sidebar {
+    background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.specialist-sidebar .logo i {
+    color: var(--specialist-accent-light);
+}
+
+/* Connection Status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    margin: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.connection-status.connecting {
+    background: rgba(234, 179, 8, 0.2);
+    color: #fbbf24;
+}
+
+.connection-status.connected {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.connection-status.disconnected,
+.connection-status.error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.connection-status i {
+    font-size: 8px;
+    animation: pulse 2s infinite;
+}
+
+.connection-status.connected i {
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Escalation Info Panel */
+.escalation-info,
+.user-info-panel {
+    padding: 16px;
+    margin: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.escalation-info h3,
+.user-info-panel h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #a5b4fc;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.escalation-info .info-loading {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.info-item {
+    margin-bottom: 10px;
+}
+
+.info-item label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.info-item span,
+.info-item p {
+    font-size: 13px;
+    color: #e2e8f0;
+}
+
+.info-item a {
+    color: var(--specialist-accent-light);
+    text-decoration: none;
+}
+
+.info-item a:hover {
+    text-decoration: underline;
+}
+
+.info-item.issue-summary p {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+/* Urgency Badge */
+.urgency-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px !important;
+    font-weight: 600;
+}
+
+.urgency-badge.critical {
+    background: #dc2626;
+    color: white;
+}
+
+.urgency-badge.high {
+    background: #f97316;
+    color: white;
+}
+
+.urgency-badge.normal {
+    background: #3b82f6;
+    color: white;
+}
+
+.urgency-badge.low {
+    background: #22c55e;
+    color: white;
+}
+
+/* Close Session Button */
+.close-session-btn {
+    width: calc(100% - 24px);
+    margin: 12px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.close-session-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fecaca;
+}
+
+/* Specialist Header */
+.specialist-header {
+    border-bottom: 2px solid var(--specialist-accent);
+}
+
+.specialist-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--specialist-accent);
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Message Styles for Specialist View */
+.specialist-view .message.user {
+    flex-direction: row;
+}
+
+.specialist-view .message.user .message-avatar {
+    background: #3b82f6;
+}
+
+.specialist-view .message.user .message-content {
+    background: #1e40af;
+    color: white;
+    border-radius: 4px 16px 16px 16px;
+}
+
+.specialist-view .message.specialist {
+    flex-direction: row-reverse;
+}
+
+.specialist-view .message.specialist .message-avatar {
+    background: var(--specialist-accent);
+}
+
+.specialist-view .message.specialist .message-content {
+    background: #581c87;
+    color: white;
+    border-radius: 16px 4px 16px 16px;
+}
+
+.specialist-view .message.ai .message-avatar {
+    background: #059669;
+}
+
+.specialist-view .message.ai .message-content {
+    background: #064e3b;
+    color: white;
+}
+
+/* Message Header */
+.message-header {
+    margin-bottom: 4px;
+}
+
+.message-sender {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* System Message */
+.system-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    margin: 16px 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.system-message i {
+    color: #64748b;
+}
+
+/* Specialist Welcome */
+.specialist-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.specialist-welcome .welcome-icon {
+    background: linear-gradient(135deg, var(--specialist-accent), #6366f1);
+}
+
+.specialist-welcome h2 {
+    color: #e2e8f0;
+    margin-top: 20px;
+}
+
+.specialist-welcome .loading-spinner {
+    margin-top: 20px;
+    font-size: 24px;
+    color: var(--specialist-accent-light);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1e293b;
+    padding: 32px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+}
+
+.modal-icon.error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.modal-icon.success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.modal-content h2 {
+    color: #e2e8f0;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.modal-content p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.modal-btn {
+    padding: 12px 32px;
+    background: var(--specialist-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-btn:hover {
+    background: var(--specialist-accent-light);
+}
+
+/* Quick Actions for Specialist */
+.specialist-sidebar .quick-action {
+    background: rgba(147, 51, 234, 0.2);
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+.specialist-sidebar .quick-action:hover {
+    background: rgba(147, 51, 234, 0.3);
+}
+
+/* Dark Theme Adjustments */
+.dark-theme.specialist-view .specialist-sidebar {
+    background: linear-gradient(180deg, #0f0d24 0%, #1e1b4b 100%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .specialist-sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: 100;
+        transition: left 0.3s;
+    }
+    
+    .specialist-sidebar.open {
+        left: 0;
+    }
+    
+    .escalation-info,
+    .user-info-panel {
+        margin: 4px 8px;
+        padding: 12px;
+    }
+}

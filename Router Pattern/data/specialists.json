@@ -1,0 +1,100 @@
+{
+  "IT_Support": [
+    {
+      "name": "Alex Chen",
+      "email": "alex.chen@company.com",
+      "expertise": ["hardware", "network", "security"],
+      "available": true,
+      "phone": "+1-555-0101",
+      "teams_id": "alex.chen@company.com",
+      "servicenow_user": "alex.chen"
+    },
+    {
+      "name": "Maria Garcia",
+      "email": "maria.garcia@company.com",
+      "expertise": ["software", "licenses", "cloud"],
+      "available": true,
+      "phone": "+1-555-0102",
+      "teams_id": "maria.garcia@company.com",
+      "servicenow_user": "maria.garcia"
+    },
+    {
+      "name": "James Wilson",
+      "email": "james.wilson@company.com",
+      "expertise": ["infrastructure", "servers", "databases"],
+      "available": false,
+      "phone": "+1-555-0103",
+      "teams_id": "james.wilson@company.com",
+      "servicenow_user": "james.wilson"
+    }
+  ],
+  "HR": [
+    {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@company.com",
+      "expertise": ["benefits", "payroll", "leave"],
+      "available": true,
+      "phone": "+1-555-0201",
+      "teams_id": "sarah.johnson@company.com",
+      "servicenow_user": "sarah.johnson"
+    },
+    {
+      "name": "Michael Brown",
+      "email": "michael.brown@company.com",
+      "expertise": ["recruiting", "onboarding", "policies"],
+      "available": true,
+      "phone": "+1-555-0202",
+      "teams_id": "michael.brown@company.com",
+      "servicenow_user": "michael.brown"
+    },
+    {
+      "name": "Emily Davis",
+      "email": "emily.davis@company.com",
+      "expertise": ["employee_relations", "performance", "training"],
+      "available": false,
+      "phone": "+1-555-0203",
+      "teams_id": "emily.davis@company.com",
+      "servicenow_user": "emily.davis"
+    }
+  ],
+  "Sales": [
+    {
+      "name": "David Lee",
+      "email": "david.lee@company.com",
+      "expertise": ["enterprise", "contracts", "pricing"],
+      "available": true,
+      "phone": "+1-555-0301",
+      "teams_id": "david.lee@company.com",
+      "servicenow_user": "david.lee"
+    },
+    {
+      "name": "Jennifer Martinez",
+      "email": "jennifer.martinez@company.com",
+      "expertise": ["smb", "demos", "proposals"],
+      "available": true,
+      "phone": "+1-555-0302",
+      "teams_id": "jennifer.martinez@company.com",
+      "servicenow_user": "jennifer.martinez"
+    }
+  ],
+  "Legal": [
+    {
+      "name": "Robert Taylor",
+      "email": "robert.taylor@company.com",
+      "expertise": ["contracts", "compliance", "ip"],
+      "available": true,
+      "phone": "+1-555-0401",
+      "teams_id": "robert.taylor@company.com",
+      "servicenow_user": "robert.taylor"
+    },
+    {
+      "name": "Lisa Anderson",
+      "email": "lisa.anderson@company.com",
+      "expertise": ["employment_law", "policies", "disputes"],
+      "available": false,
+      "phone": "+1-555-0402",
+      "teams_id": "lisa.anderson@company.com",
+      "servicenow_user": "lisa.anderson"
+    }
+  ]
+}

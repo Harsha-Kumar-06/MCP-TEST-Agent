@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorpAssist - Your Workplace Assistant</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="/static/images/logo.svg" alt="CorpAssist" class="logo-img">
+                    <span>CorpAssist</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <!-- Live Chat Status (hidden by default, shown when escalated) -->
+                <div class="nav-section live-chat-section" id="liveChatSection" style="display: none;">
+                    <h3><i class="fas fa-circle live-indicator"></i> Live Chat Active</h3>
+                    <div id="liveChatInfo" class="live-chat-info">
+                        <!-- Populated by JS -->
+                    </div>
+                    <button class="nav-btn danger" onclick="disconnectEscalation()">
+                        <i class="fas fa-times"></i> End Live Chat
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <h3>Quick Actions</h3>
+                    <button class="nav-btn" onclick="sendQuickMessage('I need IT support')">
+                        <i class="fas fa-laptop"></i> IT Support
+                    </button>
+                    <button class="nav-btn" onclick="sendQuickMessage('I have an HR question')">
+                        <i class="fas fa-users"></i> HR Help
+                    </button>
+                    <button class="nav-btn" onclick="sendQuickMessage('I need sales assistance')">
+                        <i class="fas fa-chart-line"></i> Sales
+                    </button>
+                    <button class="nav-btn" onclick="sendQuickMessage('I have a legal question')">
+                        <i class="fas fa-gavel"></i> Legal
+                    </button>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Common Requests</h3>
+                    <button class="quick-action" onclick="sendQuickMessage('Connect me to a human specialist')">
+                        <i class="fas fa-headset"></i> Talk to Human
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('I want to request PTO')">
+                        <i class="fas fa-calendar-alt"></i> Request PTO
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('My laptop is running slow')">
+                        <i class="fas fa-tachometer-alt"></i> Slow Computer
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('I need a software license')">
+                        <i class="fas fa-key"></i> Software License
+                    </button>
+                    <button class="quick-action" onclick="sendQuickMessage('Reset my password')">
+                        <i class="fas fa-lock"></i> Password Reset
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <i class="fas fa-plus"></i> New Conversation
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <!-- Header -->
+            <header class="chat-header">
+                <div class="header-info">
+                    <h1>CorpAssist</h1>
+                    <p class="status"><span class="status-dot"></span> Online - Ready to help</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Agent Conversation Tabs -->
+            <div class="agent-tabs-container" id="agentTabsContainer" style="display: none;">
+                <div class="agent-tabs-header">
+                    <span class="tabs-label"><i class="fas fa-history"></i> Conversations:</span>
+                    <div class="agent-tabs" id="agentTabs">
+                        <!-- Agent tabs will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <img src="/static/images/logo.svg" alt="CorpAssist" class="welcome-logo">
+                    </div>
+                    <h2>Welcome to CorpAssist</h2>
+                    <p>I'm your AI-powered workplace assistant. I can help you with:</p>
+                    <div class="capabilities">
+                        <div class="capability">
+                            <i class="fas fa-laptop-code"></i>
+                            <span><strong>IT Support</strong><br>Hardware, software, access issues</span>
+                        </div>
+                        <div class="capability">
+                            <i class="fas fa-user-tie"></i>
+                            <span><strong>HR</strong><br>PTO, benefits, policies</span>
+                        </div>
+                        <div class="capability">
+                            <i class="fas fa-handshake"></i>
+                            <span><strong>Sales</strong><br>Quotes, CRM, customers</span>
+                        </div>
+                        <div class="capability">
+                            <i class="fas fa-balance-scale"></i>
+                            <span><strong>Legal</strong><br>Contracts, compliance, NDAs</span>
+                        </div>
+                    </div>
+                    <p class="hint">Try: "My laptop is slow and I need a license for Adobe"</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your message here... (Press Enter to send)"
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="input-hint">
+                    <i class="fas fa-info-circle"></i> 
+                    I'll automatically route your request to the right team
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing your request...</p>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
