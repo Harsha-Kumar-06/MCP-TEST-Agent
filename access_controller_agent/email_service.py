@@ -16,6 +16,7 @@ from email.utils import parseaddr, formataddr
 from datetime import datetime, timedelta
 from typing import Any, Optional, List
 import re
+import html
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class EmailService:
         self.smtp_port = int(os.getenv("GMAIL_SMTP_PORT", "587"))
         
         # Bot identity
-        self.bot_name = os.getenv("EMAIL_BOT_NAME", "Access Controller Bot")
+        self.bot_name = os.getenv("EMAIL_BOT_NAME", "AccessAssist")
         
         if not self.email_address or not self.app_password:
             logger.warning(
@@ -253,24 +254,111 @@ class EmailService:
             except:
                 pass
     
+    def _create_html_template(self, body: str) -> str:
+        """
+        Create a professional HTML email template.
+        """
+        # Escape HTML in body and preserve line breaks
+        body_html = html.escape(body).replace('\n', '<br>')
+        
+        # Check if body contains bullet points (•) and format them
+        if '•' in body_html:
+            lines = body_html.split('<br>')
+            formatted_lines = []
+            in_list = False
+            
+            for line in lines:
+                if '•' in line:
+                    if not in_list:
+                        formatted_lines.append('<ul style="margin: 10px 0; padding-left: 20px;">')
+                        in_list = True
+                    # Extract bullet content
+                    content = line.replace('•', '').strip()
+                    formatted_lines.append(f'<li style="margin: 5px 0;">{content}</li>')
+                else:
+                    if in_list:
+                        formatted_lines.append('</ul>')
+                        in_list = False
+                    if line.strip():
+                        formatted_lines.append(f'<p style="margin: 10px 0;">{line}</p>')
+            
+            if in_list:
+                formatted_lines.append('</ul>')
+            
+            body_html = ''.join(formatted_lines)
+        else:
+            # Simple paragraph formatting
+            body_html = '<p style="margin: 10px 0;">' + body_html.replace('<br><br>', '</p><p style="margin: 10px 0;">') + '</p>'
+        
+        template = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table role="presentation" style="width: 600px; max-width: 100%; border-collapse: collapse; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">AccessAssist</h1>
+                            <p style="margin: 5px 0 0 0; color: #e0e7ff; font-size: 14px;">Your Access Management Assistant</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px; color: #333333; font-size: 15px; line-height: 1.6;">
+                            {body_html}
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 20px 30px; border-top: 1px solid #e9ecef;">
+                            <p style="margin: 0; color: #6c757d; font-size: 13px; line-height: 1.5;">
+                                Best regards,<br>
+                                <strong style="color: #495057;">AccessAssist</strong>
+                            </p>
+                            <p style="margin: 15px 0 0 0; color: #adb5bd; font-size: 12px;">
+                                This is an automated message from your access management system.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        """.strip()
+        
+        return template
+    
     def send_email(
         self,
         to: str,
         subject: str,
         body: str,
         reply_to_message_id: Optional[str] = None,
-        references: Optional[str] = None
+        references: Optional[str] = None,
+        use_html: bool = True
     ) -> dict[str, Any]:
         """
         Send an email via Gmail SMTP.
         Supports threading by providing reply_to_message_id and references.
+        Sends both HTML and plain text versions for maximum compatibility.
         """
         if not self.email_address or not self.app_password:
             logger.info(f"[Mock] Email would send to={to} subject={subject}")
             return {"status": "success", "message": f"Email queued (mock) to {to}", "mock": True}
         
         try:
-            msg = MIMEMultipart()
+            msg = MIMEMultipart('alternative')
             msg["Subject"] = subject
             msg["From"] = formataddr((self.bot_name, self.email_address))
             msg["To"] = to
@@ -280,7 +368,16 @@ class EmailService:
                 msg["In-Reply-To"] = reply_to_message_id
                 msg["References"] = references or reply_to_message_id
             
-            msg.attach(MIMEText(body, "plain"))
+            # Create plain text version (fallback)
+            plain_body = body + "\n\n---\nBest regards,\nAccessAssist"
+            part1 = MIMEText(plain_body, 'plain')
+            msg.attach(part1)
+            
+            # Create HTML version
+            if use_html:
+                html_body = self._create_html_template(body)
+                part2 = MIMEText(html_body, 'html')
+                msg.attach(part2)
             
             with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
                 server.starttls()
@@ -317,14 +414,16 @@ class EmailService:
         else:
             subject = original_subject
         
-        # Build reply body
+        # Build reply body (no need to add signature - template handles it)
         if include_original:
             original_body = original_email.get("body", "")
             original_from = original_email.get("from_name") or original_email.get("from_email")
             original_date = original_email.get("date", "")
             
-            full_body = f"{body}\n\n---\nOn {original_date}, {original_from} wrote:\n> " + \
-                       "\n> ".join(original_body.split("\n")[:20])  # Limit quoted text
+            # For HTML, we'll quote the original nicely
+            quoted_lines = original_body.split("\n")[:20]  # Limit quoted text
+            quoted_text = "\n".join(f"> {line}" for line in quoted_lines)
+            full_body = f"{body}\n\n---\nOn {original_date}, {original_from} wrote:\n{quoted_text}"
         else:
             full_body = body
         
