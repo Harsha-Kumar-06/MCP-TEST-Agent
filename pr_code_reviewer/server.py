@@ -23,6 +23,59 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("PR_Review_Server")
 
+def validate_environment_variables():
+    """
+    Validates that all required environment variables are set and not empty.
+    Exits the application if validation fails.
+    """
+    required_vars = {
+        "GITHUB_TOKEN": "GitHub Personal Access Token",
+        "GEMINI_MODEL": "Gemini Model Name"
+    }
+    
+    # Check if using VertexAI or API Key
+    use_vertexai = os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "").upper()
+    
+    if use_vertexai == "TRUE":
+        required_vars["GOOGLE_CLOUD_PROJECT"] = "Google Cloud Project ID"
+        logger.info("Using VertexAI mode")
+    else:
+        required_vars["GOOGLE_API_KEY"] = "Google API Key"
+        logger.info("Using Google API Key mode")
+    
+    missing_vars = []
+    empty_vars = []
+    
+    for var_name, var_description in required_vars.items():
+        var_value = os.getenv(var_name)
+        
+        if var_value is None:
+            missing_vars.append(f"{var_name} ({var_description})")
+        elif not var_value.strip():
+            empty_vars.append(f"{var_name} ({var_description})")
+    
+    if missing_vars or empty_vars:
+        error_msg = "❌ Environment variable validation failed:\n"
+        
+        if missing_vars:
+            error_msg += "\n  Missing variables:\n"
+            for var in missing_vars:
+                error_msg += f"    - {var}\n"
+        
+        if empty_vars:
+            error_msg += "\n  Empty variables:\n"
+            for var in empty_vars:
+                error_msg += f"    - {var}\n"
+        
+        error_msg += "\nPlease create a .env file based on .env.example and set all required values."
+        logger.error(error_msg)
+        raise SystemExit(error_msg)
+    
+    logger.info("✅ All required environment variables are set")
+
+# Validate environment before initializing services
+validate_environment_variables()
+
 app = FastAPI(title="AI PR Code Reviewer Webhook")
 
 # Services
