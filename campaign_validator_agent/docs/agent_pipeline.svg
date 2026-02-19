@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" width="880" height="560" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="880" height="560" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="440" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Two-Phase Agent Pipeline</text>
+  <text x="440" y="58" text-anchor="middle" font-size="12" fill="#64748b">Attribute Extraction → Multimodal Post Validation</text>
+  <line x1="50" y1="68" x2="830" y2="68" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- ═══════════════════════ PHASE 1 ═══════════════════════ -->
+  <rect x="40" y="82" width="360" height="444" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <rect x="40" y="82" width="360" height="36" rx="10" fill="#16a34a"/>
+  <rect x="40" y="100" width="360" height="18" fill="#16a34a"/>
+  <text x="220" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff" letter-spacing="1">PHASE 1 — ATTRIBUTE EXTRACTION</text>
+
+  <!-- Input: Campaign Requirements -->
+  <rect x="66" y="134" width="308" height="66" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="220" y="155" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">INPUT</text>
+  <text x="220" y="173" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Campaign Requirements</text>
+  <text x="220" y="190" text-anchor="middle" font-size="10.5" fill="#64748b">Free-form natural language paragraph</text>
+
+  <!-- Arrow down -->
+  <line x1="220" y1="200" x2="220" y2="224" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Agent box -->
+  <rect x="66" y="228" width="308" height="110" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="220" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">LlmAgent</text>
+  <text x="220" y="268" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Task Breakdown Agent</text>
+  <line x1="80" y1="278" x2="360" y2="278" stroke="#86efac" stroke-width="1"/>
+  <text x="220" y="296" text-anchor="middle" font-size="10.5" fill="#166534">Model: gemini-2.0-flash-exp</text>
+  <text x="220" y="312" text-anchor="middle" font-size="10.5" fill="#166534">Instruction: Extract structured visual &amp;</text>
+  <text x="220" y="326" text-anchor="middle" font-size="10.5" fill="#166534">content attributes from requirements text</text>
+
+  <!-- Arrow down -->
+  <line x1="220" y1="338" x2="220" y2="362" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- LLM Processing visual -->
+  <rect x="66" y="366" width="308" height="44" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="220" y="383" text-anchor="middle" font-size="10.5" fill="#64748b">Reasons over requirements paragraph</text>
+  <text x="220" y="398" text-anchor="middle" font-size="10.5" fill="#64748b">No regex · No hardcoded rules · Pure LLM</text>
+
+  <!-- Arrow down -->
+  <line x1="220" y1="410" x2="220" y2="432" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arr-grn)"/>
+
+  <!-- Output: Attributes Checklist -->
+  <rect x="66" y="436" width="308" height="72" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="220" y="457" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">OUTPUT — Attributes Checklist</text>
+  <text x="95" y="475" font-size="10.5" fill="#374151">• Coca-Cola bottle visible</text>
+  <text x="95" y="489" font-size="10.5" fill="#374151">• Campaign hashtag in caption</text>
+  <text x="270" y="475" font-size="10.5" fill="#374151">• Summer/outdoor setting</text>
+  <text x="270" y="489" font-size="10.5" fill="#374151">• Branded clothing visible</text>
+
+  <!-- Phase 1 → Phase 2 arrow -->
+  <line x1="400" y1="330" x2="448" y2="330" stroke="#64748b" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="5,3"/>
+  <text x="424" y="320" text-anchor="middle" font-size="10" fill="#64748b">passes</text>
+  <text x="424" y="345" text-anchor="middle" font-size="10" fill="#64748b">checklist</text>
+
+  <!-- ═══════════════════════ PHASE 2 ═══════════════════════ -->
+  <rect x="452" y="82" width="388" height="444" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <rect x="452" y="82" width="388" height="36" rx="10" fill="#2563eb"/>
+  <rect x="452" y="100" width="388" height="18" fill="#2563eb"/>
+  <text x="646" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff" letter-spacing="1">PHASE 2 — POST VALIDATION</text>
+
+  <!-- Inputs (3 items) -->
+  <text x="646" y="148" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">INPUTS</text>
+
+  <rect x="470" y="154" width="106" height="52" rx="6" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="523" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Post Image</text>
+  <text x="523" y="188" text-anchor="middle" font-size="10" fill="#64748b">image bytes</text>
+  <text x="523" y="201" text-anchor="middle" font-size="10" fill="#64748b">multimodal</text>
+
+  <rect x="590" y="154" width="112" height="52" rx="6" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="646" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Description</text>
+  <text x="646" y="188" text-anchor="middle" font-size="10" fill="#64748b">caption text</text>
+  <text x="646" y="201" text-anchor="middle" font-size="10" fill="#64748b">setting / mood</text>
+
+  <rect x="716" y="154" width="106" height="52" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="769" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Attributes</text>
+  <text x="769" y="188" text-anchor="middle" font-size="10" fill="#64748b">from Phase 1</text>
+  <text x="769" y="201" text-anchor="middle" font-size="10" fill="#64748b">checklist</text>
+
+  <!-- Arrows to agent -->
+  <line x1="523" y1="206" x2="590" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="646" y1="206" x2="646" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="769" y1="206" x2="706" y2="240" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Agent box -->
+  <rect x="470" y="244" width="352" height="116" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="646" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">LlmAgent</text>
+  <text x="646" y="284" text-anchor="middle" font-size="13" font-weight="700" fill="#0f172a">Validator Agent #N</text>
+  <line x1="484" y1="294" x2="808" y2="294" stroke="#93c5fd" stroke-width="1"/>
+  <text x="646" y="312" text-anchor="middle" font-size="10.5" fill="#1e40af">Model: gemini-2.0-flash-exp (multimodal)</text>
+  <text x="646" y="328" text-anchor="middle" font-size="10.5" fill="#1e40af">Receives: image bytes + description + checklist</text>
+  <text x="646" y="344" text-anchor="middle" font-size="10.5" fill="#1e40af">Evaluates every attribute: pass / fail / doubt</text>
+
+  <!-- Arrow down -->
+  <line x1="646" y1="360" x2="646" y2="384" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Gemini processing -->
+  <rect x="470" y="388" width="352" height="44" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="646" y="406" text-anchor="middle" font-size="10.5" fill="#64748b">Gemini 2.0 Flash processes image pixels + text context</text>
+  <text x="646" y="421" text-anchor="middle" font-size="10.5" fill="#64748b">Returns structured JSON wrapped in a markdown code fence</text>
+
+  <!-- Arrow down -->
+  <line x1="646" y1="432" x2="646" y2="454" stroke="#2563eb" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+  <!-- Output JSON verdict -->
+  <rect x="470" y="458" width="352" height="56" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="646" y="476" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">OUTPUT — JSON Verdict</text>
+  <text x="484" y="494" font-size="10" fill="#374151" font-family="Consolas, monospace">{ "checks": [...], "overall_status": "needs_review",</text>
+  <text x="484" y="508" font-size="10" fill="#374151" font-family="Consolas, monospace">  "summary": "Product visible but hashtag missing." }</text>
+
+  <!-- Status legend at bottom -->
+  <rect x="40" y="540" width="800" height="8" rx="4" fill="#e2e8f0"/>
+  <rect x="40" y="540" width="266" height="8" rx="4" fill="#16a34a"/>
+  <rect x="307" y="540" width="266" height="8" rx="4" fill="#2563eb"/>
+
+  <text x="440" y="556" text-anchor="middle" font-size="10.5" fill="#64748b">One Validator Agent is spawned per influencer post · Each runs independently · Results persisted to SQLite</text>
+</svg>

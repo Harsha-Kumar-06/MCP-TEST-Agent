@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" width="800" height="620" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+    <marker id="arr-yel" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="620" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Human-in-the-Loop (HITL) Pattern</text>
+  <text x="400" y="56" text-anchor="middle" font-size="12" fill="#64748b">Mandatory Human Checkpoint — Every Post Reviewed Before Finalization</text>
+  <line x1="50" y1="66" x2="750" y2="66" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- ── LEFT LANE: AI ── -->
+  <rect x="50" y="78" width="220" height="24" rx="6" fill="#1e293b"/>
+  <text x="160" y="94" text-anchor="middle" font-size="11" font-weight="700" fill="#94a3b8" letter-spacing="1">AI PIPELINE</text>
+
+  <!-- ── RIGHT LANE: Human ── -->
+  <rect x="530" y="78" width="220" height="24" rx="6" fill="#92400e"/>
+  <text x="640" y="94" text-anchor="middle" font-size="11" font-weight="700" fill="#fde68a" letter-spacing="1">HUMAN REVIEWER</text>
+
+  <!-- ── CENTER LANE: System ── -->
+  <rect x="300" y="78" width="200" height="24" rx="6" fill="#1d4ed8"/>
+  <text x="400" y="94" text-anchor="middle" font-size="11" font-weight="700" fill="#bfdbfe" letter-spacing="1">SYSTEM</text>
+
+  <!-- Lane dividers -->
+  <line x1="270" y1="78" x2="270" y2="580" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="530" y1="78" x2="530" y2="580" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+  <!-- ── STEP 1: AI Completes ── -->
+  <rect x="60" y="116" width="200" height="56" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="160" y="137" text-anchor="middle" font-size="12" font-weight="700" fill="#1e293b">AI Pipeline Completes</text>
+  <text x="160" y="153" text-anchor="middle" font-size="10.5" fill="#64748b">All verdicts generated</text>
+  <text x="160" y="167" text-anchor="middle" font-size="10.5" fill="#64748b">Stored in SQLite</text>
+
+  <!-- Arrow AI → System -->
+  <line x1="260" y1="144" x2="298" y2="144" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- ── STEP 2: PAUSE Signal ── -->
+  <rect x="305" y="116" width="190" height="56" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <!-- Pause badge -->
+  <rect x="340" y="120" width="120" height="18" rx="9" fill="#d97706"/>
+  <text x="400" y="132" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">⚠ PAUSE CHECKPOINT</text>
+  <text x="400" y="153" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Agent execution halts</text>
+  <text x="400" y="168" text-anchor="middle" font-size="10.5" fill="#78350f">Streamlit phase → "hitl_review"</text>
+
+  <!-- Arrow System → Human -->
+  <line x1="495" y1="144" x2="528" y2="144" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- ── STEP 3: Human sees review dashboard ── -->
+  <rect x="538" y="116" width="202" height="56" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="639" y="137" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Review Dashboard</text>
+  <text x="639" y="153" text-anchor="middle" font-size="10.5" fill="#78350f">All posts displayed</text>
+  <text x="639" y="167" text-anchor="middle" font-size="10.5" fill="#78350f">(approved + flagged)</text>
+
+  <!-- Vertical arrows in AI lane -->
+  <line x1="160" y1="172" x2="160" y2="210" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="400" y1="172" x2="400" y2="210" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="639" y1="172" x2="639" y2="210" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- ── STEP 4: Per-post block ── -->
+  <!-- AI: post details -->
+  <rect x="60" y="214" width="200" height="90" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="160" y="234" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Per Post Data</text>
+  <text x="75" y="252" font-size="10.5" fill="#374151">• Post image thumbnail</text>
+  <text x="75" y="267" font-size="10.5" fill="#374151">• Influencer name</text>
+  <text x="75" y="282" font-size="10.5" fill="#374151">• AI overall_status badge</text>
+  <text x="75" y="297" font-size="10.5" fill="#374151">• Check-by-check table (P/F/D)</text>
+
+  <!-- System: auto feedback -->
+  <rect x="305" y="214" width="190" height="90" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="400" y="234" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Auto Feedback Gen</text>
+  <text x="316" y="252" font-size="10.5" fill="#166534">Matched checks → positive msg</text>
+  <text x="316" y="267" font-size="10.5" fill="#166534">Failed checks → revision notes</text>
+  <text x="316" y="282" font-size="10.5" fill="#166534">Pre-fills text area in UI</text>
+  <text x="316" y="297" font-size="10.5" fill="#166534">Human can freely edit</text>
+
+  <!-- Human: radio + text area -->
+  <rect x="538" y="214" width="202" height="90" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="639" y="234" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">Reviewer Actions</text>
+  <text x="549" y="252" font-size="10.5" fill="#78350f">◉ Approve  ○ Reject (radio)</text>
+  <text x="549" y="267" font-size="10.5" fill="#78350f">Editable feedback textarea</text>
+  <text x="549" y="282" font-size="10.5" fill="#78350f">Filter: All / Approved / Flagged</text>
+  <text x="549" y="297" font-size="10.5" fill="#78350f">Live tally: will approve N / reject M</text>
+
+  <!-- Arrows down -->
+  <line x1="160" y1="304" x2="160" y2="334" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="400" y1="304" x2="400" y2="334" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="639" y1="304" x2="639" y2="334" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Decision row -->
+  <!-- AI: shows override indicator -->
+  <rect x="60" y="338" width="200" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="160" y="358" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">Override Detection</text>
+  <text x="160" y="374" text-anchor="middle" font-size="10.5" fill="#64748b">AI status ≠ Human decision</text>
+  <text x="160" y="390" text-anchor="middle" font-size="10.5" fill="#64748b">→ flagged in report</text>
+
+  <!-- System: Finalize button -->
+  <rect x="305" y="338" width="190" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="400" y="358" text-anchor="middle" font-size="11" font-weight="600" fill="#1d4ed8">Finalize Button</text>
+  <text x="400" y="374" text-anchor="middle" font-size="10.5" fill="#1e40af">Always visible at top</text>
+  <text x="400" y="390" text-anchor="middle" font-size="10.5" fill="#1e40af">One click submits all posts</text>
+
+  <!-- Human: click finalize -->
+  <rect x="538" y="338" width="202" height="60" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="639" y="358" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Click Finalize</text>
+  <text x="549" y="374" font-size="10.5" fill="#166534">All decisions confirmed</text>
+  <text x="549" y="390" font-size="10.5" fill="#166534">Unreviewed → AI default</text>
+
+  <!-- Human → System arrow -->
+  <line x1="538" y1="368" x2="497" y2="368" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arr-grn)"/>
+
+  <!-- Arrows down -->
+  <line x1="160" y1="398" x2="160" y2="426" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="400" y1="398" x2="400" y2="426" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+  <line x1="639" y1="398" x2="639" y2="426" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Persist row -->
+  <rect x="60" y="430" width="200" height="56" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="160" y="450" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">AI Report Preserved</text>
+  <text x="160" y="466" text-anchor="middle" font-size="10.5" fill="#64748b">ai_report column unchanged</text>
+  <text x="160" y="480" text-anchor="middle" font-size="10.5" fill="#64748b">Original AI verdict kept</text>
+
+  <rect x="305" y="430" width="190" height="56" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="400" y="450" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Persist to SQLite</text>
+  <text x="400" y="466" text-anchor="middle" font-size="10.5" fill="#78350f">status ← human decision</text>
+  <text x="400" y="480" text-anchor="middle" font-size="10.5" fill="#78350f">human_decisions ← JSON</text>
+
+  <rect x="538" y="430" width="202" height="56" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="639" y="450" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">Decisions Finalized</text>
+  <text x="549" y="466" font-size="10.5" fill="#166534">Feedback stored per post</text>
+  <text x="549" y="480" font-size="10.5" fill="#166534">Overrides tracked in DB</text>
+
+  <!-- Arrows down -->
+  <line x1="400" y1="486" x2="400" y2="508" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Results -->
+  <rect x="240" y="512" width="320" height="56" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="400" y="533" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">Results Report Generated</text>
+  <text x="400" y="550" text-anchor="middle" font-size="11" fill="#166534">Decision table · override tracking · per-campaign breakdown</text>
+  <text x="400" y="565" text-anchor="middle" font-size="10.5" fill="#166534">AI Decision / Human Decision / Override Flag / Feedback Sent</text>
+
+  <!-- Bottom note -->
+  <rect x="50" y="582" width="700" height="28" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="400" y="600" text-anchor="middle" font-size="11" fill="#92400e" font-weight="600">HITL Guarantee: No decision is finalized without explicit human sign-off. AI verdicts are advisory only.</text>
+</svg>
