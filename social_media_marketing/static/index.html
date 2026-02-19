@@ -88,11 +88,11 @@
                             </div>
                             <div class="param-field">
                                 <label>Budget (USD)</label>
-                                <input type="text" id="marketingBudget" class="param-input" placeholder="e.g., 5000, 50000">
+                                <input type="text" id="marketingBudget" class="param-input" placeholder="e.g., 5000, 50000" inputmode="decimal" pattern="^\s*(?:\d+(?:\.\d+)?)?\s*$" title="Leave empty or enter a number greater than or equal to 0.">
                             </div>
                             <div class="param-field">
                                 <label>Duration</label>
-                                <input type="text" id="marketingDuration" class="param-input" placeholder="e.g., 3 months, 90 days">
+                                <input type="text" id="marketingDuration" class="param-input" placeholder="e.g., 3 months, 90 days" pattern="^\s*\d+(?:\.\d+)?\s*(?:day|days|week|weeks|month|months|year|years)\s*$" title="Enter duration like: 3 months, 90 days, or 1 year.">
                             </div>
                         </div>
                     </div>
@@ -127,6 +127,6 @@
         </div>
     </div>
 
-    <script src="/static/script.js?v=2"></script>
+    <script src="/static/script.js?v=3"></script>
 </body>
 </html>
