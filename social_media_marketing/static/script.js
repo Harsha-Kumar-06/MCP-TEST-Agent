@@ -222,6 +222,52 @@ Please provide marketing strategy advice and recommendations based on this reque
     return message;
 }
 
+  /**
+   * Parse and validate marketing budget input.
+   * Budget can be empty or a valid number >= 0.
+   */
+  function validateMarketingBudget(value) {
+    const raw = String(value || '').trim();
+
+    if (!raw) {
+      return { valid: true, normalized: '' };
+    }
+
+    const normalized = raw.replace(/,/g, '');
+    const numberPattern = /^\d+(?:\.\d+)?$/;
+
+    if (!numberPattern.test(normalized)) {
+      return { valid: false, message: 'Budget must be empty or a valid number (e.g., 5000, 5000.50).' };
+    }
+
+    const amount = Number(normalized);
+    if (!Number.isFinite(amount) || amount < 0) {
+      return { valid: false, message: 'Budget must be greater than or equal to 0.' };
+    }
+
+    return { valid: true, normalized };
+  }
+
+  /**
+   * Validate marketing duration input.
+   * Accepts values like "3 months", "90 days", "1 year".
+   */
+  function validateMarketingDuration(value) {
+    const raw = String(value || '').trim();
+    const durationPattern = /^(\d+(?:\.\d+)?)\s*(day|days|week|weeks|month|months|year|years)$/i;
+
+    if (!durationPattern.test(raw)) {
+      return { valid: false, message: 'Duration must be in a valid format like "3 months", "90 days", or "1 year".' };
+    }
+
+    const numericValue = Number(raw.match(durationPattern)[1]);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      return { valid: false, message: 'Duration value must be greater than 0.' };
+    }
+
+    return { valid: true };
+  }
+
 /**
  * Handle sending message
  */
@@ -234,6 +280,32 @@ async function handleSendMessage() {
     const userInput = messageInput.value.trim();
     if (!userInput) {
         return;
+    }
+
+    if (currentMode === 'marketing_advisor') {
+      const marketingBudgetInput = document.getElementById('marketingBudget');
+      const marketingDurationInput = document.getElementById('marketingDuration');
+
+      const budgetValidation = validateMarketingBudget(marketingBudgetInput?.value || '');
+      if (!budgetValidation.valid) {
+        addMessage(`❌ Validation Error: ${budgetValidation.message}`, 'error');
+        marketingBudgetInput?.focus();
+        return;
+      }
+
+      const durationValue = (marketingDurationInput?.value || '').trim();
+      if (!durationValue) {
+        addMessage('❌ Validation Error: Duration is required and must be in a format like "3 months", "90 days", or "1 year".', 'error');
+        marketingDurationInput?.focus();
+        return;
+      }
+
+      const durationValidation = validateMarketingDuration(durationValue);
+      if (!durationValidation.valid) {
+        addMessage(`❌ Validation Error: ${durationValidation.message}`, 'error');
+        marketingDurationInput?.focus();
+        return;
+      }
     }
 
     // Check API key
