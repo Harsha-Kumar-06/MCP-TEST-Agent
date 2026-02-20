@@ -43,6 +43,14 @@ from google.genai import types as genai_types
 # Import the portfolio agent (use root_agent directly with autonomous prompt)
 from portfolio_manager.agent import root_agent
 
+# Import A2A models
+from .a2a_models import (
+    AgentCard, AgentInterface, AgentProvider, AgentCapability,
+    Message, Task, TaskStatus, Artifact, Part, SendMessageRequest
+)
+from datetime import datetime
+import uuid
+
 # Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UI_DIR = os.path.join(BASE_DIR, "ui")
@@ -68,6 +76,34 @@ app.add_middleware(
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=UI_DIR), name="static")
+
+
+@app.get("/.well-known/agent-card.json", response_model=AgentCard)
+async def get_agent_card():
+    """Returns the A2A Agent Card for discovery."""
+    return AgentCard(
+        name="Portfolio Manager",
+        description="Autonomous AI agent for personalized investment portfolio creation and analysis.",
+        version="2.0.0",
+        supportedInterfaces=[
+            AgentInterface(
+                url="/message:send",
+                protocolBinding="HTTP+JSON",
+                protocolVersion="0.3"
+            )
+        ],
+        provider=AgentProvider(
+            organization="Drayvn",
+            url="https://drayvn.ai"
+        ),
+        capabilities=AgentCapability(
+            streaming=False,
+            pushNotifications=False,
+            extensions=[]
+        ),
+        defaultInputModes=["text/plain"],
+        defaultOutputModes=["application/json", "text/markdown"]
+    )
 
 
 # Request/Response Models
@@ -264,6 +300,131 @@ Start the analysis now.""")]
         "parsed": parsed_outputs,
         "session_id": session.id
     }
+
+
+# Store active sessions for A2A
+_a2a_runners: Dict[str, InMemoryRunner] = {}
+_a2a_sessions: Dict[str, Any] = {}
+
+async def get_or_create_runner_session(context_id: str):
+    """Get or create a runner and session for a given context ID."""
+    if context_id not in _a2a_runners:
+        runner = InMemoryRunner(agent=root_agent, app_name="portfolio_manager")
+        _a2a_runners[context_id] = runner
+        try:
+            # Create session using the runner's session service
+            session = await runner.session_service.create_session(
+                app_name="portfolio_manager",
+                user_id=f"a2a_user_{context_id}"
+            )
+            _a2a_sessions[context_id] = session
+        except Exception as e:
+            # Fallback for older ADK versions or different runner implementations
+            print(f"Session creation warning: {e}")
+            _a2a_sessions[context_id] = type('obj', (object,), {'id': context_id})
+            
+    return _a2a_runners[context_id], _a2a_sessions[context_id]
+
+
+@app.post("/message:send", response_model=Dict[str, Any])
+async def a2a_send_message(request: SendMessageRequest):
+    """
+    A2A Protocol endpoint for sending messages to the agent.
+    Supports multi-turn conversation for portfolio creation.
+    """
+    try:
+        # Use contextId to maintain conversation state
+        context_id = request.contextId or request.conversationId or str(uuid.uuid4())
+        
+        # Get runner and session
+        runner, session = await get_or_create_runner_session(context_id)
+        
+        # Extract user text from message parts
+        user_text = ""
+        if request.message.parts:
+            for part in request.message.parts:
+                if part.text:
+                    user_text += part.text + " "
+        
+        if not user_text.strip():
+            raise HTTPException(status_code=400, detail="Message text is empty")
+
+        # Create message for ADK runner
+        adk_message = genai_types.Content(
+            role="user",
+            parts=[genai_types.Part.from_text(text=user_text)]
+        )
+        
+        # Run agent turn
+        agent_response_text = ""
+        artifacts = []
+        
+        try:
+            # Collect response parts
+            async for event in runner.run_async(
+                user_id=f"a2a_user_{context_id}",
+                session_id=session.id,
+                new_message=adk_message
+            ):
+                if event.content and event.content.parts:
+                    for part in event.content.parts:
+                        if hasattr(part, 'text') and part.text:
+                            agent_response_text += part.text
+        except Exception as e:
+            print(f"Agent execution error: {e}")
+            agent_response_text = f"I encountered an error processing your request: {str(e)}"
+
+        # Check for structured artifacts in the response (JSON blocks)
+        # The agent outputs JSON for the final portfolio
+        parsed_outputs = extract_agent_outputs(agent_response_text)
+        
+        if parsed_outputs:
+            # If we have structured data, create artifacts
+            for key, data in parsed_outputs.items():
+                artifacts.append(Artifact(
+                    artifactId=str(uuid.uuid4()),
+                    name=key.replace("_", " ").title(),
+                    parts=[Part(
+                        text=json.dumps(data, indent=2),
+                        mediaType="application/json"
+                    )]
+                ))
+
+        # Generate unique Task ID for this interaction
+        task_id = str(uuid.uuid4())
+        
+        # Determine status
+        # If we have a full portfolio (all keys present), it's completed
+        # Otherwise it's likely waiting for more input
+        is_complete = "portfolio" in parsed_outputs
+        
+        response_status = TaskStatus(
+            state="completed" if is_complete else "input_required",
+            message=Message(
+                messageId=str(uuid.uuid4()),
+                role="ROLE_AGENT",
+                parts=[Part(text=agent_response_text)],
+                contextId=context_id,
+                taskId=task_id,
+                created=datetime.utcnow()
+            ),
+            timestamp=datetime.utcnow()
+        )
+        
+        # Construct Task object
+        task = Task(
+            id=task_id,
+            contextId=context_id,
+            status=response_status,
+            artifacts=artifacts if artifacts else None
+        )
+        
+        return {"task": task.dict()}
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/generate-portfolio", response_model=PortfolioResponse)
