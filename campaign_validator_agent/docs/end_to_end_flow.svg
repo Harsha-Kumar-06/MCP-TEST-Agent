@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 920" width="760" height="920" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-grn" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arr-yel" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="760" height="920" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="380" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">End-to-End System Flow</text>
+  <text x="380" y="58" text-anchor="middle" font-size="12" fill="#64748b">Campaign Validator Agent — Full Process from Launch to Results</text>
+  <line x1="60" y1="68" x2="700" y2="68" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- ── START ── -->
+  <ellipse cx="380" cy="102" rx="60" ry="24" fill="#0f172a"/>
+  <text x="380" y="107" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">START</text>
+
+  <!-- Arrow -->
+  <line x1="380" y1="126" x2="380" y2="148" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Step 1: Initialize -->
+  <rect x="240" y="152" width="280" height="52" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="380" y="173" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">Initialize Application</text>
+  <text x="380" y="191" text-anchor="middle" font-size="11" fill="#64748b">init_db() · seed_data() · load .env</text>
+
+  <!-- Arrow -->
+  <line x1="380" y1="204" x2="380" y2="226" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Step 2: Dashboard -->
+  <rect x="220" y="230" width="320" height="64" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="380" y="252" text-anchor="middle" font-size="13" font-weight="600" fill="#1d4ed8">Dashboard</text>
+  <text x="380" y="269" text-anchor="middle" font-size="11" fill="#3b82f6">View campaigns · metrics · post status</text>
+  <text x="380" y="285" text-anchor="middle" font-size="11" fill="#3b82f6">Select campaign(s) to validate</text>
+
+  <!-- Arrow -->
+  <line x1="380" y1="294" x2="380" y2="316" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Step 3: AI Pipeline container -->
+  <rect x="90" y="320" width="580" height="200" rx="10" fill="#fafafa" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="380" y="342" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b" letter-spacing="1">AUTONOMOUS AI PIPELINE</text>
+
+  <!-- Phase 1 box -->
+  <rect x="116" y="352" width="240" height="72" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="236" y="372" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">PHASE 1</text>
+  <text x="236" y="389" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Task Breakdown Agent</text>
+  <text x="236" y="406" text-anchor="middle" font-size="10.5" fill="#64748b">Parses campaign requirements</text>
+  <text x="236" y="420" text-anchor="middle" font-size="10.5" fill="#64748b">→ Structured attributes checklist</text>
+
+  <!-- Arrow Phase1 → Phase2 -->
+  <line x1="356" y1="388" x2="392" y2="388" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Phase 2 box -->
+  <rect x="396" y="352" width="248" height="72" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="520" y="372" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">PHASE 2</text>
+  <text x="520" y="389" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Validator Agents (×N)</text>
+  <text x="520" y="406" text-anchor="middle" font-size="10.5" fill="#64748b">Image + Description + Attributes</text>
+  <text x="520" y="420" text-anchor="middle" font-size="10.5" fill="#64748b">→ JSON verdict per post</text>
+
+  <!-- Verdict boxes -->
+  <rect x="116" y="446" width="78" height="32" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="155" y="467" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">APPROVED</text>
+
+  <rect x="206" y="446" width="78" height="32" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/>
+  <text x="245" y="467" text-anchor="middle" font-size="10" font-weight="600" fill="#854d0e">NEEDS REVIEW</text>
+
+  <rect x="296" y="446" width="78" height="32" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="335" y="467" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">REJECTED</text>
+
+  <text x="450" y="467" text-anchor="middle" font-size="10.5" fill="#64748b">All verdicts saved to DB</text>
+  <text x="450" y="480" text-anchor="middle" font-size="10.5" fill="#64748b">status, ai_report columns</text>
+  <text x="450" y="493" text-anchor="middle" font-size="10" fill="#64748b">(posts updated in SQLite)</text>
+
+  <!-- Arrow out of AI pipeline -->
+  <line x1="380" y1="520" x2="380" y2="546" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- HITL Decision Diamond -->
+  <polygon points="380,550 480,588 380,626 280,588" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="583" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">HITL</text>
+  <text x="380" y="600" text-anchor="middle" font-size="11" fill="#92400e">CHECKPOINT</text>
+
+  <!-- YES branch (left) -->
+  <line x1="280" y1="588" x2="180" y2="588" stroke="#d97706" stroke-width="1.8" marker-end="url(#arr-yel)"/>
+  <text x="228" y="580" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">REVIEW</text>
+
+  <!-- Human Review box -->
+  <rect x="60" y="614" width="220" height="90" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="170" y="636" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">Human Review Dashboard</text>
+  <text x="170" y="654" text-anchor="middle" font-size="10.5" fill="#78350f">All posts shown (approved + flagged)</text>
+  <text x="170" y="669" text-anchor="middle" font-size="10.5" fill="#78350f">Approve / Reject radio per post</text>
+  <text x="170" y="684" text-anchor="middle" font-size="10.5" fill="#78350f">Editable auto-generated feedback</text>
+  <text x="170" y="700" text-anchor="middle" font-size="10.5" fill="#78350f">Finalize → save to DB</text>
+
+  <!-- Arrow from Human Review down to DB Update -->
+  <line x1="170" y1="704" x2="170" y2="744" stroke="#64748b" stroke-width="1.8"/>
+  <line x1="170" y1="744" x2="340" y2="744" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Skip branch (right, auto-confirm) -->
+  <line x1="480" y1="588" x2="580" y2="588" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arr-grn)"/>
+  <text x="530" y="580" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">CONFIRM</text>
+
+  <!-- Auto-confirm box -->
+  <rect x="480" y="560" width="200" height="56" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <!-- already drawn by the diamond, auto box -->
+  <rect x="484" y="614" width="192" height="56" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="580" y="636" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Human Confirms</text>
+  <text x="580" y="651" text-anchor="middle" font-size="10.5" fill="#166534">Reviewer finalizes decisions</text>
+  <text x="580" y="666" text-anchor="middle" font-size="10.5" fill="#166534">for all-approved campaigns</text>
+
+  <!-- Arrow from confirm box to DB -->
+  <line x1="580" y1="670" x2="580" y2="744" stroke="#64748b" stroke-width="1.8"/>
+  <line x1="580" y1="744" x2="430" y2="744" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Step: DB Update -->
+  <rect x="240" y="730" width="280" height="52" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="380" y="751" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">Persist Decisions to Database</text>
+  <text x="380" y="769" text-anchor="middle" font-size="11" fill="#64748b">status · human_decisions · feedback saved</text>
+
+  <!-- Arrow -->
+  <line x1="380" y1="782" x2="380" y2="804" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- Results page -->
+  <rect x="220" y="808" width="320" height="64" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="380" y="830" text-anchor="middle" font-size="13" font-weight="600" fill="#15803d">Results Report</text>
+  <text x="380" y="847" text-anchor="middle" font-size="11" fill="#166534">Decision &amp; Feedback table · override tracking</text>
+  <text x="380" y="863" text-anchor="middle" font-size="11" fill="#166534">Per-campaign approved/rejected breakdown</text>
+
+  <!-- Arrow -->
+  <line x1="380" y1="872" x2="380" y2="890" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr)"/>
+
+  <!-- END -->
+  <ellipse cx="380" cy="906" rx="60" ry="20" fill="#0f172a"/>
+  <text x="380" y="911" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">END</text>
+</svg>

@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  campaign-validator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campaign-validator-agent
+    ports:
+      - "8501:8501"
+    environment:
+      # Copy your Gemini API key from .env or pass it directly here
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - PYTHONIOENCODING=utf-8
+    volumes:
+      # Persist the SQLite database outside the container
+      - ./campaign.db:/app/campaign.db
+      # Persist uploaded influencer images outside the container
+      - ./images:/app/images
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
