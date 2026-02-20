@@ -1,0 +1,177 @@
+{
+  "description": "Curated universe of liquid, quality stocks for portfolio construction",
+  "methodology": "Selected based on market cap, liquidity, and fundamental quality",
+  "last_updated": "2026-02-01",
+  "sectors": {
+    "Technology": {
+      "etf": "XLK",
+      "stocks": [
+        {"symbol": "AAPL", "name": "Apple Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "MSFT", "name": "Microsoft Corporation", "market_cap": "large", "style": "growth"},
+        {"symbol": "NVDA", "name": "NVIDIA Corporation", "market_cap": "large", "style": "growth"},
+        {"symbol": "AVGO", "name": "Broadcom Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "CRM", "name": "Salesforce Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "AMD", "name": "Advanced Micro Devices", "market_cap": "large", "style": "growth"},
+        {"symbol": "ORCL", "name": "Oracle Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "ADBE", "name": "Adobe Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "CSCO", "name": "Cisco Systems Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "INTC", "name": "Intel Corporation", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Healthcare": {
+      "etf": "XLV",
+      "stocks": [
+        {"symbol": "UNH", "name": "UnitedHealth Group", "market_cap": "large", "style": "growth"},
+        {"symbol": "JNJ", "name": "Johnson & Johnson", "market_cap": "large", "style": "value"},
+        {"symbol": "LLY", "name": "Eli Lilly and Company", "market_cap": "large", "style": "growth"},
+        {"symbol": "PFE", "name": "Pfizer Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "ABBV", "name": "AbbVie Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "MRK", "name": "Merck & Co Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "TMO", "name": "Thermo Fisher Scientific", "market_cap": "large", "style": "growth"},
+        {"symbol": "ABT", "name": "Abbott Laboratories", "market_cap": "large", "style": "growth"},
+        {"symbol": "DHR", "name": "Danaher Corporation", "market_cap": "large", "style": "growth"},
+        {"symbol": "BMY", "name": "Bristol-Myers Squibb", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Financials": {
+      "etf": "XLF",
+      "stocks": [
+        {"symbol": "BRK.B", "name": "Berkshire Hathaway", "market_cap": "large", "style": "value"},
+        {"symbol": "JPM", "name": "JPMorgan Chase & Co", "market_cap": "large", "style": "value"},
+        {"symbol": "V", "name": "Visa Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "MA", "name": "Mastercard Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "BAC", "name": "Bank of America Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "WFC", "name": "Wells Fargo & Company", "market_cap": "large", "style": "value"},
+        {"symbol": "GS", "name": "Goldman Sachs Group", "market_cap": "large", "style": "value"},
+        {"symbol": "MS", "name": "Morgan Stanley", "market_cap": "large", "style": "value"},
+        {"symbol": "SPGI", "name": "S&P Global Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "BLK", "name": "BlackRock Inc", "market_cap": "large", "style": "growth"}
+      ]
+    },
+    "Consumer Discretionary": {
+      "etf": "XLY",
+      "stocks": [
+        {"symbol": "AMZN", "name": "Amazon.com Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "TSLA", "name": "Tesla Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "HD", "name": "Home Depot Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "MCD", "name": "McDonald's Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "NKE", "name": "Nike Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "LOW", "name": "Lowe's Companies Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "SBUX", "name": "Starbucks Corporation", "market_cap": "large", "style": "growth"},
+        {"symbol": "TJX", "name": "TJX Companies Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "BKNG", "name": "Booking Holdings Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "CMG", "name": "Chipotle Mexican Grill", "market_cap": "large", "style": "growth"}
+      ]
+    },
+    "Consumer Staples": {
+      "etf": "XLP",
+      "stocks": [
+        {"symbol": "PG", "name": "Procter & Gamble Co", "market_cap": "large", "style": "value"},
+        {"symbol": "KO", "name": "Coca-Cola Company", "market_cap": "large", "style": "value"},
+        {"symbol": "PEP", "name": "PepsiCo Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "COST", "name": "Costco Wholesale Corp", "market_cap": "large", "style": "growth"},
+        {"symbol": "WMT", "name": "Walmart Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "PM", "name": "Philip Morris Intl", "market_cap": "large", "style": "value"},
+        {"symbol": "MDLZ", "name": "Mondelez International", "market_cap": "large", "style": "value"},
+        {"symbol": "CL", "name": "Colgate-Palmolive Co", "market_cap": "large", "style": "value"},
+        {"symbol": "KMB", "name": "Kimberly-Clark Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "GIS", "name": "General Mills Inc", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Energy": {
+      "etf": "XLE",
+      "stocks": [
+        {"symbol": "XOM", "name": "Exxon Mobil Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "CVX", "name": "Chevron Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "COP", "name": "ConocoPhillips", "market_cap": "large", "style": "value"},
+        {"symbol": "EOG", "name": "EOG Resources Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "SLB", "name": "Schlumberger Limited", "market_cap": "large", "style": "value"},
+        {"symbol": "MPC", "name": "Marathon Petroleum Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "PSX", "name": "Phillips 66", "market_cap": "large", "style": "value"},
+        {"symbol": "VLO", "name": "Valero Energy Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "OXY", "name": "Occidental Petroleum", "market_cap": "large", "style": "value"},
+        {"symbol": "KMI", "name": "Kinder Morgan Inc", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Industrials": {
+      "etf": "XLI",
+      "stocks": [
+        {"symbol": "CAT", "name": "Caterpillar Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "RTX", "name": "RTX Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "UNP", "name": "Union Pacific Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "HON", "name": "Honeywell International", "market_cap": "large", "style": "value"},
+        {"symbol": "DE", "name": "Deere & Company", "market_cap": "large", "style": "value"},
+        {"symbol": "BA", "name": "Boeing Company", "market_cap": "large", "style": "value"},
+        {"symbol": "LMT", "name": "Lockheed Martin Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "GE", "name": "GE Aerospace", "market_cap": "large", "style": "value"},
+        {"symbol": "MMM", "name": "3M Company", "market_cap": "large", "style": "value"},
+        {"symbol": "FDX", "name": "FedEx Corporation", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Materials": {
+      "etf": "XLB",
+      "stocks": [
+        {"symbol": "LIN", "name": "Linde plc", "market_cap": "large", "style": "value"},
+        {"symbol": "APD", "name": "Air Products & Chemicals", "market_cap": "large", "style": "value"},
+        {"symbol": "SHW", "name": "Sherwin-Williams Co", "market_cap": "large", "style": "growth"},
+        {"symbol": "FCX", "name": "Freeport-McMoRan Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "NEM", "name": "Newmont Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "ECL", "name": "Ecolab Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "DOW", "name": "Dow Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "NUE", "name": "Nucor Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "VMC", "name": "Vulcan Materials Co", "market_cap": "large", "style": "value"},
+        {"symbol": "MLM", "name": "Martin Marietta Materials", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Utilities": {
+      "etf": "XLU",
+      "stocks": [
+        {"symbol": "NEE", "name": "NextEra Energy Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "DUK", "name": "Duke Energy Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "SO", "name": "Southern Company", "market_cap": "large", "style": "value"},
+        {"symbol": "D", "name": "Dominion Energy Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "AEP", "name": "American Electric Power", "market_cap": "large", "style": "value"},
+        {"symbol": "SRE", "name": "Sempra Energy", "market_cap": "large", "style": "value"},
+        {"symbol": "EXC", "name": "Exelon Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "XEL", "name": "Xcel Energy Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "WEC", "name": "WEC Energy Group Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "ED", "name": "Consolidated Edison", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Real Estate": {
+      "etf": "XLRE",
+      "stocks": [
+        {"symbol": "PLD", "name": "Prologis Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "AMT", "name": "American Tower Corp", "market_cap": "large", "style": "growth"},
+        {"symbol": "EQIX", "name": "Equinix Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "CCI", "name": "Crown Castle Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "PSA", "name": "Public Storage", "market_cap": "large", "style": "value"},
+        {"symbol": "SPG", "name": "Simon Property Group", "market_cap": "large", "style": "value"},
+        {"symbol": "O", "name": "Realty Income Corp", "market_cap": "large", "style": "value"},
+        {"symbol": "WELL", "name": "Welltower Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "DLR", "name": "Digital Realty Trust", "market_cap": "large", "style": "growth"},
+        {"symbol": "AVB", "name": "AvalonBay Communities", "market_cap": "large", "style": "value"}
+      ]
+    },
+    "Communication Services": {
+      "etf": "XLC",
+      "stocks": [
+        {"symbol": "GOOGL", "name": "Alphabet Inc Class A", "market_cap": "large", "style": "growth"},
+        {"symbol": "META", "name": "Meta Platforms Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "NFLX", "name": "Netflix Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "DIS", "name": "Walt Disney Company", "market_cap": "large", "style": "growth"},
+        {"symbol": "CMCSA", "name": "Comcast Corporation", "market_cap": "large", "style": "value"},
+        {"symbol": "VZ", "name": "Verizon Communications", "market_cap": "large", "style": "value"},
+        {"symbol": "T", "name": "AT&T Inc", "market_cap": "large", "style": "value"},
+        {"symbol": "TMUS", "name": "T-Mobile US Inc", "market_cap": "large", "style": "growth"},
+        {"symbol": "CHTR", "name": "Charter Communications", "market_cap": "large", "style": "value"},
+        {"symbol": "EA", "name": "Electronic Arts Inc", "market_cap": "large", "style": "growth"}
+      ]
+    }
+  },
+  "benchmark": {
+    "symbol": "SPY",
+    "name": "SPDR S&P 500 ETF Trust",
+    "description": "Primary benchmark for portfolio comparison"
+  }
+}
