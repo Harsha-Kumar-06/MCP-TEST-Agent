@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="900" height="550">
+  <defs>
+    <linearGradient id="agentBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="agentShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="3" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="550" fill="#0a0a14"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">AI Agent Overview</text>
+  <text x="450" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">Specialized Agents for Marketing Campaign Automation</text>
+  
+  <!-- Coordinator Agent (Center/Top) -->
+  <rect x="325" y="90" width="250" height="80" rx="15" fill="url(#agentBg)" filter="url(#agentShadow)"/>
+  <text x="450" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#ffffff">🧠</text>
+  <text x="450" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">Coordinator Agent</text>
+  <text x="450" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ddd">Orchestrates all agents • Dynamic routing</text>
+  
+  <!-- Connection lines from coordinator -->
+  <path d="M375 170 L200 220" stroke="#667eea" stroke-width="2" stroke-dasharray="5,3"/>
+  <path d="M450 170 L450 220" stroke="#667eea" stroke-width="2" stroke-dasharray="5,3"/>
+  <path d="M525 170 L700 220" stroke="#667eea" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Row 1: Content Agents -->
+  <!-- Audience Agent -->
+  <rect x="75" y="220" width="180" height="100" rx="12" fill="#6c5ce7" filter="url(#agentShadow)"/>
+  <text x="165" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">👥</text>
+  <text x="165" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Audience Agent</text>
+  <text x="165" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ddd">Segmentation • Targeting</text>
+  
+  <!-- Email Agent -->
+  <rect x="280" y="220" width="180" height="100" rx="12" fill="#4facfe" filter="url(#agentShadow)"/>
+  <text x="370" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">✉️</text>
+  <text x="370" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Email Content Agent</text>
+  <text x="370" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ddd">HTML • A/B Testing • CTAs</text>
+  
+  <!-- SMS Agent -->
+  <rect x="485" y="220" width="180" height="100" rx="12" fill="#00b894" filter="url(#agentShadow)"/>
+  <text x="575" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">📱</text>
+  <text x="575" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">SMS Content Agent</text>
+  <text x="575" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ddd">160 chars • Optimization</text>
+  
+  <!-- Instagram Agent -->
+  <rect x="690" y="220" width="180" height="100" rx="12" fill="#e17055" filter="url(#agentShadow)"/>
+  <text x="780" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">📸</text>
+  <text x="780" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Instagram Agent</text>
+  <text x="780" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ddd">Captions • Hashtags</text>
+  
+  <!-- Connection lines to row 2 -->
+  <path d="M165 320 L165 360" stroke="#a0a0a0" stroke-width="1.5"/>
+  <path d="M370 320 L370 360" stroke="#a0a0a0" stroke-width="1.5"/>
+  <path d="M575 320 L575 360" stroke="#a0a0a0" stroke-width="1.5"/>
+  <path d="M780 320 L780 360" stroke="#a0a0a0" stroke-width="1.5"/>
+  
+  <!-- Row 2: Utility Agents -->
+  <!-- Compliance Agent -->
+  <rect x="75" y="360" width="180" height="100" rx="12" fill="#fd79a8" filter="url(#agentShadow)"/>
+  <text x="165" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">⚖️</text>
+  <text x="165" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Compliance Agent</text>
+  <text x="165" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">CAN-SPAM • TCPA • GDPR</text>
+  
+  <!-- Analytics Agent -->
+  <rect x="280" y="360" width="180" height="100" rx="12" fill="#0984e3" filter="url(#agentShadow)"/>
+  <text x="370" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">📊</text>
+  <text x="370" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Analytics Agent</text>
+  <text x="370" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">UTM • KPIs • Tracking</text>
+  
+  <!-- Email Sending Agent -->
+  <rect x="485" y="360" width="180" height="100" rx="12" fill="#00cec9" filter="url(#agentShadow)"/>
+  <text x="575" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#ffffff">📤</text>
+  <text x="575" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffffff">Email Sending Agent</text>
+  <text x="575" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">SMTP • Gmail • Delivery</text>
+  
+  <!-- SMS Sending Agent -->
+  <rect x="690" y="360" width="180" height="100" rx="12" fill="#fdcb6e" filter="url(#agentShadow)"/>
+  <text x="780" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="32" fill="#1a1a2e">📨</text>
+  <text x="780" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#1a1a2e">SMS Sending Agent</text>
+  <text x="780" y="445" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">Twilio • Textbelt</text>
+  
+  <!-- Bottom Stats -->
+  <rect x="150" y="490" width="600" height="45" rx="8" fill="rgba(102,126,234,0.15)" stroke="#667eea" stroke-width="1"/>
+  <text x="450" y="518" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#667eea">
+    8 Specialized Agents • Parallel Execution • AI-Powered Content Generation • Real-time Compliance
+  </text>
+</svg>

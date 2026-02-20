@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="900" height="550">
+  <defs>
+    <linearGradient id="compGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="compGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="compGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <filter id="compShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="550" fill="#13111a"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#ffffff">Component Architecture</text>
+  
+  <!-- Frontend Layer Box -->
+  <rect x="30" y="55" width="260" height="180" rx="10" fill="none" stroke="#667eea" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="160" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#667eea">Frontend Layer</text>
+  
+  <rect x="50" y="90" width="100" height="40" rx="5" fill="url(#compGrad1)" filter="url(#compShadow)"/>
+  <text x="100" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">pages/</text>
+  
+  <rect x="170" y="90" width="100" height="40" rx="5" fill="url(#compGrad1)" filter="url(#compShadow)"/>
+  <text x="220" y="115" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">components/</text>
+  
+  <rect x="50" y="145" width="100" height="40" rx="5" fill="url(#compGrad1)" filter="url(#compShadow)"/>
+  <text x="100" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">styles/</text>
+  
+  <rect x="170" y="145" width="100" height="40" rx="5" fill="url(#compGrad1)" filter="url(#compShadow)"/>
+  <text x="220" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">api/</text>
+  
+  <text x="160" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0">Next.js 14 + React</text>
+  
+  <!-- Agent Layer Box -->
+  <rect x="320" y="55" width="260" height="180" rx="10" fill="none" stroke="#f093fb" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="450" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#f093fb">Agent Layer</text>
+  
+  <rect x="340" y="90" width="100" height="40" rx="5" fill="url(#compGrad2)" filter="url(#compShadow)"/>
+  <text x="390" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">coordinator</text>
+  <text x="390" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">-agent.ts</text>
+  
+  <rect x="460" y="90" width="100" height="40" rx="5" fill="url(#compGrad2)" filter="url(#compShadow)"/>
+  <text x="510" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">email-content</text>
+  <text x="510" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">-agent.ts</text>
+  
+  <rect x="340" y="145" width="100" height="40" rx="5" fill="url(#compGrad2)" filter="url(#compShadow)"/>
+  <text x="390" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">sms-content</text>
+  <text x="390" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">-agent.ts</text>
+  
+  <rect x="460" y="145" width="100" height="40" rx="5" fill="url(#compGrad2)" filter="url(#compShadow)"/>
+  <text x="510" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">compliance</text>
+  <text x="510" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#fff">-agent.ts</text>
+  
+  <text x="450" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0">Genkit + Gemini AI</text>
+  
+  <!-- Data Layer Box -->
+  <rect x="610" y="55" width="260" height="180" rx="10" fill="none" stroke="#4facfe" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="740" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4facfe">Data Layer</text>
+  
+  <rect x="630" y="90" width="100" height="40" rx="5" fill="url(#compGrad3)" filter="url(#compShadow)"/>
+  <text x="680" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">campaigns</text>
+  <text x="680" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">.json</text>
+  
+  <rect x="750" y="90" width="100" height="40" rx="5" fill="url(#compGrad3)" filter="url(#compShadow)"/>
+  <text x="800" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">contacts</text>
+  <text x="800" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">.json</text>
+  
+  <rect x="630" y="145" width="100" height="40" rx="5" fill="url(#compGrad3)" filter="url(#compShadow)"/>
+  <text x="680" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">contact-lists</text>
+  <text x="680" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">.json</text>
+  
+  <rect x="750" y="145" width="100" height="40" rx="5" fill="url(#compGrad3)" filter="url(#compShadow)"/>
+  <text x="800" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">tracking</text>
+  <text x="800" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">.json</text>
+  
+  <text x="740" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0">File-based JSON DB</text>
+  
+  <!-- Connection Arrows -->
+  <path d="M290 135 L320 135" stroke="#a0a0a0" stroke-width="2"/>
+  <path d="M580 135 L610 135" stroke="#a0a0a0" stroke-width="2"/>
+  
+  <!-- External Services Box -->
+  <rect x="30" y="270" width="840" height="120" rx="10" fill="none" stroke="#43e97b" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="450" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#43e97b">External Services</text>
+  
+  <!-- Service boxes -->
+  <rect x="60" y="310" width="130" height="60" rx="8" fill="#43e97b" filter="url(#compShadow)"/>
+  <text x="125" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#1a1a2e">📧 Gmail SMTP</text>
+  <text x="125" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1a1a2e">Email Delivery</text>
+  
+  <rect x="210" y="310" width="130" height="60" rx="8" fill="#00b894" filter="url(#compShadow)"/>
+  <text x="275" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">📱 Twilio</text>
+  <text x="275" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ffffff">SMS Delivery</text>
+  
+  <rect x="360" y="310" width="130" height="60" rx="8" fill="#0984e3" filter="url(#compShadow)"/>
+  <text x="425" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">📱 Textbelt</text>
+  <text x="425" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ffffff">Free SMS (1/day)</text>
+  
+  <rect x="510" y="310" width="130" height="60" rx="8" fill="#e17055" filter="url(#compShadow)"/>
+  <text x="575" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">📸 Graph API</text>
+  <text x="575" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ffffff">Instagram Posts</text>
+  
+  <rect x="660" y="310" width="130" height="60" rx="8" fill="#6c5ce7" filter="url(#compShadow)"/>
+  <text x="725" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">🤖 Gemini AI</text>
+  <text x="725" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#ffffff">Content Gen</text>
+  
+  <!-- Config Layer -->
+  <rect x="30" y="420" width="840" height="100" rx="10" fill="none" stroke="#fd79a8" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="450" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#fd79a8">Configuration Layer</text>
+  
+  <rect x="100" y="460" width="150" height="45" rx="5" fill="#fd79a8" filter="url(#compShadow)"/>
+  <text x="175" y="487" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">google-adk-config.ts</text>
+  
+  <rect x="280" y="460" width="150" height="45" rx="5" fill="#e84393" filter="url(#compShadow)"/>
+  <text x="355" y="487" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">llm-config.ts</text>
+  
+  <rect x="460" y="460" width="150" height="45" rx="5" fill="#d63031" filter="url(#compShadow)"/>
+  <text x="535" y="487" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">init.ts</text>
+  
+  <rect x="640" y="460" width="150" height="45" rx="5" fill="#b33939" filter="url(#compShadow)"/>
+  <text x="715" y="487" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#fff">.env (secrets)</text>
+</svg>
