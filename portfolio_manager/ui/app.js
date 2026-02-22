@@ -299,17 +299,6 @@ function renderAnalysis(data) {
 
     // Agent reasoning in collapsible section
     if (hasAgentData) {
-        html += `
-            <div class="card" style="margin-top: 20px;">
-                <div class="collapsible-header" onclick="toggleAgentReasoning()">
-                    <div class="card-title">
-                        <span id="agentReasoningIcon">▶</span>
-                        🤖 Agent Reasoning Details
-                    </div>
-                    <span style="color: var(--text-secondary); font-size: 13px;">Click to expand</span>
-                </div>
-                <div id="agentReasoningContent" class="collapsible-content" style="display: none;">
-        `;
         
         // Macro Outlook from Agent
         if (macro_outlook) {
@@ -336,10 +325,7 @@ function renderAnalysis(data) {
             html += renderBacktestSection(backtest_results);
         }
         
-        html += `
-                </div>
-            </div>
-        `;
+
     }
 
     // If no agent data yet, show waiting message
