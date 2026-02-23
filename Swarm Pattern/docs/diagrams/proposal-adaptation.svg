@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="900" height="550">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560"/>
+      <stop offset="100%" style="stop-color:#f093fb"/>
+    </linearGradient>
+    <linearGradient id="rejectGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5576c"/>
+      <stop offset="100%" style="stop-color:#f093fb"/>
+    </linearGradient>
+    <linearGradient id="pendingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd93d"/>
+      <stop offset="100%" style="stop-color:#fee140"/>
+    </linearGradient>
+    <linearGradient id="approveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    <linearGradient id="infoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- Arrow markers -->
+    <marker id="arrowYellow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ffd93d"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#43e97b"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="550" fill="#0f0f23"/>
+  
+  <!-- Title -->
+  <text x="450" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#titleGrad)">Proposal Adaptation Loop</text>
+  <text x="450" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#888">How proposals shrink through iterations until consensus is reached</text>
+  
+  <!-- Iteration 1 -->
+  <g filter="url(#shadow)" transform="translate(50, 85)">
+    <rect width="170" height="180" rx="12" fill="#1a1a2e" stroke="url(#rejectGrad)" stroke-width="2"/>
+    <text x="85" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#f5576c">Iteration 1</text>
+    <text x="85" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#fff">$10.8M notional</text>
+    
+    <!-- Size indicator -->
+    <rect x="20" y="70" width="130" height="70" rx="6" fill="#f5576c" opacity="0.25"/>
+    <text x="85" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#fff">4 trades</text>
+    
+    <rect x="30" y="148" width="110" height="24" rx="4" fill="#3a2d2d"/>
+    <text x="85" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#f5576c">❌ REJECTED</text>
+    <text x="85" y="174" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">"Too aggressive"</text>
+  </g>
+  
+  <!-- Arrow 1→2 -->
+  <path d="M 225 175 L 255 175" stroke="#ffd93d" stroke-width="2" marker-end="url(#arrowYellow)"/>
+  
+  <!-- Iteration 2 -->
+  <g filter="url(#shadow)" transform="translate(260, 85)">
+    <rect width="170" height="180" rx="12" fill="#1a1a2e" stroke="url(#pendingGrad)" stroke-width="2"/>
+    <text x="85" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffd93d">Iteration 2</text>
+    <text x="85" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#fff">$5.8M notional</text>
+    
+    <!-- Size indicator (smaller) -->
+    <rect x="30" y="70" width="110" height="55" rx="6" fill="#ffd93d" opacity="0.25"/>
+    <text x="85" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#fff">4 trades</text>
+    
+    <rect x="30" y="148" width="110" height="24" rx="4" fill="#3a3a2d"/>
+    <text x="85" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffd93d">❌ REJECTED</text>
+    <text x="85" y="174" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">"Still too large"</text>
+  </g>
+  
+  <!-- Arrow 2→3 -->
+  <path d="M 435 175 L 465 175" stroke="#ffd93d" stroke-width="2" marker-end="url(#arrowYellow)"/>
+  
+  <!-- Iteration 3 -->
+  <g filter="url(#shadow)" transform="translate(470, 85)">
+    <rect width="170" height="180" rx="12" fill="#1a1a2e" stroke="url(#pendingGrad)" stroke-width="2"/>
+    <text x="85" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#ffd93d">Iteration 3</text>
+    <text x="85" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#fff">$4.8M notional</text>
+    
+    <!-- Size indicator (smaller) -->
+    <rect x="35" y="70" width="100" height="45" rx="6" fill="#ffd93d" opacity="0.25"/>
+    <text x="85" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#fff">3 trades</text>
+    
+    <rect x="30" y="148" width="110" height="24" rx="4" fill="#3a3a2d"/>
+    <text x="85" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffd93d">❌ REJECTED</text>
+    <text x="85" y="174" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">"High beta"</text>
+  </g>
+  
+  <!-- Arrow 3→4 -->
+  <path d="M 645 175 L 675 175" stroke="#43e97b" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- Iteration 4 (Success) -->
+  <g filter="url(#shadow)" transform="translate(680, 85)">
+    <rect width="170" height="180" rx="12" fill="#1a1a2e" stroke="url(#approveGrad)" stroke-width="2"/>
+    <text x="85" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#43e97b">Iteration 4</text>
+    <text x="85" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#fff">$2.7M notional</text>
+    
+    <!-- Size indicator (smallest) -->
+    <rect x="45" y="70" width="80" height="35" rx="6" fill="#43e97b" opacity="0.25"/>
+    <text x="85" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#fff">3 trades</text>
+    
+    <rect x="30" y="148" width="110" height="24" rx="4" fill="#2d3a2d"/>
+    <text x="85" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#43e97b">✅ APPROVED</text>
+    <text x="85" y="174" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">80% consensus</text>
+  </g>
+  
+  <!-- Size Reduction Formula Box -->
+  <g filter="url(#shadow)" transform="translate(50, 290)">
+    <rect width="400" height="100" rx="12" fill="#1a1a2e" stroke="url(#infoGrad)" stroke-width="2"/>
+    <text x="200" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#4facfe">📐 Size Multiplier Formula</text>
+    <text x="200" y="55" text-anchor="middle" font-family="monospace" font-size="12" fill="#fff">multiplier = max(0.3, 1.0 - iteration × 0.15)</text>
+    <text x="200" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">If "large" in feedback: × 0.5 additional reduction</text>
+    <text x="200" y="93" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">If "illiquid" in feedback: × 0.7 additional reduction</text>
+  </g>
+  
+  <!-- Feedback Mechanism Box -->
+  <g filter="url(#shadow)" transform="translate(480, 290)">
+    <rect width="370" height="100" rx="12" fill="#1a1a2e" stroke="url(#rejectGrad)" stroke-width="2"/>
+    <text x="185" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#f5576c">🔄 Rejection Feedback Loop</text>
+    <text x="185" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#aaa">1. Collect rejection rationales from all agents</text>
+    <text x="185" y="72" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#aaa">2. Pass feedback to agents before next iteration</text>
+    <text x="185" y="89" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#aaa">3. Agents adapt proposals based on concerns</text>
+  </g>
+  
+  <!-- Notional Value Progression Bar Chart -->
+  <g filter="url(#shadow)" transform="translate(50, 410)">
+    <rect width="800" height="110" rx="12" fill="#1a1a2e" stroke="#444" stroke-width="1"/>
+    <text x="400" y="28" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#fff">📉 Notional Value Progression</text>
+    
+    <!-- Bar labels -->
+    <text x="120" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">Iter 1</text>
+    <text x="290" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">Iter 2</text>
+    <text x="460" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">Iter 3</text>
+    <text x="630" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#888">Iter 4</text>
+    
+    <!-- Bars -->
+    <rect x="50" y="60" width="140" height="30" rx="4" fill="url(#rejectGrad)"/>
+    <text x="120" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fff">100% ($10.8M)</text>
+    
+    <rect x="230" y="60" width="75" height="30" rx="4" fill="url(#pendingGrad)"/>
+    <text x="268" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fff">54%</text>
+    
+    <rect x="400" y="60" width="62" height="30" rx="4" fill="url(#pendingGrad)"/>
+    <text x="431" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fff">44%</text>
+    
+    <rect x="570" y="60" width="35" height="30" rx="4" fill="url(#approveGrad)"/>
+    <text x="587" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fff">25%</text>
+    
+    <!-- Dollar values below -->
+    <text x="268" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">$5.8M</text>
+    <text x="431" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">$4.8M</text>
+    <text x="587" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">$2.7M</text>
+  </g>
+  
+  <!-- Version -->
+  <text x="850" y="540" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#444">v2.0 - Proposal Adaptation Loop</text>
+</svg>

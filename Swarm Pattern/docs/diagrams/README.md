@@ -42,6 +42,25 @@ Data transformation from input to output:
 - AI analysis
 - Output models (ConsensusResult, TradePlan)
 
+### 5. Voting Mechanism (`voting-mechanism.svg`)
+![Voting Mechanism](voting-mechanism.svg)
+
+Consensus voting visualization:
+- Score-based voting (0-100)
+- All 5 agent vote cards
+- Threshold legend (Approve/Abstain/Reject)
+- Rejection feedback loop
+- Consensus calculation
+
+### 6. Proposal Adaptation (`proposal-adaptation.svg`)
+![Proposal Adaptation](proposal-adaptation.svg)
+
+Iteration progression diagram:
+- Shrinking proposal visualization
+- Size multiplier formula
+- Rejection feedback mechanism
+- Notional value bar chart
+
 ## Usage
 
 ### In Markdown Documentation
