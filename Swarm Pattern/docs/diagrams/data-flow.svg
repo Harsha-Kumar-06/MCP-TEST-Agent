@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="inputGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="processGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4facfe"/>
+      <stop offset="100%" style="stop-color:#00f2fe"/>
+    </linearGradient>
+    <linearGradient id="outputGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#43e97b"/>
+      <stop offset="100%" style="stop-color:#38f9d7"/>
+    </linearGradient>
+    
+    <!-- Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.25"/>
+    </filter>
+    
+    <!-- Arrow marker -->
+    <marker id="arrowWhite" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#fff"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4facfe"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#43e97b"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="600" fill="#0f0f23"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#fff">Data Flow Pipeline</text>
+  <text x="600" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#888">Portfolio Optimization Data Transformation</text>
+  
+  <!-- Phase Labels -->
+  <text x="150" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="url(#inputGrad)">📥 INPUT</text>
+  <text x="460" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="url(#processGrad)">⚙️ PROCESSING</text>
+  <text x="810" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="url(#processGrad)">🤖 AI ANALYSIS</text>
+  <text x="1050" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="url(#outputGrad)">📤 OUTPUT</text>
+  
+  <!-- INPUT SECTION -->
+  <g filter="url(#shadow)" transform="translate(50, 130)">
+    <rect width="200" height="350" rx="12" fill="#1a1a2e" stroke="url(#inputGrad)" stroke-width="2"/>
+    
+    <!-- Text Input -->
+    <rect x="15" y="20" width="170" height="70" rx="8" fill="#2d2d44"/>
+    <text x="100" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#667eea">📝 Text Description</text>
+    <text x="100" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">Natural language input</text>
+    <text x="100" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">"I have $50K in AAPL..."</text>
+    
+    <!-- CSV Input -->
+    <rect x="15" y="100" width="170" height="60" rx="8" fill="#2d2d44"/>
+    <text x="100" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#667eea">📊 CSV File</text>
+    <text x="100" y="145" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">ticker,shares,price...</text>
+    
+    <!-- JSON Input -->
+    <rect x="15" y="170" width="170" height="60" rx="8" fill="#2d2d44"/>
+    <text x="100" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#667eea">📄 JSON File</text>
+    <text x="100" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">{"positions": [...]}</text>
+    
+    <!-- Config -->
+    <rect x="15" y="250" width="170" height="80" rx="8" fill="#2d2d44"/>
+    <text x="100" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#667eea">⚙️ Configuration</text>
+    <text x="100" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">• Max iterations</text>
+    <text x="100" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">• Consensus threshold</text>
+    <text x="100" y="325" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">• Strategy selection</text>
+  </g>
+  
+  <!-- Arrow: Input to Processing -->
+  <path d="M 260 305 L 300 305" stroke="#fff" stroke-width="2" marker-end="url(#arrowWhite)"/>
+  
+  <!-- PROCESSING SECTION -->
+  <g filter="url(#shadow)" transform="translate(310, 130)">
+    <rect width="300" height="350" rx="12" fill="#1a1a2e" stroke="url(#processGrad)" stroke-width="2"/>
+    
+    <!-- Parser -->
+    <rect x="15" y="20" width="270" height="70" rx="8" fill="#2d2d44"/>
+    <text x="150" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4facfe">🔄 Input Parser</text>
+    <text x="150" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">text_parser.py / input_parser.py</text>
+    <text x="150" y="78" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">Converts all formats → Portfolio object</text>
+    
+    <!-- Portfolio Model -->
+    <rect x="15" y="100" width="270" height="120" rx="8" fill="#2d2d44"/>
+    <text x="150" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4facfe">📊 Portfolio Model</text>
+    <text x="30" y="150" font-family="monospace" font-size="8" fill="#43e97b">Portfolio:</text>
+    <text x="40" y="165" font-family="monospace" font-size="8" fill="#888">positions: List[Position]</text>
+    <text x="40" y="180" font-family="monospace" font-size="8" fill="#888">cash: float</text>
+    <text x="40" y="195" font-family="monospace" font-size="8" fill="#888">policy_limits: Dict</text>
+    <text x="40" y="210" font-family="monospace" font-size="8" fill="#888">total_value: property</text>
+    
+    <!-- Compliance Check -->
+    <rect x="15" y="230" width="270" height="50" rx="8" fill="#2d2d44"/>
+    <text x="150" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#4facfe">✅ Compliance Check</text>
+    <text x="150" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#888">Validate policy limits, detect violations</text>
+    
+    <!-- Strategy Context -->
+    <rect x="15" y="290" width="270" height="45" rx="8" fill="#2d2d44"/>
+    <text x="150" y="317" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#4facfe">🎯 Strategy Builder</text>
+  </g>
+  
+  <!-- Arrow: Processing to AI -->
+  <path d="M 620 305 L 660 305" stroke="#fff" stroke-width="2" marker-end="url(#arrowWhite)"/>
+  
+  <!-- AI ANALYSIS SECTION -->
+  <g filter="url(#shadow)" transform="translate(670, 130)">
+    <rect width="280" height="350" rx="12" fill="#1a1a2e" stroke="url(#processGrad)" stroke-width="2"/>
+    
+    <!-- Gemini Integration -->
+    <rect x="15" y="20" width="250" height="50" rx="8" fill="#2d2d44" stroke="#fbbd23" stroke-width="1"/>
+    <text x="140" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fbbd23">🧠 Google Gemini AI</text>
+    
+    <!-- Analysis Output -->
+    <rect x="15" y="80" width="250" height="80" rx="8" fill="#2d2d44"/>
+    <text x="140" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#4facfe">📋 AgentAnalysis</text>
+    <text x="30" y="120" font-family="monospace" font-size="8" fill="#888">findings: str</text>
+    <text x="30" y="135" font-family="monospace" font-size="8" fill="#888">recommendation: str</text>
+    <text x="30" y="150" font-family="monospace" font-size="8" fill="#888">conviction: int (1-10)</text>
+    
+    <!-- Proposal Output -->
+    <rect x="15" y="170" width="250" height="70" rx="8" fill="#2d2d44"/>
+    <text x="140" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#4facfe">📝 AgentProposal</text>
+    <text x="30" y="210" font-family="monospace" font-size="8" fill="#888">trade_plan: TradePlan</text>
+    <text x="30" y="225" font-family="monospace" font-size="8" fill="#888">rationale: str</text>
+    
+    <!-- Vote Output -->
+    <rect x="15" y="250" width="250" height="85" rx="8" fill="#2d2d44"/>
+    <text x="140" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#4facfe">🗳️ AgentVote</text>
+    <text x="30" y="290" font-family="monospace" font-size="8" fill="#888">vote: VoteType</text>
+    <text x="30" y="305" font-family="monospace" font-size="8" fill="#888">conviction: int</text>
+    <text x="30" y="320" font-family="monospace" font-size="8" fill="#888">rationale: str</text>
+  </g>
+  
+  <!-- Arrow: AI to Output -->
+  <path d="M 960 305 L 1000 305" stroke="#fff" stroke-width="2" marker-end="url(#arrowWhite)"/>
+  
+  <!-- OUTPUT SECTION -->
+  <g filter="url(#shadow)" transform="translate(1010, 130)">
+    <rect width="170" height="350" rx="12" fill="#1a1a2e" stroke="url(#outputGrad)" stroke-width="2"/>
+    
+    <!-- Consensus Result -->
+    <rect x="10" y="20" width="150" height="100" rx="8" fill="#2d2d44"/>
+    <text x="85" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#43e97b">✅ ConsensusResult</text>
+    <text x="20" y="65" font-family="monospace" font-size="8" fill="#888">reached: bool</text>
+    <text x="20" y="80" font-family="monospace" font-size="8" fill="#888">approval_rate: float</text>
+    <text x="20" y="95" font-family="monospace" font-size="8" fill="#888">trade_plan: Plan</text>
+    <text x="20" y="110" font-family="monospace" font-size="8" fill="#888">votes: List[Vote]</text>
+    
+    <!-- Trade Plan -->
+    <rect x="10" y="130" width="150" height="90" rx="8" fill="#2d2d44"/>
+    <text x="85" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#43e97b">📋 TradePlan</text>
+    <text x="20" y="175" font-family="monospace" font-size="8" fill="#888">trades: List[Trade]</text>
+    <text x="20" y="190" font-family="monospace" font-size="8" fill="#888">total_notional: $</text>
+    <text x="20" y="205" font-family="monospace" font-size="8" fill="#888">estimated_cost: $</text>
+    
+    <!-- Debate History -->
+    <rect x="10" y="230" width="150" height="50" rx="8" fill="#2d2d44"/>
+    <text x="85" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#43e97b">💬 Debate History</text>
+    <text x="85" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#888">All agent messages</text>
+    
+    <!-- UI Display -->
+    <rect x="10" y="290" width="150" height="45" rx="8" fill="#2d2d44"/>
+    <text x="85" y="317" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#43e97b">🖥️ Web Display</text>
+  </g>
+  
+  <!-- Data Flow Labels -->
+  <text x="280" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#667eea">Raw Data</text>
+  <text x="640" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#4facfe">Portfolio</text>
+  <text x="980" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#43e97b">Results</text>
+  
+  <!-- Version -->
+  <text x="1150" y="580" text-anchor="end" font-family="Arial, sans-serif" font-size="10" fill="#444">v2.0 - Data Flow Pipeline</text>
+</svg>

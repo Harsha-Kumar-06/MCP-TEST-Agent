@@ -477,15 +477,36 @@ Cash balance: $500,000"></textarea>
                     <h2>🎯 Select Optimization Strategy</h2>
                     <p style="color:#64748b; margin-bottom:15px;">Choose how the AI agents should optimize your portfolio. Each strategy has different priorities and risk tolerance.</p>
                     
-                    <!-- Rating Legend -->
-                    <div style="background:#f0f9ff; padding:12px 16px; border-radius:8px; margin-bottom:20px; border:1px solid #bae6fd;">
-                        <strong style="color:#0369a1; font-size:0.9rem;">⭐ Personalized Ratings</strong>
-                        <span style="color:#0c4a6e; font-size:0.85rem; display:block; margin-top:4px;">
-                            Ratings adjust based on YOUR portfolio's beta, ESG score, and sector concentration.
-                        </span>
-                        <div style="margin-top:8px; font-size:0.8rem; color:#0369a1;">
-                            <span style="background:#22c55e; color:white; padding:2px 6px; border-radius:3px; margin-right:8px;">BEST FIT</span> Optimal for your portfolio |
-                            ⭐⭐☆☆☆ Lower ratings may trigger more agent debate
+                    <!-- Star Rating Legend -->
+                    <div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding:16px 20px; border-radius:12px; margin-bottom:20px; border:1px solid #7dd3fc;">
+                        <strong style="color:#0369a1; font-size:1rem;">⭐ Portfolio-Adaptive Star Ratings</strong>
+                        <p style="color:#0c4a6e; font-size:0.85rem; margin:6px 0 12px 0;">Ratings adjust based on YOUR portfolio's beta, ESG score, sector concentration, and size. Look for the 📊 tag showing why a strategy fits (or doesn't fit) your portfolio.</p>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+                            <div style="background:white; padding:8px 12px; border-radius:8px; border-left:3px solid #22c55e;">
+                                <span style="font-size:0.9rem;">⭐⭐⭐⭐⭐</span>
+                                <span style="color:#166534; font-size:0.8rem; font-weight:600;"> BEST FOR YOU</span>
+                                <div style="color:#6b7280; font-size:0.75rem;">Matches your portfolio</div>
+                            </div>
+                            <div style="background:white; padding:8px 12px; border-radius:8px; border-left:3px solid #3b82f6;">
+                                <span style="font-size:0.9rem;">⭐⭐⭐⭐☆</span>
+                                <span style="color:#1d4ed8; font-size:0.8rem; font-weight:600;"> Recommended</span>
+                                <div style="color:#6b7280; font-size:0.75rem;">Good fit</div>
+                            </div>
+                            <div style="background:white; padding:8px 12px; border-radius:8px; border-left:3px solid #a855f7;">
+                                <span style="font-size:0.9rem;">⭐⭐⭐☆☆</span>
+                                <span style="color:#7c3aed; font-size:0.8rem; font-weight:600;"> Moderate Fit</span>
+                                <div style="color:#6b7280; font-size:0.75rem;">Neutral for your portfolio</div>
+                            </div>
+                            <div style="background:white; padding:8px 12px; border-radius:8px; border-left:3px solid #f59e0b;">
+                                <span style="font-size:0.9rem;">⭐⭐☆☆☆</span>
+                                <span style="color:#d97706; font-size:0.8rem; font-weight:600;"> Poor Fit</span>
+                                <div style="color:#6b7280; font-size:0.75rem;">May not suit your portfolio</div>
+                            </div>
+                            <div style="background:white; padding:8px 12px; border-radius:8px; border-left:3px solid #ef4444;">
+                                <span style="font-size:0.9rem;">⭐☆☆☆☆</span>
+                                <span style="color:#dc2626; font-size:0.8rem; font-weight:600;"> Not Recommended</span>
+                                <div style="color:#6b7280; font-size:0.75rem;">Conflicts with portfolio</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -495,7 +516,7 @@ Cash balance: $500,000"></textarea>
                     </div>
                     
                     <div id="strategyCards" style="display:none;">
-                        <div id="strategyGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px;">
+                        <div id="strategyGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px;">
                             <!-- Strategy cards will be loaded here -->
                         </div>
                         
@@ -607,132 +628,87 @@ Cash balance: $500,000"></textarea>
             return stars;
         }
         
-        // Calculate strategy rating based on PORTFOLIO characteristics
-        // ALWAYS ensures some strategies are LOW (for testing debate)
+        // Get strategy rating - PORTFOLIO-AWARE adjustments
+        // Base rating from backend (1-5 stars) + portfolio-specific bonuses/penalties
         function getStrategyRating(strategy) {
-            const priorities = strategy.priorities || {};
-            const growth = priorities.growth || 5;
-            const risk_priority = priorities.risk || 5;
-            const esg = priorities.esg || 5;
-            const income = priorities.income || 5;
-            const tax = priorities.tax_efficiency || 5;
-            
-            // Base score from strategy balance
-            const values = [growth, risk_priority, esg, income, tax];
-            const avg = values.reduce((a, b) => a + b, 0) / values.length;
-            const variance = values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / values.length;
-            const balance = Math.max(0, 1 - variance / 20);
-            
+            // Start with the backend-defined star rating
+            let baseRating = strategy.star_rating || 3;
+            let label = strategy.effectiveness || 'Moderate';
             let bonus = 0;
-            let penalty = 0;  // NEW: Ensure some strategies are always low
-            let label = '';
+            let penalty = 0;
+            let reasons = [];
             
-            // PORTFOLIO-AWARE RATINGS
+            // PORTFOLIO-AWARE adjustments (up to ±2 stars based on fit)
             if (currentPortfolio) {
-                const portfolioBeta = currentPortfolio.beta || 1.0;
-                const portfolioESG = currentPortfolio.esg_score || 70;
+                const beta = currentPortfolio.beta || 1.0;
+                const esg = currentPortfolio.esg_score || 70;
                 const sectorAlloc = currentPortfolio.sector_allocation || {};
-                const maxSector = Math.max(...Object.values(sectorAlloc), 0);
                 const totalValue = currentPortfolio.total_value || 0;
-                
-                // === BONUSES (strategies that FIT the portfolio) ===
-                
-                // High beta portfolio -> recommend conservative/risk strategies
-                if (portfolioBeta > 1.2) {
-                    if (strategy.type === 'conservative_income') bonus += 1.0;
-                    else if (strategy.type === 'risk_minimization') bonus += 1.2;
-                }
-                // Low beta portfolio -> balanced works well
-                else if (portfolioBeta < 0.9) {
-                    if (strategy.type === 'balanced') bonus += 0.8;
-                }
-                
-                // Low ESG portfolio -> recommend ESG-focused
-                if (portfolioESG < 65) {
-                    if (strategy.type === 'esg_focused') bonus += 1.0;
-                }
-                
-                // High sector concentration -> recommend sector rotation
-                if (maxSector > 35) {
-                    if (strategy.type === 'balanced') bonus += 0.6;
-                    else if (strategy.type === 'sector_rotation') bonus += 0.8;
-                }
-                
-                // Large portfolio -> tax efficiency matters
-                if (totalValue > 1000000) {
-                    if (strategy.type === 'tax_efficient') bonus += 0.5;
-                }
-                
-                // === PENALTIES (strategies that DON'T FIT - for testing!) ===
-                
-                // High beta portfolio -> aggressive growth is RISKY (low rating)
-                if (portfolioBeta > 1.1) {
-                    if (strategy.type === 'aggressive_growth') penalty += 3.0;
-                }
-                // Low beta/conservative portfolio -> aggressive is mismatched
-                else if (portfolioBeta < 1.0) {
-                    if (strategy.type === 'aggressive_growth') penalty += 2.5;
-                }
-                
-                // High ESG portfolio -> ESG-focused is redundant (lower rating)
-                if (portfolioESG > 75) {
-                    if (strategy.type === 'esg_focused') penalty += 2.0;
-                }
-                
-                // Well-diversified portfolio -> sector rotation unnecessary
-                if (maxSector < 25) {
-                    if (strategy.type === 'sector_rotation') penalty += 2.5;
-                }
-                
-                // Small portfolio -> tax efficiency less impactful
-                if (totalValue < 500000) {
-                    if (strategy.type === 'tax_efficient') penalty += 1.5;
-                }
-                
-                // Risk minimization on already-low-risk portfolio
-                if (portfolioBeta < 0.8) {
-                    if (strategy.type === 'risk_minimization') penalty += 2.0;
-                }
-                
-                // Dividend growth on growth-heavy portfolio (based on sector)
+                const maxSector = Math.max(...Object.values(sectorAlloc), 0);
                 const techWeight = sectorAlloc['Technology'] || 0;
-                if (techWeight > 30) {
-                    if (strategy.type === 'dividend_growth') penalty += 2.0;
+                const finWeight = sectorAlloc['Financials'] || 0;
+                
+                // === HIGH BETA PORTFOLIO (>1.2) - needs risk reduction ===
+                if (beta > 1.2) {
+                    if (strategy.type === 'risk_minimization') { bonus += 1.5; reasons.push('High beta needs risk control'); }
+                    else if (strategy.type === 'conservative_income') { bonus += 1.0; reasons.push('High beta benefits from stability'); }
+                    else if (strategy.type === 'aggressive_growth') { penalty += 1.5; reasons.push('Already high risk'); }
+                    else if (strategy.type === 'momentum') { penalty += 1.0; reasons.push('Adds more volatility'); }
+                }
+                // === LOW BETA PORTFOLIO (<0.8) - can take more risk ===
+                else if (beta < 0.8) {
+                    if (strategy.type === 'aggressive_growth') { bonus += 0.8; reasons.push('Room for growth'); }
+                    else if (strategy.type === 'momentum') { bonus += 0.5; reasons.push('Can handle volatility'); }
+                    else if (strategy.type === 'risk_minimization') { penalty += 1.0; reasons.push('Already low risk'); }
                 }
                 
-                // GUARANTEED LOW: At least one strategy always gets penalized
-                // Sector rotation is rarely optimal for most portfolios
-                if (strategy.type === 'sector_rotation') penalty += 1.0;  // Base penalty
-                // Aggressive growth is risky for ANY portfolio
-                if (strategy.type === 'aggressive_growth') penalty += 0.5;  // Base penalty
+                // === LOW ESG PORTFOLIO (<65) - ESG strategy helps ===
+                if (esg < 65) {
+                    if (strategy.type === 'esg_focused') { bonus += 1.5; reasons.push('ESG improvement needed'); }
+                }
+                // === HIGH ESG PORTFOLIO (>80) - ESG strategy redundant ===
+                else if (esg > 80) {
+                    if (strategy.type === 'esg_focused') { penalty += 0.5; reasons.push('Already ESG compliant'); }
+                }
                 
-            } else {
-                // No portfolio loaded - use static ratings with spread
-                if (strategy.type === 'balanced') bonus = 0.5;
-                if (strategy.type === 'conservative_income') bonus = 0.3;
-                // Always mark these as low when no portfolio
-                if (strategy.type === 'aggressive_growth') penalty = 2.5;
-                if (strategy.type === 'sector_rotation') penalty = 2.0;
+                // === HIGH SECTOR CONCENTRATION (>35%) - needs diversification ===
+                if (maxSector > 35) {
+                    if (strategy.type === 'balanced') { bonus += 1.0; reasons.push('Needs diversification'); }
+                    else if (strategy.type === 'sector_rotation') { bonus += 0.5; reasons.push('Can reduce concentration'); }
+                }
+                
+                // === HIGH TECH WEIGHT (>40%) - dividend/value less suitable ===
+                if (techWeight > 40) {
+                    if (strategy.type === 'dividend_growth') { penalty += 0.8; reasons.push('Tech-heavy, low dividends'); }
+                    if (strategy.type === 'value_investing') { penalty += 0.5; reasons.push('Growth stocks dominate'); }
+                }
+                
+                // === LARGE PORTFOLIO (>$1M) - tax efficiency matters ===
+                if (totalValue > 1000000) {
+                    if (strategy.type === 'tax_efficient') { bonus += 1.0; reasons.push('Large portfolio benefits from tax optimization'); }
+                }
+                // === SMALL PORTFOLIO (<$100K) - tax efficiency less impactful ===
+                else if (totalValue < 100000) {
+                    if (strategy.type === 'tax_efficient') { penalty += 0.5; reasons.push('Tax impact minimal'); }
+                }
             }
             
-            if (strategy.min_esg >= 70) bonus += 0.2;
+            const score = Math.min(5, Math.max(1, baseRating + bonus - penalty));
             
-            // Calculate final score with penalties
-            const rawScore = 3 + balance * 2 + bonus - penalty;
-            const score = Math.min(5, Math.max(1, rawScore));
+            // Generate portfolio-specific label
+            if (reasons.length > 0) {
+                label = reasons[0];  // Show primary reason
+            } else if (score >= 4.5) {
+                label = 'Excellent - Best Overall';
+            } else if (score >= 3.5) {
+                label = strategy.effectiveness || 'Good Choice';
+            } else if (score >= 2.5) {
+                label = strategy.effectiveness || 'Moderate';
+            } else {
+                label = strategy.effectiveness || 'Not Recommended';
+            }
             
-            // Debug: Log strategy scores
-            console.log(`Strategy ${strategy.type}: base=~${(3 + balance*2).toFixed(1)}, bonus=${bonus.toFixed(1)}, penalty=${penalty.toFixed(1)}, final=${score.toFixed(1)}`);
-            
-            // Generate context-aware label
-            if (score >= 4.5) label = 'Best for Your Portfolio';
-            else if (score >= 4) label = 'Recommended';
-            else if (score >= 3.5) label = 'Good Choice';
-            else if (score >= 3) label = 'Moderate';
-            else if (score >= 2.5) label = 'May Not Fit';
-            else label = 'Poor Fit';
-            
-            return { score, label };
+            return { score, label, bestFor: strategy.best_for || '', reasons };
         }
         
         // Calculate trade quality rating
@@ -763,83 +739,140 @@ Cash balance: $500,000"></textarea>
             return { score, label };
         }
         
-        // Display strategy cards
+        // Display strategy cards with clear star ratings (1-5 stars)
         function displayStrategyCards() {
             const grid = document.getElementById('strategyGrid');
             if (!grid) return;
             
             grid.innerHTML = '';
             
-            // Sort strategies by rating (best first)
-            availableStrategies.sort((a, b) => getStrategyRating(b).score - getStrategyRating(a).score);
+            // Calculate ratings first, then sort by portfolio-adjusted score
+            const strategiesWithRatings = availableStrategies.map(strategy => ({
+                ...strategy,
+                rating: getStrategyRating(strategy)
+            }));
             
-            availableStrategies.forEach((strategy, index) => {
+            // Sort by ADJUSTED rating (portfolio-aware), not just base star_rating
+            strategiesWithRatings.sort((a, b) => b.rating.score - a.rating.score);
+            
+            strategiesWithRatings.forEach((strategy, index) => {
                 const riskColor = strategy.risk_level === 'High' ? '#ef4444' : 
                                   strategy.risk_level === 'Medium' ? '#f59e0b' : '#22c55e';
                 const riskBg = strategy.risk_level === 'High' ? '#fee2e2' : 
                                strategy.risk_level === 'Medium' ? '#fef3c7' : '#dcfce7';
                 
-                // Calculate strategy rating
-                const strategyRating = getStrategyRating(strategy);
-                const isLowRated = strategyRating.score < 3;
-                const isTopRated = index === 0 && strategyRating.score >= 4;
+                // Use the pre-calculated portfolio-adjusted rating
+                const strategyRating = strategy.rating;
+                const adjustedScore = strategyRating.score;
+                const starRating = Math.round(adjustedScore);  // Round to nearest integer for display
+                const isLowRated = adjustedScore < 2.5;
+                const isTopRated = starRating === 5;
+                const isMidRated = starRating >= 3 && starRating <= 4;
                 
                 const card = document.createElement('div');
                 card.className = 'strategy-card';
                 card.id = `strategy-${strategy.type}`;
                 
-                // Different styling for low-rated strategies (but still clickable!)
-                const borderColor = isTopRated ? '#22c55e' : (isLowRated ? '#f97316' : '#3b82f6');
-                const bgColor = isLowRated ? '#fff7ed' : '#f8fafc';
+                // Color coding by star rating
+                let borderColor, bgColor, headerBg;
+                if (starRating === 5) {
+                    borderColor = '#22c55e'; bgColor = '#f0fdf4'; headerBg = '#dcfce7';
+                } else if (starRating === 4) {
+                    borderColor = '#3b82f6'; bgColor = '#eff6ff'; headerBg = '#dbeafe';
+                } else if (starRating === 3) {
+                    borderColor = '#a855f7'; bgColor = '#faf5ff'; headerBg = '#f3e8ff';
+                } else if (starRating === 2) {
+                    borderColor = '#f59e0b'; bgColor = '#fffbeb'; headerBg = '#fef3c7';
+                } else {
+                    borderColor = '#ef4444'; bgColor = '#fef2f2'; headerBg = '#fee2e2';
+                }
                 
                 card.style.cssText = `
                     background: ${bgColor};
-                    padding: 20px;
+                    padding: 0;
                     border-radius: 12px;
-                    border-left: 4px solid ${borderColor};
+                    border: 2px solid ${borderColor};
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    ${isLowRated ? 'opacity: 0.85;' : ''}
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    overflow: hidden;
                 `;
                 card.onmouseover = function() {
-                    this.style.transform = 'translateY(-3px)';
-                    this.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
-                    this.style.opacity = '1';
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
                 };
                 card.onmouseout = function() {
                     if (!this.classList.contains('selected')) {
                         this.style.transform = 'none';
-                        this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
-                        if (isLowRated) this.style.opacity = '0.85';
+                        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
                     }
                 };
                 card.onclick = function() { selectStrategy(strategy); };
                 
-                const stars = renderStars(strategyRating.score, strategyRating.label);
+                // Generate star display
+                const fullStars = '⭐'.repeat(starRating);
+                const emptyStars = '☆'.repeat(5 - starRating);
+                const starDisplay = fullStars + emptyStars;
                 
-                // Add badge for top rated only
+                // Badge based on star rating - use ADJUSTED score
                 let badge = '';
-                if (isTopRated) {
-                    badge = '<span style="background:#22c55e; color:white; padding:2px 8px; border-radius:4px; font-size:0.7rem; margin-left:8px;">BEST FIT</span>';
+                if (adjustedScore >= 4.5) {
+                    badge = '<span style="background:#22c55e; color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">BEST FOR YOU</span>';
+                } else if (adjustedScore >= 3.5) {
+                    badge = '<span style="background:#3b82f6; color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">RECOMMENDED</span>';
+                } else if (adjustedScore < 2) {
+                    badge = '<span style="background:#ef4444; color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">NOT RECOMMENDED</span>';
+                } else if (adjustedScore < 2.5) {
+                    badge = '<span style="background:#f97316; color:white; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">POOR FIT</span>';
                 }
                 
+                // Effectiveness label styling - use adjusted score
+                const effectivenessColor = adjustedScore >= 4 ? '#166534' : (adjustedScore >= 3 ? '#7c3aed' : '#c2410c');
+                
+                // Portfolio-specific reasoning
+                const portfolioReason = strategyRating.reasons && strategyRating.reasons.length > 0
+                    ? `<div style="background:#fef3c7; padding:8px 12px; border-radius:6px; margin-bottom:12px; border-left:3px solid #f59e0b;">
+                        <span style="color:#92400e; font-size:0.82rem; font-weight:500;">📊 For your portfolio: ${strategyRating.reasons[0]}</span>
+                       </div>`
+                    : '';
+                
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                        <h3 style="margin:0; color:#1e293b; font-size:1.1rem;">${strategy.name}${badge}</h3>
-                        <div style="font-size:1.1rem;" title="${strategyRating.label}">${stars}</div>
+                    <div style="background:${headerBg}; padding:15px 18px; border-bottom:1px solid ${borderColor}20;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <h3 style="margin:0; color:#1e293b; font-size:1.15rem; font-weight:700;">${strategy.name}</h3>
+                            ${badge}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.2rem; letter-spacing:-1px;">${starDisplay}</span>
+                            <span style="color:${effectivenessColor}; font-size:0.85rem; font-weight:600;">${strategyRating.label || strategy.effectiveness || ''}</span>
+                        </div>
                     </div>
-                    <p style="color:#64748b; font-size:0.9rem; margin-bottom:8px; line-height:1.4;">${strategy.description}</p>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
-                            β ${strategy.target_beta}
-                        </span>
-                        <span style="background:${riskBg}; color:${riskColor}; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
-                            ${strategy.risk_level} Risk
-                        </span>
-                        <span style="background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:4px; font-size:0.8rem;">
-                            ESG ≥${strategy.min_esg}
-                        </span>
+                    <div style="padding:15px 18px;">
+                        ${portfolioReason}
+                        <p style="color:#475569; font-size:0.9rem; margin:0 0 12px 0; line-height:1.5;">${strategy.description}</p>
+                        ${strategy.best_for ? `<p style="color:#64748b; font-size:0.8rem; margin:0 0 12px 0; font-style:italic;">👤 Best for: ${strategy.best_for}</p>` : ''}
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:6px; font-size:0.78rem; font-weight:500;">
+                                β ${strategy.target_beta}
+                            </span>
+                            <span style="background:${riskBg}; color:${riskColor}; padding:4px 10px; border-radius:6px; font-size:0.78rem; font-weight:500;">
+                                ${strategy.risk_level} Risk
+                            </span>
+                            <span style="background:#f1f5f9; color:#475569; padding:4px 10px; border-radius:6px; font-size:0.78rem; font-weight:500;">
+                                ESG ≥${strategy.min_esg || 60}
+                            </span>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <span style="background:#faf5ff; color:#7c3aed; padding:3px 8px; border-radius:4px; font-size:0.72rem;">
+                                Max DD: ${strategy.max_drawdown || '20%'}
+                            </span>
+                            <span style="background:#f0fdf4; color:#166534; padding:3px 8px; border-radius:4px; font-size:0.72rem;">
+                                Turnover: ${strategy.max_turnover || '30%'}
+                            </span>
+                            <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:4px; font-size:0.72rem;">
+                                Vol: ${strategy.volatility_target || '15%'}
+                            </span>
+                        </div>
                     </div>
                 `;
                 
@@ -849,20 +882,29 @@ Cash balance: $500,000"></textarea>
         
         // Select a strategy
         async function selectStrategy(strategy) {
-            // Update UI
+            // Update UI - reset all cards first
             document.querySelectorAll('.strategy-card').forEach(card => {
                 card.classList.remove('selected');
-                card.style.borderLeftColor = '#3b82f6';
-                card.style.background = '#f8fafc';
+                // Re-apply original style based on rating
+                const cardStrategy = availableStrategies.find(s => `strategy-${s.type}` === card.id);
+                if (cardStrategy) {
+                    // Use portfolio-adjusted rating for border color
+                    const adjRating = getStrategyRating(cardStrategy);
+                    const roundedRating = Math.round(adjRating.score);
+                    if (roundedRating >= 5) card.style.borderColor = '#22c55e';
+                    else if (roundedRating >= 4) card.style.borderColor = '#3b82f6';
+                    else if (roundedRating >= 3) card.style.borderColor = '#a855f7';
+                    else if (roundedRating >= 2) card.style.borderColor = '#f59e0b';
+                    else card.style.borderColor = '#ef4444';
+                }
             });
             
             const selectedCard = document.getElementById(`strategy-${strategy.type}`);
             if (selectedCard) {
                 selectedCard.classList.add('selected');
-                selectedCard.style.borderLeftColor = '#22c55e';
-                selectedCard.style.background = '#dcfce7';
-                selectedCard.style.transform = 'translateY(-3px)';
-                selectedCard.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
+                selectedCard.style.borderColor = '#22c55e';
+                selectedCard.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.3), 0 12px 24px rgba(0,0,0,0.15)';
+                selectedCard.style.transform = 'translateY(-4px)';
             }
             
             // Store selected strategy
@@ -879,13 +921,26 @@ Cash balance: $500,000"></textarea>
                 console.error('Error setting strategy:', error);
             }
             
-            // Show selection info
+            // Show selection info with PORTFOLIO-ADJUSTED rating
+            const adjRating = getStrategyRating(strategy);
+            const starRating = Math.round(adjRating.score);
+            const stars = '⭐'.repeat(starRating) + '☆'.repeat(5 - starRating);
+            
             document.getElementById('selectedStrategyInfo').style.display = 'block';
-            document.getElementById('selectedStrategyName').textContent = strategy.name;
-            document.getElementById('selectedStrategyDesc').textContent = strategy.description;
+            document.getElementById('selectedStrategyName').innerHTML = `${strategy.name} <span style="font-size:1rem; margin-left:8px;">${stars}</span>`;
+            document.getElementById('selectedStrategyDesc').innerHTML = `
+                <div style="margin-bottom:8px;">${strategy.description}</div>
+                ${adjRating.reasons && adjRating.reasons.length > 0 ? `<div style="background:#fef3c7; padding:8px 12px; border-radius:6px; margin:8px 0; color:#92400e; font-size:0.9rem;">📊 ${adjRating.reasons[0]}</div>` : ''}
+                ${strategy.best_for ? `<div style="font-style:italic; font-size:0.9rem;">👤 Best for: ${strategy.best_for}</div>` : ''}
+                <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; font-size:0.85rem;">
+                    <span>β: ${strategy.target_beta}</span>
+                    <span>Risk: ${strategy.risk_level}</span>
+                    <span>ESG ≥${strategy.min_esg || 60}</span>
+                </div>
+            `;
             
             // Update optimize tab reminder
-            document.getElementById('currentStrategyName').textContent = strategy.name;
+            document.getElementById('currentStrategyName').innerHTML = `${strategy.name} ${stars}`;
             document.getElementById('strategyReminder').style.display = 'block';
         }
         
@@ -895,16 +950,14 @@ Cash balance: $500,000"></textarea>
             document.getElementById('strategyCards').style.display = 'block';
             
             // Load strategies if not already loaded, otherwise refresh display
-            // Always refresh to recalculate portfolio-aware ratings
             if (availableStrategies.length === 0) {
                 loadStrategies();
             } else {
-                displayStrategyCards();  // Refresh ratings based on current portfolio
+                displayStrategyCards();  // Refresh display with portfolio-aware ratings
             }
             
-            // Auto-select best strategy based on portfolio
+            // Auto-select best strategy (highest PORTFOLIO-ADJUSTED rating)
             if (!selectedStrategy && availableStrategies.length > 0) {
-                // Sort by rating and select the best one
                 const sortedStrategies = [...availableStrategies].sort(
                     (a, b) => getStrategyRating(b).score - getStrategyRating(a).score
                 );
@@ -2110,10 +2163,43 @@ Cash balance: $500,000"></textarea>
                     });
                     html += `</div>`;
                     
+                    // Proposal details (NEW)
+                    if (iter.proposal) {
+                        html += `<div style="background:rgba(255,255,255,0.5); padding:10px; border-radius:8px; margin-top:10px;">`;
+                        html += `<div style="font-size:0.85rem; color:#475569;">`;
+                        html += `<strong>📋 Proposal from ${iter.proposal.from_agent}</strong>`;
+                        html += ` (conviction: ${iter.proposal.conviction}/10)`;
+                        html += `</div>`;
+                        html += `<div style="font-size:0.85rem; color:#64748b; margin-top:4px;">`;
+                        html += `${iter.proposal.num_trades} trades, $${iter.proposal.total_notional?.toLocaleString() || 0} notional`;
+                        html += `</div>`;
+                        // Show trades summary
+                        if (iter.proposal.trades && iter.proposal.trades.length > 0) {
+                            html += `<div style="font-size:0.8rem; color:#64748b; margin-top:6px; display:flex; flex-wrap:wrap; gap:8px;">`;
+                            iter.proposal.trades.slice(0, 4).forEach(t => {
+                                const actionColor = t.action === 'SELL' ? '#dc2626' : '#16a34a';
+                                html += `<span style="background:${actionColor}22; color:${actionColor}; padding:2px 6px; border-radius:4px;">`;
+                                html += `${t.action} ${t.ticker}: ${t.shares?.toLocaleString() || 0}`;
+                                html += `</span>`;
+                            });
+                            if (iter.proposal.trades.length > 4) {
+                                html += `<span style="color:#94a3b8;">+${iter.proposal.trades.length - 4} more</span>`;
+                            }
+                            html += `</div>`;
+                        }
+                        // Show rationale
+                        if (iter.proposal.rationale) {
+                            html += `<div style="font-size:0.8rem; color:#64748b; margin-top:6px; font-style:italic;">`;
+                            html += `"${iter.proposal.rationale}"`;
+                            html += `</div>`;
+                        }
+                        html += `</div>`;
+                    }
+                    
                     // Key concerns (if any)
                     if (iter.key_concerns && iter.key_concerns.length > 0) {
                         html += `<div style="font-size:0.85rem; color:#64748b; margin-top:8px;">`;
-                        html += `<strong>Key Issues:</strong> ${iter.key_concerns.join(' | ')}`;
+                        html += `<strong>⚠️ Key Issues:</strong> ${iter.key_concerns.join(' | ')}`;
                         html += `</div>`;
                     }
                     

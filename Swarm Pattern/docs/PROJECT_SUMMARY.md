@@ -13,12 +13,24 @@ A complete **Multi-Agent Swarm System** for financial portfolio optimization tha
 - ✅ **Working Demo** with $50M portfolio rebalancing scenario
 
 ### Web UI Features (Feb 2026)
-- ✅ **Strategy Selection** - 8 optimization strategies with ⭐ ratings
-- ✅ **Portfolio-Aware Ratings** - Strategies rated based on YOUR portfolio
+- ✅ **Strategy Selection** - 10 optimization strategies with 1-5 ⭐ ratings
+- ✅ **Portfolio-Adaptive Ratings** - Strategies rated based on YOUR portfolio's beta, ESG, sectors
 - ✅ **Sector Pie Chart** - Visual sector allocation breakdown
 - ✅ **Star Ratings** - For strategies AND trade recommendations
-- ✅ **Enhanced Voting** - All 5 agents vote properly (no abstains)
+- ✅ **Iteration-Aware Voting** - Agents debate properly, becoming more lenient each iteration
 - ✅ **Multiple Iterations** - Low-rated strategies trigger more debate
+
+### Strategy System (Feb 2026)
+- ✅ **10 Strategies** - Balanced, Aggressive, Conservative, Tax, ESG, Risk, Sector, Dividend, Momentum, Value
+- ✅ **Star Ratings** - 1-5 stars with effectiveness labels (Excellent, Good, Moderate, etc.)
+- ✅ **Portfolio-Adaptive** - Ratings adjust ±2 stars based on your holdings
+- ✅ **Dynamic Reasoning** - Shows "📊 For your portfolio:" explanations
+
+### Performance Optimizations (Feb 2026)
+- ✅ **Rule-Based Voting** - 50% reduction in API calls (voting uses logic, not AI)
+- ✅ **Analysis Caching** - Reuses AI analysis across iterations
+- ✅ **New google.genai API** - Migrated from deprecated google-generativeai
+- ✅ **Model Upgrade** - Now uses gemini-2.5-flash with 4096 tokens
 
 ### Documentation & Examples
 - ✅ **Comprehensive README** with architecture overview

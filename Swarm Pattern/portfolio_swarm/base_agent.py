@@ -27,10 +27,42 @@ class BaseAgent(ABC):
         self.strategy: Optional['OptimizationStrategy'] = None
         self.strategy_context: str = ""
         
+        # Analysis caching - only call AI on first iteration
+        self._cached_analysis: Optional[AgentAnalysis] = None
+        self._analysis_portfolio_hash: Optional[str] = None
+        
+        # Swarm context - set by orchestrator
+        self.consensus_threshold: float = 0.6
+        self.total_agents: int = 5
+        self.max_iterations: int = 10
+        self.votes_needed_to_pass: int = 3
+        self.votes_needed_to_fail: int = 3
+        
+        # Rejection feedback from previous iteration - used to adapt proposals
+        self.rejection_feedback: List[str] = []
+        self.last_rejection_reasons: List[str] = []
+        
         # Subscribe to messages
         self.comm_bus.subscribe_broadcast(self._on_message_received)
         
         logger.info(f"{self.agent_type.value} initialized")
+    
+    def _get_portfolio_hash(self, portfolio: Portfolio) -> str:
+        """Generate hash of portfolio for cache invalidation"""
+        positions_str = ",".join(f"{p.ticker}:{p.shares}" for p in sorted(portfolio.positions, key=lambda x: x.ticker))
+        return f"{positions_str}:{portfolio.total_value:.0f}"
+    
+    def _should_use_cached_analysis(self, portfolio: Portfolio) -> bool:
+        """Check if we can reuse cached analysis (same portfolio, not first iteration)"""
+        if self._cached_analysis is None:
+            return False
+        current_hash = self._get_portfolio_hash(portfolio)
+        return self._analysis_portfolio_hash == current_hash and self.current_iteration > 0
+    
+    def _cache_analysis(self, analysis: AgentAnalysis, portfolio: Portfolio):
+        """Cache analysis result for reuse in subsequent iterations"""
+        self._cached_analysis = analysis
+        self._analysis_portfolio_hash = self._get_portfolio_hash(portfolio)
     
     @abstractmethod
     def analyze(self, portfolio: Portfolio) -> AgentAnalysis:
@@ -76,6 +108,25 @@ class BaseAgent(ABC):
     def set_iteration(self, iteration: int):
         """Update current iteration"""
         self.current_iteration = iteration
+    
+    def set_rejection_feedback(self, feedback: List[str]):
+        """Set rejection feedback from previous iteration to adapt proposals"""
+        self.last_rejection_reasons = feedback
+        self.rejection_feedback.extend(feedback)
+    
+    def clear_rejection_feedback(self):
+        """Clear rejection feedback for fresh optimization"""
+        self.rejection_feedback = []
+        self.last_rejection_reasons = []
+    
+    def set_swarm_context(self, consensus_threshold: float, total_agents: int, max_iterations: int):
+        """Set swarm-level context for consensus awareness"""
+        self.consensus_threshold = consensus_threshold
+        self.total_agents = total_agents
+        self.max_iterations = max_iterations
+        # Calculate how many votes needed to pass/fail
+        self.votes_needed_to_pass = int(total_agents * consensus_threshold) + 1
+        self.votes_needed_to_fail = total_agents - self.votes_needed_to_pass + 1
     
     def set_strategy(self, strategy: 'OptimizationStrategy'):
         """Set the optimization strategy for this agent"""

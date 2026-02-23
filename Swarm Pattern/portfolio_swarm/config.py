@@ -18,7 +18,7 @@ class GeminiConfig:
     
     # API Configuration
     API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")  # Stable, best price-performance
+    MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")  # Current stable model (Feb 2026)
     TEMPERATURE: float = float(os.getenv("GEMINI_TEMPERATURE", "0.3"))
     MAX_TOKENS: int = int(os.getenv("GEMINI_MAX_TOKENS", "2048"))
     

@@ -16,10 +16,10 @@ This system implements a **swarm pattern** where 5 specialized AI agents collabo
 - 📊 **Consensus Voting** - Transparent decision-making process
 - 💡 **AI Recommendations** - Smart threshold suggestions based on portfolio
 - 🔒 **Input Locking** - Prevents changes during optimization
-- 🎯 **Strategy Selection** - 8 optimization strategies with star ratings
-- ⭐ **Portfolio-Aware Ratings** - Strategies rated based on YOUR portfolio
+- 🎯 **Strategy Selection** - 10 optimization strategies with 1-5 star ratings
+- ⭐ **Portfolio-Adaptive Ratings** - Strategies rated based on YOUR portfolio's beta, ESG, sectors
 - 📈 **Sector Pie Chart** - Visual sector allocation breakdown
-- 🗳️ **Enhanced Voting** - All agents vote with clear rationale
+- 🗳️ **Iteration-Aware Voting** - Agents debate properly, adjusting thresholds each iteration
 
 ## 📁 Project Structure
 
@@ -84,12 +84,17 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+> ⚠️ **Important:** Uses `google-genai` package (NOT the deprecated `google-generativeai`)
+
 ### 3. Set Up API Key
 
 Create a `.env` file with your Google Gemini API key:
 
 ```env
 GEMINI_API_KEY=your-api-key-here
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_TEMPERATURE=0.5
+GEMINI_MAX_TOKENS=4096
 ```
 
 Get a free API key at: https://makersuite.google.com/app/apikey
@@ -166,16 +171,31 @@ GEMINI_API_KEY=your-api-key
 
 # Optional (defaults shown)
 GEMINI_MODEL=gemini-2.5-flash
-GEMINI_TEMPERATURE=0.3
-GEMINI_MAX_TOKENS=2048
+GEMINI_TEMPERATURE=0.5
+GEMINI_MAX_TOKENS=4096
+ENABLE_COST_TRACKING=true
+ENABLE_DEBUG_LOGGING=false
 ```
 
 ### Consensus Settings
 
 | Setting | Range | Description |
 |---------|-------|-------------|
-| Max Iterations | 1-20 | Debate rounds before stopping |
+| Min Iterations | 1-10 | Minimum debate rounds before consensus |
+| Max Iterations | 1-20 | Maximum debate rounds before stopping |
 | Consensus Threshold | 0.5-1.0 | Required approval rate (60% = 3/5 agents) |
+
+## ⚡ Performance Optimizations
+
+The system includes several optimizations to reduce API costs:
+
+| Feature | Benefit |
+|---------|---------|
+| **Rule-Based Voting** | 50% less API calls - voting uses logic, not AI |
+| **Analysis Caching** | Eliminates redundant AI calls across iterations |
+| **Smart Model** | Uses gemini-2.5-flash with 4096 tokens |
+
+See [CHANGELOG.md](docs/CHANGELOG.md) for details.
 
 ## 📊 Sample Files
 
@@ -194,12 +214,24 @@ All documentation is in the `docs/` folder:
 
 | Document | Description |
 |----------|-------------|
+| `SETUP_GUIDE.md` | **Complete setup & project guide** ⭐ |
 | `QUICKSTART_2MIN.md` | 2-minute setup guide |
 | `GEMINI_SETUP.md` | API key configuration |
 | `SAMPLE_INPUT_EXAMPLE.md` | Input/output examples |
 | `ARCHITECTURE.md` | System design details |
 | `COMPLETE_GUIDE.md` | Full user guide |
 | `FILE_INPUT_GUIDE.md` | File format specifications |
+
+### 📊 Architecture Diagrams
+
+Visual diagrams in `docs/diagrams/`:
+
+| Diagram | Description |
+|---------|-------------|
+| `architecture.svg` | System architecture overview |
+| `flowchart.svg` | Optimization process flow |
+| `agent-interaction.svg` | Agent communication model |
+| `data-flow.svg` | Data transformation pipeline |
 
 ## 🧪 Running Tests
 
@@ -258,23 +290,21 @@ C:\Python313\python.exe flask_ui.py
 
 ## 🆕 Recent Updates
 
-### Latest (Feb 2026)
-- ✅ **Strategy Selection Tab** - Choose from 8 strategies AFTER loading portfolio
-- ✅ **Star Ratings** - ⭐⭐⭐⭐⭐ ratings for strategies and trades
-- ✅ **Portfolio-Aware Ratings** - Ratings adjust based on portfolio beta, ESG, sectors
+### Latest (Feb 2026 - v2.1.0)
+- ✅ **10 Strategies** - Added Momentum Trading and Value Investing
+- ✅ **Star Ratings** - 1-5 ⭐ ratings with effectiveness labels
+- ✅ **Portfolio-Adaptive** - Ratings adjust ±2 stars based on portfolio characteristics
+- ✅ **Iteration-Aware Voting** - Agents adjust thresholds to encourage consensus
+- ✅ **Improved Filters** - Fixed irrelevant content detection (phrase-based)
+- ✅ **BUY Trades** - Added proper BUY trade generation
+
+### Previous (v2.0.0)
+- ✅ **Strategy Selection Tab** - Choose strategy AFTER loading portfolio
 - ✅ **Sector Allocation Pie Chart** - Visual breakdown using Chart.js
 - ✅ **Fixed Agent Voting** - All 5 agents now vote properly (no abstains)
-- ✅ **Fixed Percentage Display** - Correct allocation percentages shown
 - ✅ **BEST FIT Badge** - Top-rated strategy highlighted
-- ✅ **Multiple Iterations** - Low-rated strategies trigger agent debate
-
-### Previous
-- ✅ Input method locking during optimization
-- ✅ Fresh start when switching input methods
-- ✅ Cancel button for auto-optimization countdown
-- ✅ Organized project structure (docs/, tests/, samples/, backups/)
-- ✅ Fixed all type checking errors
-- ✅ Updated __init__.py with proper exports
+- ✅ **API Migration** - google-genai package (from deprecated google-generativeai)
+- ✅ **Organized project structure** (docs/, tests/, samples/, backups/)
 
 ## 📝 License
 
