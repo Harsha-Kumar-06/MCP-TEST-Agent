@@ -1,0 +1,126 @@
+═══════════════════════════════════════════════════════════════════════════════
+                               ╔══════════════════════════════╗
+                               ║  FIRST NATIONAL BANK OF CO   ║
+                               ╚══════════════════════════════╝
+                              MONTHLY ACCOUNT STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Statement Period: January 1, 2026 - January 31, 2026
+Account Type: Premier Checking Plus
+Account Number: ****8521
+Statement Date: February 1, 2026
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT HOLDER INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Name: Jennifer A. Martinez
+Address: 1250 Pearl Street, Unit 304
+         Denver, CO 80203
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   42,875.43
+Total Deposits and Credits .............................. $    8,228.44
+Total Withdrawals and Debits ............................ $   (5,353.92)
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   45,749.95
+
+Average Daily Balance ................................... $   44,312.69
+
+───────────────────────────────────────────────────────────────────────────────
+DEPOSITS AND CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/05/2026  DIRECT DEP GLOBALTECH INDUSTRIES PAYROLL          $3,614.22
+01/20/2026  DIRECT DEP GLOBALTECH INDUSTRIES PAYROLL          $3,614.22
+01/25/2026  DIVIDEND PAYMENT FIDELITY INVESTMENTS             $1,000.00
+                                                            ──────────
+Total Deposits and Credits                                    $8,228.44
+
+───────────────────────────────────────────────────────────────────────────────
+WITHDRAWALS AND DEBITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/02/2026  AUTOPAY XCEL ENERGY                                ($125.47)
+01/03/2026  DEBIT CARD KING SOOPERS #1247                       ($98.56)
+01/05/2026  AUTOPAY COMCAST XFINITY                             ($79.99)
+01/05/2026  AUTOPAY RENT 1250 PEARL LLC                      ($2,100.00)
+01/08/2026  DEBIT CARD SAFEWAY #2847                            ($72.34)
+01/10/2026  DEBIT CARD CONOCO GAS                               ($48.00)
+01/12/2026  AUTOPAY TOYOTA FINANCIAL                           ($425.00)
+01/14/2026  DEBIT CARD AMAZON.COM                               ($89.45)
+01/15/2026  TRANSFER TO FIDELITY BROKERAGE                     ($500.00)
+01/18/2026  DEBIT CARD WHOLE FOODS MARKET                      ($124.67)
+01/20/2026  DEBIT CARD REI CO-OP                               ($175.89)
+01/22/2026  AUTOPAY T-MOBILE                                    ($85.00)
+01/25/2026  DEBIT CARD COSTCO #347                             ($198.56)
+01/28/2026  ZELLE PAYMENT TO *SARAH M.                          ($75.00)
+01/30/2026  DEBIT CARD SHELL GAS                                ($42.00)
+01/31/2026  AUTOPAY ORANGE THEORY FITNESS                      ($113.99)
+01/31/2026  AUTOPAY NETFLIX                                     ($15.99)
+                                                            ──────────
+Total Withdrawals and Debits                                ($5,353.92)
+
+───────────────────────────────────────────────────────────────────────────────
+DAILY BALANCE SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Balance          Date        Balance
+──────────  ──────────       ──────────  ──────────
+01/01       $42,875.43       01/17       $43,896.01
+01/05       $43,883.70       01/20       $47,334.34
+01/10       $43,763.36       01/25       $47,559.78
+01/15       $42,848.91       01/31       $45,749.95
+
+───────────────────────────────────────────────────────────────────────────────
+OTHER ACCOUNTS SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Account Type                    Account Number       Balance
+────────────────────────────    ──────────────       ───────────
+High-Yield Savings              ****8524             $ 78,500.00
+Money Market                    ****8527             $ 25,000.00
+Certificate of Deposit          ****8530             $ 50,000.00
+
+───────────────────────────────────────────────────────────────────────────────
+INVESTMENT ACCOUNTS (LINKED)
+───────────────────────────────────────────────────────────────────────────────
+
+Fidelity Brokerage Account      ****4521             $165,000.00
+Fidelity 401(k) Rollover        ****4524             $285,000.00
+
+───────────────────────────────────────────────────────────────────────────────
+CREDIT SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+First National Visa Platinum    ****1847             $    425.00 (current balance)
+Credit Limit: $35,000           Available: $34,575   Last Payment: $1,247.00
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT ALERTS & NOTIFICATIONS
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Account is in excellent standing
+✓ No overdrafts this statement period
+✓ Overdraft Protection is ACTIVE (linked to Savings ****8524)
+✓ Paperless statements enabled
+✓ Average balance qualified for fee waiver
+
+───────────────────────────────────────────────────────────────────────────────
+IMPORTANT NOTICES
+───────────────────────────────────────────────────────────────────────────────
+
+• Your Premier Plus account benefits are active
+• You've maintained an excellent relationship with us for 12 years
+• Thank you for being a valued customer!
+
+Questions? Call 1-800-555-FNBC or visit fnbcolorado.com
+
+   Member FDIC                        © 2026 First National Bank of Colorado
+═══════════════════════════════════════════════════════════════════════════════

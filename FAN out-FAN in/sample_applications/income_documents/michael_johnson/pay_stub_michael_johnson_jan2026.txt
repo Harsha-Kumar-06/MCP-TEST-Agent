@@ -1,0 +1,96 @@
+═══════════════════════════════════════════════════════════════════════════════
+                              TECH SOLUTIONS INC
+                          EMPLOYEE EARNINGS STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+COMPANY INFORMATION                      PAY PERIOD INFORMATION
+──────────────────────                   ──────────────────────
+Tech Solutions Inc                       Pay Period: 01/01/2026 - 01/15/2026
+500 Howard Street, Suite 400             Pay Date: 01/20/2026
+San Francisco, CA 94105                  Check Number: DIR-DEP-847291
+EIN: 94-3847291
+
+EMPLOYEE INFORMATION
+────────────────────
+Name: Michael R. Johnson                 Employee ID: TSI-2021-0847
+SSN: XXX-XX-4521                         Department: Engineering
+Address: 456 Market Street, Apt 12B      Position: Senior Software Engineer
+         San Francisco, CA 94102         Pay Rate: $6,346.15 / Bi-Weekly
+
+═══════════════════════════════════════════════════════════════════════════════
+                                  EARNINGS
+═══════════════════════════════════════════════════════════════════════════════
+
+Description                    Hours      Rate           Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Regular Salary                 80.00      Salary      $6,346.15    $6,346.15
+                                                     ──────────   ──────────
+GROSS EARNINGS                                       $6,346.15    $6,346.15
+
+═══════════════════════════════════════════════════════════════════════════════
+                                DEDUCTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+TAXES                                                Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Federal Income Tax                                  $1,237.50    $1,237.50
+Social Security (OASDI)                               393.46       393.46
+Medicare                                               92.02        92.02
+CA State Income Tax                                   494.40       494.40
+CA SDI                                                 53.11        53.11
+                                                   ──────────   ──────────
+Total Taxes                                        $2,270.49    $2,270.49
+
+PRE-TAX DEDUCTIONS                                   Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+401(k) Contribution (10%)                            $634.62      $634.62
+Health Insurance - Employee                           175.00       175.00
+Dental Insurance                                       25.00        25.00
+Vision Insurance                                       10.00        10.00
+HSA Contribution                                      118.75       118.75
+                                                   ──────────   ──────────
+Total Pre-Tax Deductions                             $963.37      $963.37
+
+POST-TAX DEDUCTIONS                                  Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Life Insurance (Supplemental)                         $15.00       $15.00
+                                                   ──────────   ──────────
+Total Post-Tax Deductions                             $15.00       $15.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                             PAY SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+                                                    Current        YTD
+                                                   ──────────   ──────────
+Gross Earnings                                     $6,346.15    $6,346.15
+Pre-Tax Deductions                                  (963.37)     (963.37)
+Taxable Gross                                      $5,382.78    $5,382.78
+Taxes                                             (2,270.49)   (2,270.49)
+Post-Tax Deductions                                  (15.00)      (15.00)
+                                                   ══════════   ══════════
+NET PAY                                            $3,097.29    $3,097.29
+
+═══════════════════════════════════════════════════════════════════════════════
+                          PAYMENT INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+Payment Method: Direct Deposit
+Bank: Chase Bank
+Account: ****7842
+Routing: ****4521
+Amount Deposited: $3,097.29
+
+═══════════════════════════════════════════════════════════════════════════════
+                           LEAVE BALANCES
+═══════════════════════════════════════════════════════════════════════════════
+
+Leave Type                    Accrued    Used      Available
+─────────────────────────────────────────────────────────────
+Vacation (PTO)                160.00     8.00      152.00 hours
+Sick Leave                     80.00     0.00       80.00 hours
+Personal Days                  24.00     0.00       24.00 hours
+
+═══════════════════════════════════════════════════════════════════════════════
+Questions about your pay? Contact HR at hr@techsolutions.com or ext. 4500
+═══════════════════════════════════════════════════════════════════════════════

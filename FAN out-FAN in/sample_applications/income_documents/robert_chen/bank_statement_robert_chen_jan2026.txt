@@ -1,0 +1,129 @@
+═══════════════════════════════════════════════════════════════════════════════
+                          ╔═══════════════════════════╗
+                          ║   FIRST REPUBLIC BANK     ║
+                          ╚═══════════════════════════╝
+                      PRIVATE BANKING MONTHLY STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Statement Period: January 1, 2026 - January 31, 2026
+Relationship Manager: David Wilson, Vice President
+Phone: (650) 555-8000
+
+───────────────────────────────────────────────────────────────────────────────
+CLIENT INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Name: Robert A. Chen & Jennifer L. Chen
+Address: 890 University Avenue
+         Palo Alto, CA 94301
+
+Client Segment: Private Banking Platinum
+Relationship Since: 2018
+
+═══════════════════════════════════════════════════════════════════════════════
+                        RELATIONSHIP SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+Account Type                    Account Number       Balance
+────────────────────────────    ──────────────       ───────────────
+Private Checking                ****4156             $    85,247.82
+High-Yield Savings              ****4160             $   245,000.00
+Money Market                    ****4165             $   150,000.00
+12-Month CD                     ****4170             $   100,000.00
+                                                     ───────────────
+Total Deposits                                       $   580,247.82
+
+───────────────────────────────────────────────────────────────────────────────
+PRIVATE CHECKING ACCOUNT ****4156
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   78,456.23
+Total Deposits and Credits .............................. $   32,538.19
+Total Withdrawals and Debits ............................ $  (25,746.60)
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   85,247.82
+
+───────────────────────────────────────────────────────────────────────────────
+DEPOSITS AND CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ───────────
+01/31/2026  DIRECT DEP GLOBAL INNOVATIONS CORP PAYROLL       $22,538.19
+01/31/2026  DIRECT DEP STANFORD UNIVERSITY PAYROLL           $10,000.00
+                                                            ───────────
+Total Deposits and Credits                                   $32,538.19
+
+───────────────────────────────────────────────────────────────────────────────
+WITHDRAWALS AND DEBITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ───────────
+01/02/2026  AUTOPAY PACIFIC GAS & ELECTRIC                     ($387.45)
+01/03/2026  DEBIT CARD WHOLE FOODS PALO ALTO                   ($245.67)
+01/05/2026  AUTOPAY XFINITY PREMIUM                            ($189.99)
+01/05/2026  AUTOPAY MORTGAGE - 890 UNIVERSITY AVE            ($8,450.00)
+            (First Republic Jumbo Mortgage ****8901)
+01/06/2026  DEBIT CARD STANFORD CHILDREN'S HEALTH              ($125.00)
+01/08/2026  DEBIT CARD CHEVRON                                 ($125.00)
+01/10/2026  AUTOPAY TESLA FINANCING (Model X)                  ($985.00)
+01/10/2026  DEBIT CARD SAFEWAY                                 ($156.78)
+01/12/2026  AUTOPAY PROPERTY TAX ESCROW                      ($2,847.50)
+01/15/2026  DEBIT CARD WILLIAMS-SONOMA                         ($342.50)
+01/15/2026  TRANSFER TO SAVINGS ****4160                     ($5,000.00)
+01/18/2026  DEBIT CARD GUCCIOLI'S RESTAURANT                   ($287.45)
+01/20/2026  AUTOPAY PALO ALTO UTILITIES                        ($234.56)
+01/22/2026  DEBIT CARD COSTCO WHOLESALE                        ($425.87)
+01/24/2026  ACH DEBIT BRIGHT HORIZONS CHILDCARE              ($3,200.00)
+01/25/2026  DEBIT CARD AMAZON PRIME                            ($387.24)
+01/28/2026  WIRE TRANSFER - STANFORD TUITION PREPAY          ($1,500.00)
+01/28/2026  DEBIT CARD PENINSULA CREAMERY                       ($87.59)
+01/30/2026  AUTOPAY EQUINOX MEMBERSHIP                         ($350.00)
+01/31/2026  AUTOPAY BLUE SHIELD CA (FAMILY)                    ($419.00)
+                                                            ───────────
+Total Withdrawals and Debits                                ($25,746.60)
+
+───────────────────────────────────────────────────────────────────────────────
+HIGH-YIELD SAVINGS ****4160
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance ....................................... $  239,847.25
+Transfer from Checking (01/15) ..........................      5,000.00
+Interest Earned (4.25% APY) .............................        152.75
+                                                          ──────────────
+Ending Balance .......................................... $  245,000.00
+
+───────────────────────────────────────────────────────────────────────────────
+INVESTMENT ACCOUNTS (Held at First Republic Investment Management)
+───────────────────────────────────────────────────────────────────────────────
+
+Account Type                    Account Number       Balance
+────────────────────────────    ──────────────       ───────────────
+Brokerage Account               ****5001             $   847,256.00
+401(k) Rollover IRA             ****5002             $   425,000.00
+Roth IRA (Robert)               ****5003             $    85,000.00
+Roth IRA (Jennifer)             ****5004             $    72,000.00
+529 Plan (Ethan)                ****5005             $    95,000.00
+529 Plan (Sophie)               ****5006             $    82,000.00
+                                                     ───────────────
+Total Investments                                    $ 1,606,256.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                       TOTAL RELATIONSHIP VALUE
+═══════════════════════════════════════════════════════════════════════════════
+
+Deposit Accounts ..................................... $    580,247.82
+Investment Accounts .................................. $  1,606,256.00
+                                                      ────────────────
+Total Assets Under Management ........................ $  2,186,503.82
+
+Current Mortgage Balance (890 University Ave) ........ $  1,245,000.00
+Net Worth at First Republic .......................... $    941,503.82
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Your dedicated Relationship Manager:
+David Wilson, Vice President | (650) 555-8000 | dwilson@firstrepublic.com
+
+Member FDIC                               © 2026 First Republic Bank
+═══════════════════════════════════════════════════════════════════════════════

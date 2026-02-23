@@ -1,0 +1,57 @@
+JUMBO MORTGAGE APPLICATION
+===========================
+
+BORROWER DETAILS
+================
+Full Legal Name: Robert Alexander Chen
+Last 4 SSN: 9156
+Date of Birth: December 5, 1978
+Contact Email: robert.chen@techexec.com
+Mobile Phone: 650-555-4321
+Residence: 890 University Avenue, Palo Alto, CA 94301
+
+EMPLOYMENT & INCOME
+===================
+Current Status: Employed
+Employer: Global Innovations Corp
+Job Title: Chief Technology Officer
+Employment Duration: 8 years
+Base Annual Salary: $425,000
+Bonus/Stock: $150,000 (average annual)
+Total Annual Compensation: $575,000
+
+SUBJECT PROPERTY
+================
+Street Address: 2450 Waverly Street
+City: Palo Alto
+State: CA
+Postal Code: 94301
+Property Classification: Single Family
+Construction Year: 2020
+Total Square Feet: 3,800
+Bed Count: 5
+Bath Count: 4.5
+Lot Size: 0.35 acres
+
+TRANSACTION DETAILS
+===================
+Asking Price: $3,250,000
+Down Payment: $975,000 (30%)
+Loan Amount: $2,275,000
+Loan Type: Jumbo 30-Year Fixed
+
+DOCUMENTATION CHECKLIST
+=======================
+✓ W-2 Forms - Provided (2 years)
+✓ Federal Tax Returns - Provided (3 years)
+✓ Recent Pay Stubs - Provided (2 months)
+✓ Bank/Investment Statements - Provided (12 months)
+✓ Stock Vesting Schedule - Provided
+
+BORROWER CERTIFICATION
+======================
+I, Robert A. Chen, certify under penalty of perjury that all 
+information contained in this application is true and complete.
+
+Electronic Signature: Robert A. Chen
+Submission Date: 2026-02-13

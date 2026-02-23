@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+
+{% block title %}Results - MortgageClear{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div id="loadingState" class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+        <p>Loading results...</p>
+    </div>
+    
+    <div id="resultsContent" style="display: none;">
+        <!-- Decision Header -->
+        <div class="card mb-4">
+            <div class="card-body text-center py-5">
+                <div id="decisionBadge"></div>
+                <h2 class="mt-3" id="decisionText"></h2>
+                <p class="text-muted" id="applicationIdText"></p>
+                <p id="decisionSummary" class="mt-3"></p>
+            </div>
+        </div>
+
+        <!-- Processing Time -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Processing Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h3 class="text-primary" id="totalTime">-</h3>
+                        <small class="text-muted">Total Processing Time</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="text-warning">30-60 days</h3>
+                        <small class="text-muted">Traditional Manual Underwriting</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="text-success" id="timeSaved">-</h3>
+                        <small class="text-muted">vs Traditional Process</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agent Results -->
+        <div class="row g-4 mb-4">
+            <!-- Credit Analysis -->
+            <div class="col-md-3">
+                <div class="card h-100 agent-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-credit-card-2-back me-2"></i>Credit Analysis</h5>
+                        <span class="badge bg-primary">Agent A</span>
+                    </div>
+                    <div class="card-body" id="creditResults">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Valuation -->
+            <div class="col-md-3">
+                <div class="card h-100 agent-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-house-door me-2"></i>Property Valuation</h5>
+                        <span class="badge bg-primary">Agent B</span>
+                    </div>
+                    <div class="card-body" id="propertyResults">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fraud Detection -->
+            <div class="col-md-3">
+                <div class="card h-100 agent-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Fraud Detection</h5>
+                        <span class="badge bg-primary">Agent C</span>
+                    </div>
+                    <div class="card-body" id="fraudResults">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Person Verification -->
+            <div class="col-md-3">
+                <div class="card h-100 agent-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Person Verification</h5>
+                        <span class="badge bg-primary">Agent D</span>
+                    </div>
+                    <div class="card-body" id="personResults">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conditions and Next Steps -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Conditions</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush" id="conditionsList">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-arrow-right-circle me-2"></i>Next Steps</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="list-group list-group-numbered list-group-flush" id="nextStepsList">
+                            <!-- Populated by JS -->
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Chart -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Risk Analysis Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                    <div class="col-md-4" id="riskBreakdown">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-between">
+            <a href="/application" class="btn btn-outline-primary">
+                <i class="bi bi-plus-circle me-2"></i>New Application
+            </a>
+            <div>
+                <button class="btn btn-outline-secondary me-2" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Print
+                </button>
+                <a href="/dashboard" class="btn btn-primary">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" style="display: none;" class="text-center py-5">
+        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+        <h3 class="mt-3">Application Not Found</h3>
+        <p class="text-muted" id="errorMessage">This application may have expired or the server was restarted.</p>
+        <div class="mt-4">
+            <a href="/apply" class="btn btn-primary me-2">
+                <i class="bi bi-file-earmark-plus me-2"></i>New Application
+            </a>
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="bi bi-house me-2"></i>Return Home
+            </a>
+        </div>
+        <p class="text-muted mt-4 small">
+            <i class="bi bi-info-circle me-1"></i>
+            Tip: Try the "Run Demo" button on the home page to test the system
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const applicationId = '{{ application_id }}';
+
+async function loadResults() {
+    try {
+        const response = await fetch(`/api/v1/applications/${applicationId}`);
+        
+        if (!response.ok) {
+            throw new Error('Application not found');
+        }
+        
+        const result = await response.json();
+        displayResults(result);
+        
+    } catch (error) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        document.getElementById('errorMessage').textContent = error.message;
+    }
+}
+
+function displayResults(result) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('resultsContent').style.display = 'block';
+    
+    // Decision Badge
+    const decisionClass = result.decision === 'approved' ? 'score-approved' : 
+                         result.decision === 'manual_review' ? 'score-review' : 'score-denied';
+    
+    document.getElementById('decisionBadge').innerHTML = `
+        <span class="score-badge ${decisionClass}">
+            ${result.approval_confidence_score.toFixed(1)}%
+        </span>
+    `;
+    
+    document.getElementById('decisionText').textContent = result.decision.replace('_', ' ').toUpperCase();
+    document.getElementById('applicationIdText').textContent = `Application: ${result.application_id}`;
+    document.getElementById('decisionSummary').textContent = result.decision_summary;
+    
+    // Processing Time
+    const totalMs = result.total_processing_time_ms;
+    const totalSec = (totalMs / 1000).toFixed(1);
+    document.getElementById('totalTime').textContent = `${totalSec}s`;
+    document.getElementById('timeSaved').textContent = '~30-60 days';
+    
+    // Credit Results
+    const credit = result.credit_analysis;
+    document.getElementById('creditResults').innerHTML = `
+        <div class="mb-3">
+            <strong>Credit Score:</strong> 
+            <span class="float-end">${credit.credit_score}</span>
+        </div>
+        <div class="mb-3">
+            <strong>DTI Ratio:</strong> 
+            <span class="float-end">${(credit.debt_to_income_ratio * 100).toFixed(1)}%</span>
+        </div>
+        <div class="mb-3">
+            <strong>Total Debt:</strong> 
+            <span class="float-end">$${credit.total_debt.toLocaleString()}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Risk Score:</strong>
+            <div class="risk-meter mt-1">
+                <div class="risk-meter-fill bg-${getRiskColor(credit.risk_score)}" style="width: ${credit.risk_score}%"></div>
+            </div>
+            <small class="text-muted">${credit.risk_score.toFixed(1)} / 100</small>
+        </div>
+        <div class="mb-3">
+            <small class="text-muted">${credit.analysis_summary}</small>
+        </div>
+        <div class="text-end">
+            <small class="badge bg-secondary">${credit.processing_time_ms}ms</small>
+        </div>
+    `;
+    
+    // Property Results
+    const property = result.property_valuation;
+    document.getElementById('propertyResults').innerHTML = `
+        <div class="mb-3">
+            <strong>Estimated Value:</strong> 
+            <span class="float-end">$${property.estimated_value.toLocaleString()}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Zillow Estimate:</strong> 
+            <span class="float-end">$${property.zillow_estimate.toLocaleString()}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Valuation Gap:</strong> 
+            <span class="float-end ${property.valuation_gap_percent > 10 ? 'text-warning' : ''}">${property.valuation_gap_percent.toFixed(1)}%</span>
+        </div>
+        <div class="mb-3">
+            <strong>Market Trend:</strong> 
+            <span class="float-end">${property.market_trend}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Risk Score:</strong>
+            <div class="risk-meter mt-1">
+                <div class="risk-meter-fill bg-${getRiskColor(property.risk_score)}" style="width: ${property.risk_score}%"></div>
+            </div>
+            <small class="text-muted">${property.risk_score.toFixed(1)} / 100</small>
+        </div>
+        <div class="text-end">
+            <small class="badge bg-secondary">${property.processing_time_ms}ms</small>
+        </div>
+    `;
+    
+    // Fraud Results
+    const fraud = result.fraud_detection;
+    document.getElementById('fraudResults').innerHTML = `
+        <div class="mb-3">
+            <strong>Identity Verified:</strong> 
+            <span class="float-end ${fraud.identity_verified ? 'text-success' : 'text-danger'}">
+                <i class="bi bi-${fraud.identity_verified ? 'check-circle' : 'x-circle'}"></i>
+                ${fraud.identity_verified ? 'Yes' : 'No'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Watchlist Match:</strong> 
+            <span class="float-end ${fraud.watchlist_match ? 'text-danger' : 'text-success'}">
+                ${fraud.watchlist_match ? 'MATCH FOUND!' : 'Clear'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Document Score:</strong> 
+            <span class="float-end">${(fraud.document_authenticity_score * 100).toFixed(0)}%</span>
+        </div>
+        <div class="mb-3">
+            <strong>Documentation Completeness:</strong>
+            <span class="float-end badge bg-${getDocStatusColor(fraud.documentation_status || 'unknown')}">
+                ${fraud.documentation_status ? fraud.documentation_status.charAt(0).toUpperCase() + fraud.documentation_status.slice(1) : 'Unknown'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Completeness Score:</strong>
+            <div class="progress mt-1" style="height: 18px;">
+                <div class="progress-bar bg-${getDocStatusColor(fraud.documentation_status || 'unknown')}" role="progressbar" 
+                     style="width: ${fraud.documentation_completeness_score || 50}%">
+                    ${(fraud.documentation_completeness_score || 50).toFixed(0)}%
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <strong>Cross-Doc Identity:</strong>
+            <span class="float-end badge bg-${fraud.identity_documents_validated !== false ? 'success' : 'danger'}">
+                ${fraud.identity_documents_validated !== false ? 'Verified' : 'MISMATCH'}
+            </span>
+        </div>
+        ${fraud.identity_consistency_score < 100 ? `
+        <div class="mb-3">
+            <strong>Identity Match:</strong>
+            <div class="progress mt-1" style="height: 18px;">
+                <div class="progress-bar bg-${fraud.identity_consistency_score >= 80 ? 'success' : fraud.identity_consistency_score >= 50 ? 'warning' : 'danger'}" role="progressbar" 
+                     style="width: ${fraud.identity_consistency_score || 100}%">
+                    ${(fraud.identity_consistency_score || 100).toFixed(0)}%
+                </div>
+            </div>
+        </div>
+        ` : ''}
+        <div class="mb-3">
+            <strong>Flags:</strong> 
+            <span class="float-end">${fraud.flags.length}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Risk Score:</strong>
+            <div class="risk-meter mt-1">
+                <div class="risk-meter-fill bg-${getRiskColor(fraud.risk_score)}" style="width: ${fraud.risk_score}%"></div>
+            </div>
+            <small class="text-muted">${fraud.risk_score.toFixed(1)} / 100</small>
+        </div>
+        ${fraud.flags.length > 0 ? `
+        <div class="mb-3">
+            <small class="text-warning">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                ${fraud.flags.slice(0, 2).join(', ')}
+            </small>
+        </div>
+        ` : ''}
+        <div class="text-end">
+            <small class="badge bg-secondary">${fraud.processing_time_ms}ms</small>
+        </div>
+    `;
+    
+    // Person Verification Results
+    const person = result.person_verification || {};
+    document.getElementById('personResults').innerHTML = `
+        <div class="mb-3">
+            <strong>Age:</strong>
+            <span class="float-end">${person.age || 'N/A'}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Identity Consistent:</strong>
+            <span class="float-end ${person.identity_consistent ? 'text-success' : 'text-danger'}">
+                <i class="bi bi-${person.identity_consistent ? 'check-circle' : 'x-circle'}"></i>
+                ${person.identity_consistent ? 'Yes' : 'No'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Synthetic Identity:</strong>
+            <span class="float-end ${person.synthetic_identity_risk ? 'text-danger fw-bold' : 'text-success'}">
+                ${person.synthetic_identity_risk ? 'RISK DETECTED' : 'Clear'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Employment Consistent:</strong>
+            <span class="float-end ${person.employment_consistent ? 'text-success' : 'text-warning'}">
+                ${person.employment_consistent ? 'Yes' : 'Review Required'}
+            </span>
+        </div>
+        <div class="mb-3">
+            <strong>Person Flags:</strong>
+            <span class="float-end">${(person.person_flags || []).length}</span>
+        </div>
+        <div class="mb-3">
+            <strong>Risk Score:</strong>
+            <div class="risk-meter mt-1">
+                <div class="risk-meter-fill bg-${getRiskColor(person.risk_score || 0)}" style="width: ${person.risk_score || 0}%"></div>
+            </div>
+            <small class="text-muted">${(person.risk_score || 0).toFixed(1)} / 100</small>
+        </div>
+        ${(person.person_flags || []).length > 0 ? `
+        <div class="mb-3">
+            <small class="text-warning">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                ${(person.person_flags || []).slice(0, 2).join(', ')}
+            </small>
+        </div>
+        ` : ''}
+        <div class="text-end">
+            <small class="badge bg-secondary">${person.processing_time_ms || 0}ms</small>
+        </div>
+    `;
+
+    // Conditions
+    const conditionsList = document.getElementById('conditionsList');
+    if (result.conditions.length === 0) {
+        conditionsList.innerHTML = '<li class="list-group-item bg-transparent text-muted">No conditions required</li>';
+    } else {
+        conditionsList.innerHTML = result.conditions.map(c => 
+            `<li class="list-group-item bg-transparent text-dark"><i class="bi bi-arrow-right text-warning me-2"></i>${c}</li>`
+        ).join('');
+    }
+    
+    // Next Steps
+    document.getElementById('nextStepsList').innerHTML = result.next_steps.map(s => 
+        `<li class="list-group-item bg-transparent text-dark">${s}</li>`
+    ).join('');
+    
+    // Risk Breakdown
+    const personScore = (person.risk_score || 0);
+    document.getElementById('riskBreakdown').innerHTML = `
+        <div class="mb-3">
+            <h6>Weighted Scoring</h6>
+            <p class="small text-muted">Final score combines all four agent assessments:</p>
+        </div>
+        <div class="mb-2">
+            <strong>Credit (35%):</strong> ${credit.risk_score.toFixed(1)} × 0.35 = <span class="text-primary">${(credit.risk_score * 0.35).toFixed(1)}</span>
+        </div>
+        <div class="mb-2">
+            <strong>Property (25%):</strong> ${property.risk_score.toFixed(1)} × 0.25 = <span class="text-primary">${(property.risk_score * 0.25).toFixed(1)}</span>
+        </div>
+        <div class="mb-2">
+            <strong>Fraud (25%):</strong> ${fraud.risk_score.toFixed(1)} × 0.25 = <span class="text-primary">${(fraud.risk_score * 0.25).toFixed(1)}</span>
+        </div>
+        <div class="mb-2">
+            <strong>Person (15%):</strong> ${personScore.toFixed(1)} × 0.15 = <span class="text-primary">${(personScore * 0.15).toFixed(1)}</span>
+        </div>
+        <hr>
+        <div>
+            <strong>Final Score:</strong> <span class="text-success fs-5">${result.approval_confidence_score.toFixed(1)}%</span>
+        </div>
+    `;
+    
+    // Risk Chart
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Credit Score', 'DTI Ratio', 'Property Value', 'Market Trend', 'Identity', 'Documents'],
+            datasets: [{
+                label: 'Risk Assessment',
+                data: [
+                    credit.risk_score,
+                    100 - (credit.debt_to_income_ratio * 200),
+                    property.risk_score,
+                    property.market_trend === 'appreciating' ? 90 : property.market_trend === 'stable' ? 70 : 50,
+                    fraud.identity_verified ? 95 : 30,
+                    fraud.document_authenticity_score * 100
+                ],
+                backgroundColor: 'rgba(26, 115, 232, 0.2)',
+                borderColor: 'rgba(26, 115, 232, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(26, 115, 232, 1)'
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { color: 'rgba(0,0,0,0.6)' },
+                    grid: { color: 'rgba(0,0,0,0.1)' },
+                    pointLabels: { color: 'rgba(0,0,0,0.7)' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: 'rgba(0,0,0,0.7)' } }
+            }
+        }
+    });
+}
+
+function getRiskColor(score) {
+    if (score >= 80) return 'success';
+    if (score >= 60) return 'warning';
+    return 'danger';
+}
+
+function getDocStatusColor(status) {
+    switch(status) {
+        case 'complete': return 'success';
+        case 'adequate': return 'info';
+        case 'incomplete': return 'warning';
+        case 'insufficient': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+// Load results on page load
+loadResults();
+</script>
+{% endblock %}

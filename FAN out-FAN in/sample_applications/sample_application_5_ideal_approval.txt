@@ -1,0 +1,87 @@
+MORTGAGE LOAN APPLICATION
+==========================
+Application Date: February 20, 2026
+Application ID: APP-2026-005
+
+APPLICANT INFORMATION
+---------------------
+First Name: Jennifer
+Last Name: Martinez
+Social Security Number: XXX-XX-8734
+Date of Birth: 1984-03-22
+Email: jennifer.martinez@email.com
+Phone: 303-555-7892
+Current Address: 1250 Pearl Street, Unit 304, Denver, CO 80203
+
+EMPLOYMENT INFORMATION
+----------------------
+Employment Status: Employed
+Employer Name: GlobalTech Industries
+Position: Director of Marketing
+Years at Current Employer: 8
+Annual Income: $185,000
+
+PROPERTY INFORMATION
+--------------------
+Property Address: 4521 Maple Ridge Drive
+City: Lakewood
+State: CO
+ZIP Code: 80215
+Property Type: Single Family
+Year Built: 2018
+Square Footage: 2,200
+Number of Bedrooms: 4
+Number of Bathrooms: 3
+
+LOAN DETAILS
+------------
+Purchase Price: $550,000
+Down Payment: $132,000
+Loan Amount Requested: $418,000
+
+FINANCIAL INFORMATION
+---------------------
+Monthly Debts:
+- Auto Loan: $425 (18 months remaining)
+- Student Loan: $0 (paid off)
+- Credit Card: $0 (pays in full monthly)
+Total Monthly Debt: $425
+Estimated Monthly Mortgage Payment: $2,680
+Debt-to-Income Ratio: 20.2%
+
+ASSETS
+------
+Checking Account: $45,750
+Savings Account: $78,500
+Investment Accounts: $165,000
+401(k) Balance: $285,000
+Total Liquid Assets: $574,250
+
+CREDIT INFORMATION
+------------------
+Estimated Credit Score: 795
+Credit History: Excellent - 15+ years
+Late Payments (last 24 months): 0
+Bankruptcies: None
+Foreclosures: None
+
+INCOME DOCUMENTATION PROVIDED
+-----------------------------
+- W2 Forms: Yes (2 years)
+- Tax Returns: 2 years
+- Pay Stubs: 3 months
+- Bank Statements: 6 months
+
+ADDITIONAL INFORMATION
+----------------------
+First-Time Homebuyer: No
+Purpose of Loan: Primary Residence
+Current Housing: Renting ($2,100/month)
+Reason for Move: Upgrading to larger home, growing family
+
+DECLARATION
+-----------
+I certify that all information provided is true and accurate.
+
+Signature: Jennifer Martinez
+Date: February 20, 2026

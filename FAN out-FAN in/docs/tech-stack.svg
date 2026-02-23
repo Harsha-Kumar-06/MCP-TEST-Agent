@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550">
+  <defs>
+    <linearGradient id="pythonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3776AB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD43B;stop-opacity:1" />
+    </linearGradient>
+    <filter id="stackShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="550" fill="#FFFFFF"/>
+  
+  <!-- Title -->
+  <text x="400" y="35" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#1E293B" text-anchor="middle">Technology Stack</text>
+  
+  <!-- Layer Labels -->
+  <text x="50" y="80" font-family="Arial, sans-serif" font-size="12" fill="#64748B" font-weight="bold">PRESENTATION</text>
+  <text x="50" y="175" font-family="Arial, sans-serif" font-size="12" fill="#64748B" font-weight="bold">API LAYER</text>
+  <text x="50" y="275" font-family="Arial, sans-serif" font-size="12" fill="#64748B" font-weight="bold">BUSINESS LOGIC</text>
+  <text x="50" y="385" font-family="Arial, sans-serif" font-size="12" fill="#64748B" font-weight="bold">AI / ML</text>
+  <text x="50" y="485" font-family="Arial, sans-serif" font-size="12" fill="#64748B" font-weight="bold">EXTERNAL APIs</text>
+  
+  <!-- Presentation Layer -->
+  <rect x="150" y="55" width="130" height="60" rx="8" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="215" y="85" font-family="Arial, sans-serif" font-size="11" fill="#0369A1" text-anchor="middle" font-weight="bold">HTML/CSS</text>
+  <text x="215" y="102" font-family="Arial, sans-serif" font-size="9" fill="#0C4A6E" text-anchor="middle">Jinja2 Templates</text>
+  
+  <rect x="295" y="55" width="130" height="60" rx="8" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="360" y="85" font-family="Arial, sans-serif" font-size="11" fill="#1D4ED8" text-anchor="middle" font-weight="bold">JavaScript</text>
+  <text x="360" y="102" font-family="Arial, sans-serif" font-size="9" fill="#1E3A8A" text-anchor="middle">Chart.js, Fetch API</text>
+  
+  <rect x="440" y="55" width="130" height="60" rx="8" fill="#F3E8FF" stroke="#A855F7" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="505" y="85" font-family="Arial, sans-serif" font-size="11" fill="#7C3AED" text-anchor="middle" font-weight="bold">Bootstrap 5</text>
+  <text x="505" y="102" font-family="Arial, sans-serif" font-size="9" fill="#5B21B6" text-anchor="middle">Responsive UI</text>
+  
+  <rect x="585" y="55" width="130" height="60" rx="8" fill="#FCE7F3" stroke="#EC4899" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="650" y="85" font-family="Arial, sans-serif" font-size="11" fill="#DB2777" text-anchor="middle" font-weight="bold">Swagger UI</text>
+  <text x="650" y="102" font-family="Arial, sans-serif" font-size="9" fill="#9D174D" text-anchor="middle">API Documentation</text>
+  
+  <!-- API Layer -->
+  <rect x="150" y="145" width="200" height="70" rx="8" fill="#DCFCE7" stroke="#22C55E" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="250" y="175" font-family="Arial, sans-serif" font-size="13" fill="#15803D" text-anchor="middle" font-weight="bold">⚡ FastAPI</text>
+  <text x="250" y="195" font-family="Arial, sans-serif" font-size="10" fill="#166534" text-anchor="middle">Async REST Framework</text>
+  <text x="250" y="208" font-family="Arial, sans-serif" font-size="9" fill="#14532D" text-anchor="middle">OpenAPI, Type Hints</text>
+  
+  <rect x="370" y="145" width="160" height="70" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="450" y="175" font-family="Arial, sans-serif" font-size="13" fill="#B45309" text-anchor="middle" font-weight="bold">🔷 Pydantic</text>
+  <text x="450" y="195" font-family="Arial, sans-serif" font-size="10" fill="#92400E" text-anchor="middle">Data Validation</text>
+  <text x="450" y="208" font-family="Arial, sans-serif" font-size="9" fill="#78350F" text-anchor="middle">Schema Models</text>
+  
+  <rect x="550" y="145" width="160" height="70" rx="8" fill="#E0E7FF" stroke="#6366F1" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="630" y="175" font-family="Arial, sans-serif" font-size="13" fill="#4338CA" text-anchor="middle" font-weight="bold">🦄 Uvicorn</text>
+  <text x="630" y="195" font-family="Arial, sans-serif" font-size="10" fill="#3730A3" text-anchor="middle">ASGI Server</text>
+  <text x="630" y="208" font-family="Arial, sans-serif" font-size="9" fill="#312E81" text-anchor="middle">Hot Reload</text>
+  
+  <!-- Business Logic Layer -->
+  <rect x="150" y="245" width="560" height="90" rx="8" fill="#FEE2E2" stroke="#EF4444" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="430" y="275" font-family="Arial, sans-serif" font-size="14" fill="#B91C1C" text-anchor="middle" font-weight="bold">🐍 Python 3.10+ with AsyncIO</text>
+  
+  <rect x="170" y="290" width="120" height="35" rx="4" fill="#FECACA"/>
+  <text x="230" y="312" font-family="Arial, sans-serif" font-size="10" fill="#7F1D1D" text-anchor="middle">Credit Agent</text>
+  
+  <rect x="305" y="290" width="120" height="35" rx="4" fill="#FECACA"/>
+  <text x="365" y="312" font-family="Arial, sans-serif" font-size="10" fill="#7F1D1D" text-anchor="middle">Property Agent</text>
+  
+  <rect x="440" y="290" width="120" height="35" rx="4" fill="#FECACA"/>
+  <text x="500" y="312" font-family="Arial, sans-serif" font-size="10" fill="#7F1D1D" text-anchor="middle">Fraud Agent</text>
+  
+  <rect x="575" y="290" width="120" height="35" rx="4" fill="#FECACA"/>
+  <text x="635" y="312" font-family="Arial, sans-serif" font-size="10" fill="#7F1D1D" text-anchor="middle">Aggregator</text>
+  
+  <!-- AI/ML Layer -->
+  <rect x="150" y="355" width="280" height="80" rx="8" fill="#CFFAFE" stroke="#06B6D4" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="290" y="385" font-family="Arial, sans-serif" font-size="13" fill="#0E7490" text-anchor="middle" font-weight="bold">🤖 Google ADK</text>
+  <text x="290" y="405" font-family="Arial, sans-serif" font-size="10" fill="#155E75" text-anchor="middle">Agent Development Kit</text>
+  <text x="290" y="420" font-family="Arial, sans-serif" font-size="9" fill="#164E63" text-anchor="middle">google-genai package</text>
+  
+  <rect x="450" y="355" width="260" height="80" rx="8" fill="#D1FAE5" stroke="#10B981" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="580" y="385" font-family="Arial, sans-serif" font-size="13" fill="#047857" text-anchor="middle" font-weight="bold">✨ Gemini 2.0 Flash</text>
+  <text x="580" y="405" font-family="Arial, sans-serif" font-size="10" fill="#065F46" text-anchor="middle">LLM for Analysis</text>
+  <text x="580" y="420" font-family="Arial, sans-serif" font-size="9" fill="#064E3B" text-anchor="middle">Function Calling</text>
+  
+  <!-- External APIs Layer -->
+  <rect x="150" y="455" width="130" height="70" rx="8" fill="#E5E7EB" stroke="#6B7280" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="215" y="485" font-family="Arial, sans-serif" font-size="11" fill="#374151" text-anchor="middle" font-weight="bold">Experian</text>
+  <text x="215" y="502" font-family="Arial, sans-serif" font-size="9" fill="#4B5563" text-anchor="middle">Credit Reports</text>
+  <text x="215" y="515" font-family="Arial, sans-serif" font-size="8" fill="#6B7280" text-anchor="middle">OAuth2</text>
+  
+  <rect x="295" y="455" width="130" height="70" rx="8" fill="#E5E7EB" stroke="#6B7280" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="360" y="485" font-family="Arial, sans-serif" font-size="11" fill="#374151" text-anchor="middle" font-weight="bold">Equifax</text>
+  <text x="360" y="502" font-family="Arial, sans-serif" font-size="9" fill="#4B5563" text-anchor="middle">Credit Reports</text>
+  <text x="360" y="515" font-family="Arial, sans-serif" font-size="8" fill="#6B7280" text-anchor="middle">OAuth2</text>
+  
+  <rect x="440" y="455" width="130" height="70" rx="8" fill="#DCFCE7" stroke="#22C55E" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="505" y="485" font-family="Arial, sans-serif" font-size="11" fill="#15803D" text-anchor="middle" font-weight="bold">RentCast</text>
+  <text x="505" y="502" font-family="Arial, sans-serif" font-size="9" fill="#166534" text-anchor="middle">Property Data</text>
+  <text x="505" y="515" font-family="Arial, sans-serif" font-size="8" fill="#14532D" text-anchor="middle">✓ Active</text>
+  
+  <rect x="585" y="455" width="130" height="70" rx="8" fill="#E5E7EB" stroke="#6B7280" stroke-width="2" filter="url(#stackShadow)"/>
+  <text x="650" y="485" font-family="Arial, sans-serif" font-size="11" fill="#374151" text-anchor="middle" font-weight="bold">Persona</text>
+  <text x="650" y="502" font-family="Arial, sans-serif" font-size="9" fill="#4B5563" text-anchor="middle">Identity/KYC</text>
+  <text x="650" y="515" font-family="Arial, sans-serif" font-size="8" fill="#6B7280" text-anchor="middle">API Key</text>
+</svg>

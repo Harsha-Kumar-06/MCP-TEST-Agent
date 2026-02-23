@@ -1,0 +1,72 @@
+═══════════════════════════════════════════════════════════════════════════════
+                             ╔════════════════════╗
+                             ║   WELLS FARGO      ║
+                             ╚════════════════════╝
+                         PERSONAL CHECKING STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Statement Period: January 1, 2026 - January 31, 2026
+Account Type: Everyday Checking
+Account Number: ****3421
+Statement Date: February 1, 2026
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT HOLDER INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Name: Sarah Elizabeth Williams
+Address: 234 Congress Avenue
+         Austin, TX 78701
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   15,234.87
+Total Deposits and Credits .............................. $    5,500.00
+Total Withdrawals and Debits ............................ $   (2,278.87)
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   18,456.00
+
+───────────────────────────────────────────────────────────────────────────────
+DEPOSITS AND CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/05/2026  TRANSFER FROM BUSINESS ****9847                   $4,000.00
+01/20/2026  TRANSFER FROM BUSINESS ****9847                   $1,500.00
+                                                            ──────────
+Total Deposits and Credits                                    $5,500.00
+
+───────────────────────────────────────────────────────────────────────────────
+WITHDRAWALS AND DEBITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/02/2026  AUTOPAY AUSTIN ENERGY                             ($124.56)
+01/03/2026  DEBIT CARD H-E-B #0847                             ($92.34)
+01/05/2026  AUTOPAY SPECTRUM INTERNET                          ($79.99)
+01/05/2026  AUTOPAY RENT 234 CONGRESS AVE                   ($1,100.00)
+01/08/2026  DEBIT CARD WHOLE FOODS AUSTIN                      ($67.82)
+01/10/2026  DEBIT CARD EXXON GAS                               ($45.00)
+01/12/2026  AUTOPAY TOYOTA FINANCIAL                          ($285.00)
+01/15/2026  DEBIT CARD TARGET                                  ($54.23)
+01/18/2026  DEBIT CARD TRADER JOE'S                            ($78.45)
+01/20/2026  AUTOPAY BLUE CROSS HEALTH INS                     ($180.00)
+01/22/2026  DEBIT CARD AMAZON                                  ($42.67)
+01/25/2026  VENMO PAYMENT                                      ($35.00)
+01/28/2026  DEBIT CARD RANDALLS                                ($68.81)
+01/30/2026  AUTOPAY PLANET FITNESS                             ($24.99)
+                                                            ──────────
+Total Withdrawals and Debits                                ($2,278.86)
+
+───────────────────────────────────────────────────────────────────────────────
+NOTE: Primary income source is Williams Design Studio LLC (self-employed)
+Average monthly transfer from business: $5,000 - $6,000
+═══════════════════════════════════════════════════════════════════════════════
+
+Questions? Call 1-800-869-3557 or visit wellsfargo.com
+
+   Member FDIC                              © 2026 Wells Fargo Bank, N.A.
+═══════════════════════════════════════════════════════════════════════════════

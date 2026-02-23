@@ -1,0 +1,56 @@
+RESIDENTIAL MORTGAGE APPLICATION - UNIFORM FORM 1003
+====================================================
+
+SECTION I - BORROWER INFORMATION
+
+Name: Sarah Elizabeth Williams
+SSN (last 4): 7834
+DOB: 1990-03-28
+Email: sarah.williams@gmail.com
+Phone Number: 512-555-9876
+Current Address: 234 Congress Avenue, Austin, TX 78701
+
+Employment:
+- Status: Self-Employed
+- Company/Business Name: Williams Design Studio LLC
+- Years in Business: 4
+- Gross Annual Income: $128,000
+
+SECTION II - PROPERTY INFORMATION
+
+Subject Property Address: 1567 Riverside Drive
+City: Austin
+State: TX
+ZIP: 78704
+Type of Property: Single Family Home
+Year Constructed: 2019
+Living Area (sq ft): 2,100
+Bedrooms: 3
+Bathrooms: 2.5
+
+SECTION III - LOAN INFORMATION
+
+Purpose of Loan: Purchase
+Property Value/Sales Price: $495,000
+Down Payment Amount: $99,000
+Requested Loan Amount: $396,000
+
+SECTION IV - ASSETS AND LIABILITIES
+
+Monthly Debts:
+- Car Payment: $450
+- Student Loans: $320
+- Credit Cards: $150
+
+SECTION V - DECLARATIONS
+
+Documents Provided:
+[X] W-2 (last 2 years)
+[X] Tax Returns (2 years)
+[X] Pay Stubs (3 months recent)
+[X] Bank Statements (6 months)
+
+I hereby certify that all statements made in this application are true.
+
+Borrower Signature: Sarah Williams
+Date: 02/13/2026

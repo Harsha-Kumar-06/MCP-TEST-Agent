@@ -1,0 +1,54 @@
+MORTGAGE LOAN APPLICATION
+==========================
+Application Date: February 13, 2026
+Application ID: APP-2026-001
+
+APPLICANT INFORMATION
+---------------------
+First Name: Michael
+Last Name: Johnson
+Social Security Number: XXX-XX-4521
+Date of Birth: 1985-07-15
+Email: michael.johnson@email.com
+Phone: 415-555-1234
+Current Address: 456 Market Street, Apt 12B, San Francisco, CA 94102
+
+EMPLOYMENT INFORMATION
+----------------------
+Employment Status: Employed
+Employer Name: Tech Solutions Inc
+Position: Senior Software Engineer
+Years at Current Employer: 5
+Annual Income: $165,000
+
+PROPERTY INFORMATION
+--------------------
+Property Address: 789 Valencia Street
+City: San Francisco
+State: CA
+ZIP Code: 94110
+Property Type: Condo
+Year Built: 2015
+Square Footage: 1,450
+Number of Bedrooms: 2
+Number of Bathrooms: 2
+
+LOAN DETAILS
+------------
+Purchase Price: $925,000
+Down Payment: $185,000
+Loan Amount Requested: $740,000
+
+INCOME DOCUMENTATION PROVIDED
+-----------------------------
+- W2 Forms: Yes (2 years)
+- Tax Returns: 2 years
+- Pay Stubs: 3 months
+- Bank Statements: 6 months
+
+DECLARATION
+-----------
+I certify that all information provided is true and accurate.
+
+Signature: Michael Johnson
+Date: February 13, 2026

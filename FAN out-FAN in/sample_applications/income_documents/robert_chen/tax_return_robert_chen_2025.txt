@@ -1,0 +1,168 @@
+═══════════════════════════════════════════════════════════════════════════════
+                                    Form 1040
+                        U.S. Individual Income Tax Return
+                                 Tax Year 2025
+═══════════════════════════════════════════════════════════════════════════════
+
+Department of the Treasury—Internal Revenue Service
+
+Filing Status: □ Single  ☑ Married filing jointly  □ Married filing separately
+               □ Head of household  □ Qualifying surviving spouse
+
+───────────────────────────────────────────────────────────────────────────────
+YOUR INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Your first name and middle initial    Your last name
+Robert A.                             Chen
+
+Your social security number
+XXX-XX-9156
+
+Spouse's first name and middle initial    Spouse's last name
+Jennifer L.                               Chen
+
+Spouse's social security number
+XXX-XX-8247
+
+Home address (number and street)
+890 University Avenue
+
+City, town, or post office            State    ZIP code
+Palo Alto                             CA       94301
+
+───────────────────────────────────────────────────────────────────────────────
+DEPENDENTS
+───────────────────────────────────────────────────────────────────────────────
+
+Name                    Relationship    SSN (last 4)    CTC Eligible
+──────────────────────  ──────────────  ──────────────  ────────────
+Ethan Chen              Son             XXXX-3847       Yes
+Sophie Chen             Daughter        XXXX-3912       Yes
+
+───────────────────────────────────────────────────────────────────────────────
+INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+1   Wages, salaries, tips:
+    Robert Chen (W-2, Global Innovations Corp) ... $  575,000.00
+    Jennifer Chen (W-2, Stanford University) .....    125,000.00
+                                                   ──────────────
+    Total line 1 ..................................   700,000.00
+
+2a  Tax-exempt interest (Municipal Bonds) ........      8,450.00
+2b  Taxable interest .............................      2,847.15
+
+3a  Qualified dividends ..........................     15,847.00
+3b  Ordinary dividends ...........................     18,234.50
+
+4a  IRA distributions ............................          0.00
+4b  Taxable amount ...............................          0.00
+
+5a  Pensions and annuities .......................          0.00
+5b  Taxable amount ...............................          0.00
+
+6a  Social security benefits .....................          0.00
+6b  Taxable amount ...............................          0.00
+
+7   Capital Gains (Schedule D):
+    Long-term gains ..............................     42,500.00
+    Short-term gains .............................      8,750.00
+                                                   ──────────────
+    Total line 7 ..................................    51,250.00
+
+8   Other income (Schedule 1) ....................          0.00
+
+9   Total income (add lines 1-8) ................. $  772,331.65
+
+───────────────────────────────────────────────────────────────────────────────
+ADJUSTMENTS TO INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+10  HSA deduction ................................ $    7,700.00
+11  Educator expenses (Jennifer, $300 limit) .....        300.00
+                                                   ──────────────
+12  Total adjustments (Schedule 1) ............... $    8,000.00
+
+13  Adjusted gross income (line 9 minus line 12) . $  764,331.65
+
+───────────────────────────────────────────────────────────────────────────────
+DEDUCTIONS
+───────────────────────────────────────────────────────────────────────────────
+
+ITEMIZED DEDUCTIONS (Schedule A):
+
+State and local taxes (SALT - capped at $10,000) . $   10,000.00
+Mortgage interest (primary residence) ............     28,450.00
+Charitable contributions:
+  - Cash donations ...............................     15,000.00
+  - Stock donations (at FMV) .....................     25,000.00
+                                                   ──────────────
+14  Total itemized deductions .................... $   78,450.00
+
+15  Qualified business income deduction ..........          0.00
+16  Total deductions .............................     78,450.00
+
+───────────────────────────────────────────────────────────────────────────────
+TAXABLE INCOME AND TAX
+───────────────────────────────────────────────────────────────────────────────
+
+17  Taxable income (line 13 minus line 16) ....... $  685,881.65
+18  Tax (from Tax Table) .........................    187,847.00
+19  Qualified dividends/cap gains (lower rate) ...    (4,250.00)
+20  Net Investment Income Tax (3.8%) .............      2,687.50
+21  Add lines 18-20 ..............................    186,284.50
+
+───────────────────────────────────────────────────────────────────────────────
+CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+22  Child tax credit (2 children x $2,000, 
+    phased out due to income) ....................          0.00
+23  Credit for other dependents ..................          0.00
+24  Total credits ................................          0.00
+
+25  Tax after credits ............................ $  186,284.50
+
+───────────────────────────────────────────────────────────────────────────────
+PAYMENTS
+───────────────────────────────────────────────────────────────────────────────
+
+26  Federal tax withheld:
+    Robert Chen (W-2) ............................    172,500.00
+    Jennifer Chen (W-2) ..........................     18,750.00
+                                                   ──────────────
+    Total line 26 ................................    191,250.00
+
+27  2025 estimated tax payments ..................     12,000.00
+28  Amount from Schedule 3 .......................          0.00
+                                                   ──────────────
+29  Total payments ............................... $  203,250.00
+
+───────────────────────────────────────────────────────────────────────────────
+REFUND OR AMOUNT OWED
+───────────────────────────────────────────────────────────────────────────────
+
+30  Overpayment (line 29 minus line 25) .......... $   16,965.50
+31  Amount to be refunded ........................     16,965.50
+32  Amount you owe ...............................          0.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                              SIGNATURE SECTION
+═══════════════════════════════════════════════════════════════════════════════
+
+Under penalties of perjury, I declare that I have examined this return and
+accompanying schedules and statements, and to the best of my knowledge and
+belief, they are true, correct, and complete.
+
+Your signature                         Date
+Robert A. Chen                         04/15/2026
+
+Spouse's signature                     Date
+Jennifer L. Chen                       04/15/2026
+
+Your occupation                        Spouse's occupation
+Chief Technology Officer               Associate Professor
+
+Phone number: (650) 555-4321
+
+═══════════════════════════════════════════════════════════════════════════════

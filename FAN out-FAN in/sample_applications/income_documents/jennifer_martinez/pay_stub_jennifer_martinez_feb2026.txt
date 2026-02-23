@@ -1,0 +1,106 @@
+═══════════════════════════════════════════════════════════════════════════════
+                            GLOBALTECH INDUSTRIES
+                          EMPLOYEE EARNINGS STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+COMPANY INFORMATION                      PAY PERIOD INFORMATION
+──────────────────────                   ──────────────────────
+GlobalTech Industries                    Pay Period: 02/01/2026 - 02/15/2026
+1700 Lincoln Street, Suite 3500          Pay Date: 02/20/2026
+Denver, CO 80203                         Check Number: DIR-DEP-158347
+EIN: 84-2947583
+
+EMPLOYEE INFORMATION
+────────────────────
+Name: Jennifer A. Martinez               Employee ID: GTI-2018-0347
+SSN: XXX-XX-8734                         Department: Marketing
+Address: 1250 Pearl Street, Unit 304     Position: Director of Marketing
+         Denver, CO 80203                Pay Rate: $7,115.38 / Bi-Weekly
+
+═══════════════════════════════════════════════════════════════════════════════
+                                  EARNINGS
+═══════════════════════════════════════════════════════════════════════════════
+
+Description                    Hours      Rate           Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Regular Salary                 80.00      Salary      $7,115.38   $28,461.52
+                                                     ──────────   ──────────
+GROSS EARNINGS                                       $7,115.38   $28,461.52
+
+═══════════════════════════════════════════════════════════════════════════════
+                                DEDUCTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+TAXES                                                Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Federal Income Tax                                  $1,430.25    $5,721.00
+Social Security (OASDI)                               441.15     1,764.60
+Medicare                                              103.17       412.68
+CO State Income Tax                                   306.16     1,224.64
+                                                   ──────────   ──────────
+Total Taxes                                        $2,280.73    $9,122.92
+
+PRE-TAX DEDUCTIONS                                   Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+401(k) Contribution (12%)                            $853.85    $3,415.40
+Health Insurance - Employee                           150.00       600.00
+Dental Insurance                                       22.50        90.00
+Vision Insurance                                        8.50        34.00
+HSA Contribution                                      173.08       692.32
+                                                   ──────────   ──────────
+Total Pre-Tax Deductions                           $1,207.93    $4,831.72
+
+POST-TAX DEDUCTIONS                                  Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Life Insurance (Supplemental)                         $12.50       $50.00
+                                                   ──────────   ──────────
+Total Post-Tax Deductions                             $12.50       $50.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                             PAY SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+                                                    Current        YTD
+                                                   ──────────   ──────────
+Gross Earnings                                     $7,115.38   $28,461.52
+Pre-Tax Deductions                                (1,207.93)   (4,831.72)
+Taxable Gross                                      $5,907.45   $23,629.80
+Taxes                                             (2,280.73)   (9,122.92)
+Post-Tax Deductions                                  (12.50)      (50.00)
+                                                   ══════════   ══════════
+NET PAY                                            $3,614.22   $14,456.88
+
+═══════════════════════════════════════════════════════════════════════════════
+                          PAYMENT INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+Payment Method: Direct Deposit
+Bank: First National Bank of Colorado
+Account: ****8521
+Routing: ****6789
+Amount Deposited: $3,614.22
+
+═══════════════════════════════════════════════════════════════════════════════
+                           LEAVE BALANCES
+═══════════════════════════════════════════════════════════════════════════════
+
+Leave Type                    Accrued    Used      Available
+─────────────────────────────────────────────────────────────
+Vacation (PTO)                200.00    16.00      184.00 hours
+Sick Leave                     96.00     0.00       96.00 hours
+Personal Days                  32.00     0.00       32.00 hours
+
+═══════════════════════════════════════════════════════════════════════════════
+                         YEAR-TO-DATE TOTALS
+═══════════════════════════════════════════════════════════════════════════════
+
+Pay Periods to Date: 4 of 26
+YTD Gross Earnings: $28,461.52
+YTD Net Pay: $14,456.88
+YTD Federal Tax: $5,721.00
+YTD State Tax: $1,224.64
+YTD 401(k): $3,415.40
+
+═══════════════════════════════════════════════════════════════════════════════
+Questions about your pay? Contact HR at hr@globaltech.com or ext. 2500
+═══════════════════════════════════════════════════════════════════════════════
