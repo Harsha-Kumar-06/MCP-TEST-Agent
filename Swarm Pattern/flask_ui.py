@@ -536,12 +536,13 @@ def optimize():
             agents.append(AlgorithmicTradingAgent(bus))
             active_agents.append('Algorithmic Trading')
         
-        # Validate at least one agent is selected
-        if len(agents) == 0:
-            log_activity("❌ No agents selected!")
+        # Validate minimum 2 agents for meaningful multi-agent debate
+        if len(agents) < 2:
+            log_activity(f"❌ Only {len(agents)} agent(s) selected - minimum 2 required!")
             return jsonify({
                 'success': False,
-                'error': 'Please select at least one agent to run optimization'
+                'error': f'Multi-agent debate requires at least 2 active agents ({len(agents)} selected). '
+                         'A single agent automatically results in 100% consensus, defeating the purpose of swarm intelligence.'
             })
         
         log_activity(f"🤖 Active agents ({len(agents)}): {', '.join(active_agents)}")

@@ -901,6 +901,12 @@ Cash: $500,000. Keep tech under 30%.""", language="text")
                 if use_trading:
                     agents.append(AlgorithmicTradingAgent(comm_bus))
                 
+                # Validate minimum 2 agents for meaningful multi-agent debate
+                if len(agents) < 2:
+                    st.error(f"⚠️ Multi-agent debate requires at least 2 active agents ({len(agents)} selected). "
+                             "A single agent automatically results in 100% consensus, defeating the purpose of swarm intelligence.")
+                    st.stop()
+                
                 # Create orchestrator with strategy
                 orchestrator = SwarmOrchestrator(
                     agents=agents,

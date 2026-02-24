@@ -37,6 +37,13 @@ class SwarmOrchestrator:
             progress_callback: Optional callback function(iteration, phase, details)
             strategy: Optional optimization strategy to guide agent behavior
         """
+        # Validate minimum agents for meaningful multi-agent debate
+        if len(agents) < 2:
+            raise ValueError(
+                f"Multi-agent debate requires at least 2 active agents, but only {len(agents)} provided. "
+                "A single agent automatically results in 100% consensus, defeating the purpose of swarm intelligence."
+            )
+        
         self.agents = agents
         self.max_iterations = max_iterations
         self.min_iterations = min(min_iterations, max_iterations)  # Can't exceed max
