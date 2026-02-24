@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1700">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; }
+      .process-box { fill: #dbeafe; stroke: #3b82f6; stroke-width: 2; }
+      .decision-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .success-box { fill: #d1fae5; stroke: #059669; stroke-width: 2; }
+      .agent-box { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 13px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 15px; font-weight: bold; fill: #1f2937; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #4b5563; }
+      .tiny-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .decision-arrow { stroke: #f59e0b; stroke-width: 2; fill: none; marker-end: url(#arrowhead-orange); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#f59e0b" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title-text" font-size="18">End-to-End Email Processing Flow</text>
+
+  <!-- Step 1: User sends email -->
+  <rect x="100" y="55" width="700" height="50" rx="8" class="box"/>
+  <text x="450" y="77" text-anchor="middle" class="title-text">User sends email</text>
+  <text x="450" y="95" text-anchor="middle" class="small-text">"Please add sarah@co.com to TEST project"</text>
+  <path d="M 450 105 L 450 135" class="arrow"/>
+
+  <!-- Step 2: Email arrives -->
+  <rect x="150" y="135" width="600" height="45" rx="8" class="process-box"/>
+  <text x="450" y="155" text-anchor="middle" class="text">Email arrives in Gmail inbox</text>
+  <text x="450" y="172" text-anchor="middle" class="small-text">(unread flag set)</text>
+  <path d="M 450 180 L 450 215" class="arrow"/>
+  <text x="475" y="202" class="small-text">(30s poll)</text>
+
+  <!-- Step 3: Polling task fetches -->
+  <rect x="150" y="215" width="600" height="55" rx="8" class="process-box"/>
+  <text x="450" y="237" text-anchor="middle" class="text">email_polling_task() fetches</text>
+  <text x="450" y="255" text-anchor="middle" class="small-text">EmailService.fetch_unread_emails()</text>
+  <path d="M 450 270 L 450 310" class="arrow"/>
+
+  <!-- Step 4: Decision -->
+  <polygon points="450,310 570,350 450,390 330,350" class="decision-box"/>
+  <text x="450" y="355" text-anchor="middle" class="text">is_access_request()?</text>
+  <path d="M 330 350 L 230 350" class="decision-arrow"/>
+  <text x="290" y="342" class="small-text">No</text>
+  
+  <rect x="60" y="328" width="170" height="45" rx="8" class="box"/>
+  <text x="145" y="347" text-anchor="middle" class="text">Skip email</text>
+  <text x="145" y="363" text-anchor="middle" class="small-text">(mark read)</text>
+
+  <!-- Yes path -->
+  <path d="M 450 390 L 450 430" class="decision-arrow"/>
+  <text x="470" y="415" class="small-text">Yes</text>
+
+  <!-- Step 5: Process single email -->
+  <rect x="150" y="430" width="600" height="40" rx="8" class="process-box"/>
+  <text x="450" y="455" text-anchor="middle" class="text">process_single_email()</text>
+  <path d="M 450 470 L 450 510" class="arrow"/>
+
+  <!-- Step 6: Construct agent input -->
+  <rect x="100" y="510" width="700" height="100" rx="8" class="box"/>
+  <text x="450" y="530" text-anchor="middle" class="title-text">Construct agent input</text>
+  <text x="450" y="550" text-anchor="middle" class="small-text">From: user@co.com | Subject: "Access request"</text>
+  <text x="450" y="567" text-anchor="middle" class="small-text">Email ID: &lt;msg-id&gt; | Body: "Please add sarah..."</text>
+  <text x="450" y="584" text-anchor="middle" class="small-text">Is Follow-up: False</text>
+  <path d="M 450 610 L 450 645" class="arrow"/>
+
+  <!-- Step 7: Create ADK session -->
+  <rect x="150" y="645" width="600" height="55" rx="8" class="process-box"/>
+  <text x="450" y="667" text-anchor="middle" class="text">Create ADK session + Run root_agent</text>
+  <text x="450" y="685" text-anchor="middle" class="small-text">runner.run_async()</text>
+  <path d="M 450 700 L 450 735" class="arrow"/>
+
+  <!-- Step 8: Coordinator processes -->
+  <rect x="100" y="735" width="700" height="75" rx="8" class="agent-box"/>
+  <text x="450" y="755" text-anchor="middle" class="title-text">AccessControllerCoordinator</text>
+  <text x="450" y="774" text-anchor="middle" class="small-text">1. Parse: Grant Jira project access</text>
+  <text x="450" y="790" text-anchor="middle" class="small-text">2. Extract: sarah@co.com, TEST, Member</text>
+  <text x="450" y="806" text-anchor="middle" class="small-text">3. Transfer to JiraAgent</text>
+  <path d="M 450 810 L 450 845" class="arrow"/>
+
+  <!-- Step 9: JiraAgent executes -->
+  <rect x="80" y="845" width="740" height="125" rx="8" class="agent-box"/>
+  <text x="450" y="865" text-anchor="middle" class="title-text">JiraAgent executes</text>
+  <g transform="translate(100, 880)">
+    <text x="0" y="15" class="small-text">1. jira_get_user_by_email(sarah@co.com) → ID: 123</text>
+    <text x="0" y="32" class="small-text">2. jira_list_projects() → Resolve "TEST"</text>
+    <text x="0" y="49" class="small-text">3. jira_grant_access(sarah, TEST, Member)</text>
+    <text x="15" y="65" class="tiny-text">→ JiraService.assign_project_role()</text>
+    <text x="15" y="79" class="tiny-text">→ HTTP POST to Jira API → Success ✓</text>
+  </g>
+  <path d="M 450 970 L 450 1005" class="arrow"/>
+
+  <!-- Step 10: Coordinator receives result -->
+  <rect x="100" y="1005" width="700" height="70" rx="8" class="agent-box"/>
+  <text x="450" y="1027" text-anchor="middle" class="title-text">Coordinator receives result</text>
+  <text x="450" y="1046" text-anchor="middle" class="text">Transfer to EmailAgent</text>
+  <text x="450" y="1063" text-anchor="middle" class="small-text">Email ID: &lt;msg-id&gt; | "✓ Granted sarah access"</text>
+  <path d="M 450 1075 L 450 1110" class="arrow"/>
+
+  <!-- Step 11: EmailAgent sends reply -->
+  <rect x="100" y="1110" width="700" height="85" rx="8" class="agent-box"/>
+  <text x="450" y="1130" text-anchor="middle" class="title-text">EmailAgent sends reply</text>
+  <text x="450" y="1151" text-anchor="middle" class="text">email_reply(</text>
+  <text x="450" y="1168" text-anchor="middle" class="small-text">original_email_id=&lt;msg-id&gt;,</text>
+  <text x="450" y="1184" text-anchor="middle" class="small-text">reply_body="✓ Granted..."</text>
+  <path d="M 450 1195 L 450 1230" class="arrow"/>
+
+  <!-- Step 12: Mark as read -->
+  <rect x="150" y="1230" width="600" height="55" rx="8" class="process-box"/>
+  <text x="450" y="1252" text-anchor="middle" class="text">Mark email as read</text>
+  <text x="450" y="1270" text-anchor="middle" class="small-text">EmailService.mark_as_read(email_id)</text>
+  <path d="M 450 1285 L 450 1320" class="arrow"/>
+
+  <!-- Step 13: Success -->
+  <rect x="100" y="1320" width="700" height="55" rx="8" class="success-box"/>
+  <text x="450" y="1343" text-anchor="middle" class="title-text">User receives threaded reply ✅</text>
+  <text x="450" y="1361" text-anchor="middle" class="small-text">(appears in same Gmail conversation)</text>
+
+  <!-- Legend -->
+  <g transform="translate(100, 1440)">
+    <text x="0" y="0" class="title-text" font-size="14">Legend:</text>
+    <rect x="0" y="10" width="50" height="22" rx="4" class="process-box"/>
+    <text x="58" y="26" class="small-text">Process</text>
+    <polygon points="140,10 162,21 140,32 118,21" class="decision-box"/>
+    <text x="170" y="26" class="small-text">Decision</text>
+    <rect x="250" y="10" width="50" height="22" rx="4" class="agent-box"/>
+    <text x="308" y="26" class="small-text">Agent</text>
+    <rect x="380" y="10" width="50" height="22" rx="4" class="success-box"/>
+    <text x="438" y="26" class="small-text">Success</text>
+  </g>
+</svg>

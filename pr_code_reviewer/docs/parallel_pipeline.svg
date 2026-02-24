@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 1500">
+  <defs>
+    <style>
+      .input-box { fill: #f3e8ff; stroke: #7c3aed; stroke-width: 2; }
+      .root-box { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .swarm-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .agent-box { fill: #ffffff; stroke: #9ca3af; stroke-width: 2; }
+      .decision-box { fill: #fce7f3; stroke: #ec4899; stroke-width: 2; }
+      .output-box { fill: #d1fae5; stroke: #059669; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 13px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 15px; font-weight: bold; fill: #1f2937; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #4b5563; }
+      .tiny-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .split-arrow { stroke: #f59e0b; stroke-width: 2; fill: none; }
+      .merge-arrow { stroke: #ec4899; stroke-width: 2; fill: none; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="650" y="30" text-anchor="middle" class="title-text" font-size="18">Parallel Agent Pipeline Architecture</text>
+
+  <!-- Input -->
+  <rect x="200" y="60" width="900" height="100" rx="8" class="input-box"/>
+  <text x="650" y="85" text-anchor="middle" class="title-text">Input from server.py</text>
+  <text x="220" y="110" class="text" font-weight="bold">agent_input JSON:</text>
+  <text x="220" y="130" class="small-text">{"repo": "owner/repo", "pr_number": 42, "language": "python",</text>
+  <text x="230" y="147" class="small-text">"diff": "diff --git a/file.py...+new_code\n-old_code"}</text>
+  <path d="M 650 160 L 650 200" class="arrow"/>
+
+  <!-- Root Agent -->
+  <rect x="250" y="200" width="800" height="80" rx="8" class="root-box"/>
+  <text x="650" y="225" text-anchor="middle" class="title-text">root_agent (SequentialAgent)</text>
+  <text x="650" y="247" text-anchor="middle" class="text">Sub-agents:</text>
+  <text x="650" y="265" text-anchor="middle" class="small-text">1. parallel_review_swarm → 2. review_synthesizer</text>
+  <path d="M 650 280 L 650 320" class="arrow"/>
+
+  <!-- Parallel Review Swarm -->
+  <rect x="100" y="320" width="1100" height="520" rx="8" class="swarm-box"/>
+  <text x="650" y="345" text-anchor="middle" class="title-text">PHASE 1: Parallel Review Swarm (ParallelAgent)</text>
+  <text x="650" y="365" text-anchor="middle" class="small-text">All 5 agents receive same diff and execute concurrently</text>
+
+  <!-- Split arrows -->
+  <path d="M 650 380 L 650 410" class="split-arrow"/>
+  <path d="M 650 410 L 200 410" class="split-arrow"/>
+  <path d="M 650 410 L 1100 410" class="split-arrow"/>
+  <path d="M 380 410 L 380 410" class="split-arrow"/>
+  <path d="M 920 410 L 920 410" class="split-arrow"/>
+  
+  <line x1="200" y1="410" x2="200" y2="450" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="410" x2="380" y2="450" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="650" y1="410" x2="650" y2="450" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="920" y1="410" x2="920" y2="450" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="1100" y1="410" x2="1100" y2="450" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 5 Agent Boxes -->
+  <g transform="translate(120, 450)">
+    <!-- Security -->
+    <rect x="0" y="0" width="160" height="345" rx="6" class="agent-box"/>
+    <text x="80" y="20" text-anchor="middle" class="title-text" font-size="13">Security Auditor</text>
+    <text x="80" y="37" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+    <text x="10" y="57" class="tiny-text" font-weight="bold">output_key:</text>
+    <text x="10" y="71" class="tiny-text">"security_report"</text>
+    <text x="10" y="91" class="tiny-text" font-weight="bold">Analyzes:</text>
+    <text x="10" y="105" class="tiny-text">• SQL/XSS injection</text>
+    <text x="10" y="118" class="tiny-text">• Hardcoded secrets</text>
+    <text x="10" y="131" class="tiny-text">• Unsafe API calls</text>
+    <text x="10" y="144" class="tiny-text">• Auth/authz flaws</text>
+    <text x="10" y="164" class="tiny-text" font-weight="bold">Output:</text>
+    <text x="10" y="178" class="tiny-text">Markdown with:</text>
+    <text x="10" y="191" class="tiny-text">**File:** file.py</text>
+    <text x="10" y="204" class="tiny-text">**Line:** 23</text>
+    <text x="10" y="217" class="tiny-text">**Issue:** SQL injection</text>
+    <text x="10" y="230" class="tiny-text">**Fix:** Use parameterized query</text>
+    <text x="10" y="250" class="tiny-text" font-weight="bold">Severity:</text>
+    <text x="10" y="264" class="tiny-text">HIGH → blocks merge</text>
+
+    <!-- Style -->
+    <rect x="180" y="0" width="160" height="345" rx="6" class="agent-box"/>
+    <text x="260" y="20" text-anchor="middle" class="title-text" font-size="13">Style Checker</text>
+    <text x="260" y="37" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+    <text x="190" y="57" class="tiny-text" font-weight="bold">output_key:</text>
+    <text x="190" y="71" class="tiny-text">"style_report"</text>
+    <text x="190" y="91" class="tiny-text" font-weight="bold">Analyzes:</text>
+    <text x="190" y="105" class="tiny-text">• PEP8/ESLint violations</text>
+    <text x="190" y="118" class="tiny-text">• Naming conventions</text>
+    <text x="190" y="131" class="tiny-text">• Dead code</text>
+    <text x="190" y="144" class="tiny-text">• Readability issues</text>
+    <text x="190" y="164" class="tiny-text" font-weight="bold">Output:</text>
+    <text x="190" y="178" class="tiny-text">Markdown with:</text>
+    <text x="190" y="191" class="tiny-text">**File:** file.py</text>
+    <text x="190" y="204" class="tiny-text">**Line:** 45</text>
+    <text x="190" y="217" class="tiny-text">**Issue:** Variable 'x'</text>
+    <text x="190" y="230" class="tiny-text">**Fix:** Rename to 'user_count'</text>
+    <text x="190" y="250" class="tiny-text" font-weight="bold">Severity:</text>
+    <text x="190" y="264" class="tiny-text">LOW → no block</text>
+
+    <!-- Performance -->
+    <rect x="360" y="0" width="160" height="345" rx="6" class="agent-box"/>
+    <text x="440" y="20" text-anchor="middle" class="title-text" font-size="13">Performance</text>
+    <text x="440" y="37" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+    <text x="370" y="57" class="tiny-text" font-weight="bold">output_key:</text>
+    <text x="370" y="71" class="tiny-text">"performance_report"</text>
+    <text x="370" y="91" class="tiny-text" font-weight="bold">Analyzes:</text>
+    <text x="370" y="105" class="tiny-text">• O(n²) algorithms</text>
+    <text x="370" y="118" class="tiny-text">• Memory leaks</text>
+    <text x="370" y="131" class="tiny-text">• N+1 queries</text>
+    <text x="370" y="144" class="tiny-text">• Resource exhaustion</text>
+    <text x="370" y="164" class="tiny-text" font-weight="bold">Output:</text>
+    <text x="370" y="178" class="tiny-text">Markdown with:</text>
+    <text x="370" y="191" class="tiny-text">**File:** file.py</text>
+    <text x="370" y="204" class="tiny-text">**Line:** 67</text>
+    <text x="370" y="217" class="tiny-text">**Issue:** Nested loop</text>
+    <text x="370" y="230" class="tiny-text">**Fix:** Use set lookup</text>
+    <text x="370" y="250" class="tiny-text" font-weight="bold">Severity:</text>
+    <text x="370" y="264" class="tiny-text">MEDIUM</text>
+
+    <!-- Logic -->
+    <rect x="540" y="0" width="160" height="345" rx="6" class="agent-box"/>
+    <text x="620" y="20" text-anchor="middle" class="title-text" font-size="13">Logic Verifier</text>
+    <text x="620" y="37" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+    <text x="550" y="57" class="tiny-text" font-weight="bold">output_key:</text>
+    <text x="550" y="71" class="tiny-text">"logic_report"</text>
+    <text x="550" y="91" class="tiny-text" font-weight="bold">Analyzes:</text>
+    <text x="550" y="105" class="tiny-text">• Correctness</text>
+    <text x="550" y="118" class="tiny-text">• Edge cases</text>
+    <text x="550" y="131" class="tiny-text">• Off-by-one errors</text>
+    <text x="550" y="144" class="tiny-text">• Null pointer issues</text>
+    <text x="550" y="164" class="tiny-text" font-weight="bold">Output:</text>
+    <text x="550" y="178" class="tiny-text">Markdown with:</text>
+    <text x="550" y="191" class="tiny-text">**File:** file.py</text>
+    <text x="550" y="204" class="tiny-text">**Line:** 89</text>
+    <text x="550" y="217" class="tiny-text">**Issue:** Missing null check</text>
+    <text x="550" y="230" class="tiny-text">**Fix:** Add if user is not None</text>
+    <text x="550" y="250" class="tiny-text" font-weight="bold">Severity:</text>
+    <text x="550" y="264" class="tiny-text">HIGH → blocks merge</text>
+
+    <!-- Docs -->
+    <rect x="720" y="0" width="160" height="345" rx="6" class="agent-box"/>
+    <text x="800" y="20" text-anchor="middle" class="title-text" font-size="13">Docs Reviewer</text>
+    <text x="800" y="37" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+    <text x="730" y="57" class="tiny-text" font-weight="bold">output_key:</text>
+    <text x="730" y="71" class="tiny-text">"docs_report"</text>
+    <text x="730" y="91" class="tiny-text" font-weight="bold">Analyzes:</text>
+    <text x="730" y="105" class="tiny-text">• Missing docstrings</text>
+    <text x="730" y="118" class="tiny-text">• Unclear comments</text>
+    <text x="730" y="131" class="tiny-text">• Outdated README</text>
+    <text x="730" y="144" class="tiny-text">• API documentation</text>
+    <text x="730" y="164" class="tiny-text" font-weight="bold">Output:</text>
+    <text x="730" y="178" class="tiny-text">Markdown with:</text>
+    <text x="730" y="191" class="tiny-text">**File:** file.py</text>
+    <text x="730" y="204" class="tiny-text">**Line:** 101</text>
+    <text x="730" y="217" class="tiny-text">**Issue:** No docstring</text>
+    <text x="730" y="230" class="tiny-text">**Fix:** Add Args/Returns</text>
+    <text x="730" y="250" class="tiny-text" font-weight="bold">Severity:</text>
+    <text x="730" y="264" class="tiny-text">LOW → no block</text>
+  </g>
+
+  <!-- Merge arrows -->
+  <line x1="200" y1="795" x2="200" y2="835" stroke="#ec4899" stroke-width="2"/>
+  <line x1="380" y1="795" x2="380" y2="835" stroke="#ec4899" stroke-width="2"/>
+  <line x1="650" y1="795" x2="650" y2="835" stroke="#ec4899" stroke-width="2"/>
+  <line x1="920" y1="795" x2="920" y2="835" stroke="#ec4899" stroke-width="2"/>
+  <line x1="1100" y1="795" x2="1100" y2="835" stroke="#ec4899" stroke-width="2"/>
+  
+  <path d="M 200 835 L 650 835" class="merge-arrow"/>
+  <path d="M 380 835 L 650 835" class="merge-arrow"/>
+  <path d="M 920 835 L 650 835" class="merge-arrow"/>
+  <path d="M 1100 835 L 650 835" class="merge-arrow"/>
+  
+  <text x="650" y="822" text-anchor="middle" class="tiny-text">↓ 5 reports merged ↓</text>
+
+  <!-- Review Synthesizer -->
+  <rect x="150" y="870" width="1000" height="195" rx="8" class="decision-box"/>
+  <text x="650" y="895" text-anchor="middle" class="title-text">PHASE 2: Review Synthesizer (Decision Engine)</text>
+  <text x="650" y="915" text-anchor="middle" class="text">Input: All 5 reports from session context</text>
+  
+  <g transform="translate(170, 935)">
+    <text x="0" y="0" class="text" font-weight="bold">Processing:</text>
+    <text x="0" y="18" class="small-text">1. Read all reports (security_report, style_report, performance_report, logic_report, docs_report)</text>
+    <text x="0" y="34" class="small-text">2. Apply Decision Rules:</text>
+    <text x="15" y="50" class="tiny-text">• IF security has HIGH severity → decision: REQUEST_CHANGES (blocks merge)</text>
+    <text x="15" y="64" class="tiny-text">• IF logic fails → decision: REQUEST_CHANGES</text>
+    <text x="15" y="78" class="tiny-text">• IF only style/docs issues → decision: COMMENT (no block)</text>
+    <text x="15" y="92" class="tiny-text">• IF no issues → decision: APPROVE</text>
+    <text x="0" y="108" class="small-text">3. Preserve exact File/Line/Fix blocks from sub-agents</text>
+    <text x="0" y="124" class="small-text">4. Generate unified markdown summary</text>
+  </g>
+  
+  <path d="M 650 1065 L 650 1110" class="arrow"/>
+
+  <!-- Output -->
+  <rect x="200" y="1110" width="900" height="145" rx="8" class="output-box"/>
+  <text x="650" y="1135" text-anchor="middle" class="title-text">Output to server.py</text>
+  <text x="220" y="1160" class="text" font-weight="bold">JSON Response:</text>
+  <text x="220" y="1180" class="small-text">{</text>
+  <text x="235" y="1196" class="small-text">"decision": "APPROVE" | "REQUEST_CHANGES" | "COMMENT",</text>
+  <text x="235" y="1212" class="small-text">"summary_markdown": "### Code Review\n**Security**\n...",</text>
+  <text x="235" y="1228" class="small-text">"checks": {"security": "success", "style": "failure", ...}</text>
+  <text x="220" y="1244" class="small-text">}</text>
+
+  <!-- Legend -->
+  <g transform="translate(150, 1315)">
+    <text x="0" y="12" class="title-text" font-size="13">Legend:</text>
+    <rect x="80" y="0" width="80" height="20" rx="3" class="input-box"/>
+    <text x="168" y="14" class="tiny-text">Input</text>
+    <rect x="230" y="0" width="80" height="20" rx="3" class="root-box"/>
+    <text x="318" y="14" class="tiny-text">Root Agent</text>
+    <rect x="390" y="0" width="80" height="20" rx="3" class="swarm-box"/>
+    <text x="478" y="14" class="tiny-text">Swarm</text>
+    <rect x="540" y="0" width="80" height="20" rx="3" class="agent-box"/>
+    <text x="628" y="14" class="tiny-text">Sub-Agent</text>
+    <rect x="690" y="0" width="80" height="20" rx="3" class="decision-box"/>
+    <text x="778" y="14" class="tiny-text">Decision</text>
+    <rect x="840" y="0" width="80" height="20" rx="3" class="output-box"/>
+    <text x="928" y="14" class="tiny-text">Output</text>
+  </g>
+</svg>
