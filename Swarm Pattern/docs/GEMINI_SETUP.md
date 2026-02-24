@@ -55,10 +55,11 @@ Open `.env` in a text editor and replace `your_api_key_here` with your actual ke
 
 ```bash
 GEMINI_API_KEY=AIzaSyC...YOUR_ACTUAL_KEY_HERE
-GEMINI_MODEL=gemini-1.5-flash
-GEMINI_TEMPERATURE=0.3
-GEMINI_MAX_TOKENS=2048
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_TEMPERATURE=0.5
+GEMINI_MAX_TOKENS=4096
 ENABLE_COST_TRACKING=true
+ENABLE_DEBUG_LOGGING=false
 ```
 
 ---
@@ -70,10 +71,12 @@ pip install -r requirements.txt
 ```
 
 This installs:
-- `google-generativeai` - Gemini SDK
+- `google-genai` - **New** Gemini SDK (replaces deprecated google-generativeai)
 - `python-dotenv` - Environment variable management
 - `Flask` - Web framework
 - `pyyaml` - File parsing support
+
+> ⚠️ **Important:** Use `google-genai` NOT `google-generativeai` (deprecated)
 
 ---
 
@@ -85,7 +88,8 @@ python flask_ui.py
 
 You should see:
 ```
-✅ Google Gemini configured: gemini-1.5-flash
+✅ Using new google.genai API
+✅ Google Gemini configured: gemini-2.5-flash
 🌐 Open your browser and go to: http://localhost:5000
 ```
 
@@ -192,20 +196,31 @@ CONVICTION: 8
 CONCERNS: Apple overweight at 15%, Nvidia elevated valuation
 ```
 
-### **Voting Phase**
+### **Voting Phase (Rule-Based + Iteration-Aware)**
 
-Agents vote on proposed trades based on their expertise:
+Voting now uses **rule-based logic** (no AI calls) with **iteration-aware thresholds**:
 
 ```python
-# Example: Tax Strategy Agent voting on selling NVDA
-PROMPT: "Vote on selling 100 shares of NVDA.
-         Position held 200 days (short-term), $50K gain..."
+# Example: Tax Strategy Agent voting
+# Base threshold: 15% tax liability
+# Iteration adjustment: +3% per iteration
 
-AI RESPONSE:
-VOTE: REJECT
-RATIONALE: NVDA becomes long-term in 165 days, would save $8,500 in taxes
-CONCERNS: Short-term capital gains trigger 37% rate vs 20% long-term
+# Iteration 1: threshold 15%, REJECT if tax > 15%
+# Iteration 3: threshold 21%, REJECT if tax > 21%
+# Iteration 5: threshold 27%, REJECT if tax > 27%
+
+# This encourages consensus in later iterations
+vote_rationale = f"Iter {iteration}: threshold {threshold}%, tax={tax_pct:.1f}%"
 ```
+
+Each agent adjusts thresholds progressively:
+| Agent | Base | Adjustment |
+|-------|------|------------|
+| Market Analysis | 30% bad trades | +5%/iter |
+| Risk Assessment | 3 violations | +1/iter |
+| Tax Strategy | 15% liability | +3%/iter |
+| ESG Compliance | ESG avg 60 | -3/iter |
+| Algorithmic Trading | 50 bps cost | +10 bps/iter |
 
 ### **Cost Tracking**
 

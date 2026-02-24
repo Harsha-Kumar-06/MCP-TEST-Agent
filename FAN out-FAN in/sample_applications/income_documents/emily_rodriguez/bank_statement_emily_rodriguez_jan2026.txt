@@ -1,0 +1,119 @@
+═══════════════════════════════════════════════════════════════════════════════
+                          ╔════════════════════════════╗
+                          ║  FIRST BANK OF BOULDER     ║
+                          ╚════════════════════════════╝
+                          MONTHLY ACCOUNT STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Statement Period: January 1, 2026 - January 31, 2026
+Account Type: Simply Free Checking
+Account Number: ****4892
+Statement Date: February 1, 2026
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT HOLDER INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Name: Emily M. Rodriguez
+Address: 567 Pearl Street, Apt 305
+         Boulder, CO 80302
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   12,456.78
+Total Deposits and Credits .............................. $    3,528.58
+Total Withdrawals and Debits ............................ $   (2,158.45)
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   13,826.91
+
+───────────────────────────────────────────────────────────────────────────────
+DEPOSITS AND CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/10/2026  DIRECT DEP MOUNTAIN HEALTH SYSTEMS PAYROLL        $1,764.29
+01/24/2026  DIRECT DEP MOUNTAIN HEALTH SYSTEMS PAYROLL        $1,764.29
+                                                            ──────────
+Total Deposits and Credits                                    $3,528.58
+
+───────────────────────────────────────────────────────────────────────────────
+WITHDRAWALS AND DEBITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/02/2026  AUTOPAY XCEL ENERGY                                ($87.45)
+01/03/2026  DEBIT CARD KING SOOPERS #847                       ($65.23)
+01/05/2026  AUTOPAY RENT - 567 PEARL ST                     ($1,150.00)
+01/05/2026  AUTOPAY COMCAST XFINITY                            ($69.99)
+01/08/2026  DEBIT CARD SPROUTS FARMERS MKT                     ($52.34)
+01/10/2026  DEBIT CARD SHELL GAS                               ($38.00)
+01/12/2026  AUTOPAY STUDENT LOAN - FEDLOAN                    ($320.00)
+01/14/2026  DEBIT CARD TARGET                                  ($45.67)
+01/15/2026  VENMO PAYMENT TO *MARIA S                          ($25.00)
+01/18/2026  DEBIT CARD WHOLE FOODS BOULDER                     ($48.92)
+01/20/2026  AUTOPAY T-MOBILE WIRELESS                          ($65.00)
+01/22/2026  DEBIT CARD COSTCO GAS                              ($42.00)
+01/25/2026  DEBIT CARD AMAZON                                  ($34.56)
+01/27/2026  DEBIT CARD TRADER JOE'S                            ($38.29)
+01/30/2026  AUTOPAY PLANET FITNESS                             ($25.00)
+01/31/2026  TRANSFER TO SAVINGS ****4895                       ($51.00)
+                                                            ──────────
+Total Withdrawals and Debits                                ($2,158.45)
+
+───────────────────────────────────────────────────────────────────────────────
+SAVINGS ACCOUNT SUMMARY ****4895
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   24,567.00
+Transfers In ...........................................          51.00
+Interest Earned (0.50% APY) ............................          10.24
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   24,628.24
+
+Note: Saving for down payment - Target: $38,500 (10% of $385,000)
+Current Progress: 64% of down payment goal
+
+───────────────────────────────────────────────────────────────────────────────
+12-MONTH DEPOSIT HISTORY
+───────────────────────────────────────────────────────────────────────────────
+
+Month          Net Deposits     Month          Net Deposits
+─────────      ───────────      ─────────      ───────────
+Feb 2025       $ 3,450.00       Aug 2025       $ 3,520.00
+Mar 2025       $ 3,480.00       Sep 2025       $ 3,490.00
+Apr 2025       $ 3,510.00       Oct 2025       $ 3,550.00
+May 2025       $ 3,460.00       Nov 2025       $ 3,510.00
+Jun 2025       $ 3,540.00       Dec 2025       $ 3,680.00*
+Jul 2025       $ 3,500.00       Jan 2026       $ 3,528.58
+
+*December includes holiday pay bonus
+
+12-Month Average Monthly Deposit: $3,518.05
+
+───────────────────────────────────────────────────────────────────────────────
+COMBINED ACCOUNT BALANCES
+───────────────────────────────────────────────────────────────────────────────
+
+Account Type                    Account Number       Balance
+────────────────────────────    ──────────────       ───────────
+Simply Free Checking            ****4892             $ 13,826.91
+High-Yield Savings              ****4895             $ 24,628.24
+                                                     ───────────
+Total Deposit Relationship                           $ 38,455.15
+
+───────────────────────────────────────────────────────────────────────────────
+IMPORTANT NOTICES
+───────────────────────────────────────────────────────────────────────────────
+
+• Your accounts are in good standing
+• You qualify for First-Time Homebuyer Program assistance
+• Schedule a consultation: homeloans@firstbankboulder.com
+• Pre-approval estimate available based on your deposit history
+
+Questions? Call (303) 555-2000 or visit any branch location
+
+   Member FDIC                           © 2026 First Bank of Boulder
+═══════════════════════════════════════════════════════════════════════════════

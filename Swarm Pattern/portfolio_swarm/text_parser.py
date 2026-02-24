@@ -10,10 +10,15 @@ from typing import Dict, List, Optional, Tuple
 import logging
 
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     GEMINI_AVAILABLE = True
+    USE_NEW_API = True
 except ImportError:
     GEMINI_AVAILABLE = False
+    USE_NEW_API = False
+    genai = None  # type: ignore[assignment]
+    types = None  # type: ignore[assignment]
 
 try:
     from .models import Portfolio, Position
@@ -33,13 +38,29 @@ class DynamicKnowledgeBase:
         self.company_tickers = self._load_base_mappings()
         self.ticker_sectors = self._load_base_sectors()
         self.learned_data = self._load_cache()
-        self.gemini_model = None
+        self.gemini_client = None
         
-        if GEMINI_AVAILABLE and GeminiConfig.validate():
-            genai.configure(api_key=GeminiConfig.API_KEY)
-            # Use the model from config, fallback to gemini-2.0-flash-exp
-            model_name = GeminiConfig.MODEL if hasattr(GeminiConfig, 'MODEL') else 'gemini-2.0-flash-exp'
-            self.gemini_model = genai.GenerativeModel(model_name)
+        if GEMINI_AVAILABLE and GeminiConfig.validate() and genai:
+            # New google.genai API
+            self.gemini_client = genai.Client(api_key=GeminiConfig.get_api_key())
+    
+    def _call_gemini(self, prompt: str, max_tokens: int = 100) -> Optional[str]:
+        """Call Gemini API with the new google.genai package"""
+        if not self.gemini_client or not types:
+            return None
+        try:
+            response = self.gemini_client.models.generate_content(
+                model=GeminiConfig.MODEL,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                    max_output_tokens=max_tokens,
+                )
+            )
+            return response.text
+        except Exception as e:
+            logger.warning(f"Gemini API call failed: {e}")
+            return None
     
     def _load_base_mappings(self) -> Dict[str, str]:
         """Load base company to ticker mappings"""
@@ -115,7 +136,7 @@ class DynamicKnowledgeBase:
             return self.learned_data['companies'][company_lower]
         
         # Use Gemini to learn new ticker
-        if self.gemini_model:
+        if self.gemini_client:
             ticker = self._ask_gemini_for_ticker(company_name)
             if ticker:
                 # Cache the learned mapping
@@ -140,7 +161,7 @@ class DynamicKnowledgeBase:
             return self.learned_data['sectors'][ticker_upper]
         
         # Use Gemini to learn new sector
-        if self.gemini_model:
+        if self.gemini_client:
             sector = self._ask_gemini_for_sector(ticker)
             if sector:
                 # Cache the learned mapping
@@ -161,7 +182,7 @@ class DynamicKnowledgeBase:
             return self.learned_data['esg_scores'][ticker_upper]
         
         # Use Gemini to estimate ESG
-        if self.gemini_model:
+        if self.gemini_client:
             esg = self._ask_gemini_for_esg(ticker)
             if esg:
                 self.learned_data['esg_scores'][ticker_upper] = esg
@@ -179,15 +200,11 @@ Return ONLY the ticker symbol in uppercase (e.g., AAPL, MSFT, GOOGL).
 If the company is not publicly traded or you're unsure, return "UNKNOWN".
 No explanation needed, just the ticker."""
 
-            response = self.gemini_model.generate_content(
-                prompt,
-                generation_config={
-                    'temperature': 0.1,  # Low temp for factual answers
-                    'max_output_tokens': 20,
-                }
-            )
+            response_text = self._call_gemini(prompt, max_tokens=20)
+            if not response_text:
+                return None
             
-            ticker = response.text.strip().upper()
+            ticker = response_text.strip().upper()
             
             # Validate ticker format
             if ticker and ticker != "UNKNOWN" and 1 <= len(ticker) <= 5 and ticker.replace('.', '').isalpha():
@@ -207,15 +224,11 @@ Choose ONE from: Technology, Healthcare, Financials, Energy, Consumer, Industria
 
 Return ONLY the sector name, no explanation."""
 
-            response = self.gemini_model.generate_content(
-                prompt,
-                generation_config={
-                    'temperature': 0.1,
-                    'max_output_tokens': 20,
-                }
-            )
+            response_text = self._call_gemini(prompt, max_tokens=20)
+            if not response_text:
+                return None
             
-            sector = response.text.strip()
+            sector = response_text.strip()
             
             # Validate sector
             valid_sectors = ['Technology', 'Healthcare', 'Financials', 'Energy', 
@@ -229,6 +242,8 @@ Return ONLY the sector name, no explanation."""
             logger.warning(f"Gemini sector lookup failed for '{ticker}': {e}")
         
         return None
+        
+        return None
     
     def _ask_gemini_for_esg(self, ticker: str) -> Optional[int]:
         """Ask Gemini for ESG score estimate"""
@@ -238,16 +253,15 @@ Return ONLY the sector name, no explanation."""
 Return ONLY a number between 0-100 representing the ESG score.
 Higher is better. No explanation needed."""
 
-            response = self.gemini_model.generate_content(
-                prompt,
-                generation_config={
-                    'temperature': 0.1,
-                    'max_output_tokens': 10,
-                }
-            )
+            response_text = self._call_gemini(prompt, max_tokens=10)
+            if not response_text:
+                return None
             
-            score_text = response.text.strip()
-            score = int(re.search(r'\d+', score_text).group())
+            score_text = response_text.strip()
+            match = re.search(r'\d+', score_text)
+            if not match:
+                return None
+            score = int(match.group())
             
             if 0 <= score <= 100:
                 return score
@@ -259,7 +273,7 @@ Higher is better. No explanation needed."""
     
     def extract_all_from_text(self, text: str) -> Dict:
         """Use Gemini to extract ALL portfolio data from free-form text"""
-        if not self.gemini_model:
+        if not self.gemini_client:
             return {}
         
         try:
@@ -287,16 +301,12 @@ Return a JSON object with this exact format:
 Extract ALL positions you can find. For prices, "current_price" is what it's "at" or "trading at" now. "cost_basis" is what was "bought" or "purchased" for.
 Return ONLY valid JSON, no markdown or explanation."""
 
-            response = self.gemini_model.generate_content(
-                prompt,
-                generation_config={
-                    'temperature': 0.2,
-                    'max_output_tokens': 2048,
-                }
-            )
+            response_text = self._call_gemini(prompt, max_tokens=2048)
+            if not response_text:
+                return {}
             
             # Extract JSON from response
-            json_text = response.text.strip()
+            json_text = response_text.strip()
             
             # Remove markdown code blocks if present
             json_text = re.sub(r'```json\s*', '', json_text)
@@ -329,7 +339,7 @@ class GeminiEnhancedParser:
         self._parse_line_by_line()
         
         # If we got very few positions, try Gemini full extraction
-        if len(self.positions) < 2 and self.knowledge.gemini_model:
+        if len(self.positions) < 2 and self.knowledge.gemini_client:
             logger.info("🤖 Using Gemini to extract portfolio data...")
             gemini_data = self.knowledge.extract_all_from_text(self.original_text)
             

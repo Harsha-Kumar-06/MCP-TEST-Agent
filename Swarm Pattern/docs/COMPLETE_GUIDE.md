@@ -33,8 +33,11 @@
 - **URL**: http://localhost:5000
 - **Features**:
   - Three input methods (text/file upload/manual)
+  - 10 optimization strategies with 1-5 star ratings
+  - Portfolio-adaptive strategy recommendations
   - Visual sector allocation charts
   - Real-time optimization with countdown
+  - Iteration-aware voting (agents debate properly)
   - Color-coded agent votes
   - Downloadable reports
 

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="coordinatorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sendingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="600" fill="#1a1a2e"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#headerGrad)">Multi-Agent System Architecture</text>
+  
+  <!-- User/Frontend Layer -->
+  <rect x="350" y="60" width="200" height="50" rx="10" fill="#16213e" stroke="#4facfe" stroke-width="2" filter="url(#shadow)"/>
+  <text x="450" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#ffffff">👤 User Interface</text>
+  <text x="450" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0a0a0">Next.js Dashboard</text>
+  
+  <!-- Arrow down -->
+  <path d="M450 110 L450 140" stroke="#4facfe" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4facfe"/>
+    </marker>
+  </defs>
+  
+  <!-- Coordinator Agent (Center) -->
+  <rect x="300" y="145" width="300" height="70" rx="15" fill="url(#coordinatorGrad)" filter="url(#shadow)"/>
+  <text x="450" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff">🧠 Coordinator Agent</text>
+  <text x="450" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#ffffff">Genkit + Gemini 2.5 Flash AI</text>
+  
+  <!-- Arrows to Content Agents -->
+  <path d="M350 215 L200 260" stroke="#4facfe" stroke-width="2"/>
+  <path d="M450 215 L450 260" stroke="#4facfe" stroke-width="2"/>
+  <path d="M550 215 L700 260" stroke="#4facfe" stroke-width="2"/>
+  
+  <!-- Content Generation Agents Row -->
+  <!-- Email Agent -->
+  <rect x="80" y="260" width="140" height="60" rx="10" fill="url(#agentGrad)" filter="url(#shadow)"/>
+  <text x="150" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1a1a2e">✉️ Email Content</text>
+  <text x="150" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1a1a2e">Agent</text>
+  
+  <!-- SMS Agent -->
+  <rect x="380" y="260" width="140" height="60" rx="10" fill="url(#agentGrad)" filter="url(#shadow)"/>
+  <text x="450" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1a1a2e">📱 SMS Content</text>
+  <text x="450" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1a1a2e">Agent</text>
+  
+  <!-- Instagram Agent -->
+  <rect x="680" y="260" width="140" height="60" rx="10" fill="url(#agentGrad)" filter="url(#shadow)"/>
+  <text x="750" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1a1a2e">📸 Instagram</text>
+  <text x="750" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1a1a2e">Posting Agent</text>
+  
+  <!-- Secondary Agents Row -->
+  <!-- Audience Agent -->
+  <rect x="80" y="350" width="140" height="60" rx="10" fill="#6c5ce7" filter="url(#shadow)"/>
+  <text x="150" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">👥 Audience</text>
+  <text x="150" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffffff">Segmentation</text>
+  
+  <!-- Compliance Agent -->
+  <rect x="380" y="350" width="140" height="60" rx="10" fill="#e17055" filter="url(#shadow)"/>
+  <text x="450" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">⚖️ Compliance</text>
+  <text x="450" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffffff">Agent</text>
+  
+  <!-- Analytics Agent -->
+  <rect x="680" y="350" width="140" height="60" rx="10" fill="#00b894" filter="url(#shadow)"/>
+  <text x="750" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">📊 Analytics</text>
+  <text x="750" y="395" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffffff">Setup Agent</text>
+  
+  <!-- Arrows connecting rows -->
+  <path d="M150 320 L150 350" stroke="#a0a0a0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <path d="M450 320 L450 350" stroke="#a0a0a0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <path d="M750 320 L750 350" stroke="#a0a0a0" stroke-width="1.5" stroke-dasharray="5,3"/>
+  
+  <!-- Sending Layer -->
+  <rect x="200" y="450" width="500" height="60" rx="15" fill="url(#sendingGrad)" filter="url(#shadow)"/>
+  <text x="450" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#1a1a2e">🚀 Sending Agents</text>
+  <text x="450" y="498" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#1a1a2e">Email (SMTP) | SMS (Twilio/Textbelt) | Instagram (Graph API)</text>
+  
+  <!-- Arrows to sending layer -->
+  <path d="M150 410 L350 450" stroke="#43e97b" stroke-width="2"/>
+  <path d="M450 410 L450 450" stroke="#43e97b" stroke-width="2"/>
+  <path d="M750 410 L550 450" stroke="#43e97b" stroke-width="2"/>
+  
+  <!-- Database Layer -->
+  <rect x="320" y="540" width="260" height="50" rx="10" fill="url(#dbGrad)" filter="url(#shadow)"/>
+  <text x="450" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1a1a2e">💾 JSON Database</text>
+  <text x="450" y="582" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1a1a2e">campaigns.json | contacts.json | tracking.json</text>
+  
+  <!-- Arrow to database -->
+  <path d="M450 510 L450 540" stroke="#fa709a" stroke-width="2"/>
+</svg>

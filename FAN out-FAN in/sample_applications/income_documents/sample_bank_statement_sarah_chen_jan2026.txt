@@ -1,0 +1,132 @@
+================================================================================
+                         PACIFIC COAST BANK
+                   BUSINESS CHECKING ACCOUNT STATEMENT
+================================================================================
+
+Statement Period: January 1, 2026 - January 31, 2026
+Statement Date: February 1, 2026
+Page 1 of 2
+
+================================================================================
+                       ACCOUNT INFORMATION
+================================================================================
+Account Holder: Sarah Chen Design Studio
+DBA: Sarah M. Chen
+Account Number: XXXXXX7891
+Account Type: Business Checking Plus
+Routing Number: XXXXXX456
+Tax ID (EIN): 94-XXXXXX
+
+Mailing Address:
+Sarah Chen Design Studio
+2847 Market Street, Unit 12
+Oakland, CA 94608
+
+================================================================================
+                       ACCOUNT SUMMARY
+================================================================================
+Beginning Balance (01/01/2026):              $42,567.00
+Total Deposits & Credits:                    $18,750.00
+Total Withdrawals & Debits:                  $12,234.56
+Ending Balance (01/31/2026):                 $49,082.44
+Average Daily Balance:                       $45,824.72
+
+================================================================================
+                     DEPOSITS AND CREDITS
+================================================================================
+Date        Description                              Amount
+--------------------------------------------------------------------------------
+01/05/2026  ACH - CLIENT: STARTUP VENTURES INC     $4,500.00
+            Invoice #2026-001 Payment
+01/10/2026  WIRE TRANSFER - NEXUS DIGITAL          $8,500.00
+            Project: Mobile App Redesign
+01/15/2026  ACH - CLIENT: BLOOM WELLNESS           $2,500.00
+            Invoice #2026-002 Payment
+01/22/2026  SQUARE DEPOSIT                           $750.00
+            Workshop Registration Fees
+01/28/2026  ACH - CLIENT: METRO REAL ESTATE        $2,500.00
+            Invoice #2026-003 Payment
+--------------------------------------------------------------------------------
+                              TOTAL DEPOSITS:     $18,750.00
+
+================================================================================
+                    WITHDRAWALS AND DEBITS
+================================================================================
+Date        Description                              Amount
+--------------------------------------------------------------------------------
+01/02/2026  ACH - ADOBE CREATIVE CLOUD               $59.99
+01/05/2026  AUTO PAY - OFFICE RENT (SHARED)         $500.00
+01/08/2026  ACH - FIGMA PROFESSIONAL                 $15.00
+01/08/2026  ACH - SLACK BUSINESS                     $12.50
+01/10/2026  DEBIT - STAPLES OFFICE SUPPLIES          $87.45
+01/12/2026  ACH - CONTRACTOR PAY - J. RODRIGUEZ    $850.00
+01/15/2026  AUTO PAY - BUSINESS INSURANCE           $150.00
+01/15/2026  TRANSFER TO PERSONAL - OWNER DRAW    $5,000.00
+01/18/2026  DEBIT - DELTA AIRLINES                  $456.78
+            (Client meeting travel)
+01/20/2026  ACH - FRAMER SUBSCRIPTION                $20.00
+01/22/2026  DEBIT - COWORKING SPACE DAY PASS         $35.00
+01/25/2026  ACH - CONTRACTOR PAY - M. PATEL        $650.00
+01/28/2026  QUARTERLY EST TAX - CA FTB            $3,500.00
+01/28/2026  DEBIT - CLIENT DINNER (DEDUCTIBLE)      $145.34
+01/30/2026  ACH - NOTION TEAM PLAN                   $10.00
+01/31/2026  AUTO PAY - QUICKBOOKS SUBSCRIPTION       $42.50
+01/31/2026  MONTHLY SERVICE FEE                       $0.00*
+--------------------------------------------------------------------------------
+                           TOTAL WITHDRAWALS:     $11,534.56
+
+* Fee waived - Business Premier customer
+
+================================================================================
+                        INCOME ANALYSIS
+================================================================================
+Total Client Payments This Month:                 $18,000.00
+Other Income (Workshops):                            $750.00
+Average Monthly Income (12-month):               $12,083.33
+Year-To-Date Income:                             $18,750.00
+
+Top Clients This Period:
+1. Nexus Digital                                  $8,500.00
+2. Startup Ventures Inc                           $4,500.00
+3. Metro Real Estate                              $2,500.00
+4. Bloom Wellness                                 $2,500.00
+
+================================================================================
+                        EXPENSE ANALYSIS
+================================================================================
+Category                           Amount          % of Total
+--------------------------------------------------------------------------------
+Owner Draw/Salary                 $5,000.00         43.3%
+Contractor Payments               $1,500.00         13.0%
+Tax Payments                      $3,500.00         30.3%
+Software Subscriptions              $160.00          1.4%
+Travel & Meals                      $637.12          5.5%
+Office & Supplies                   $622.45          5.4%
+Insurance                           $150.00          1.3%
+--------------------------------------------------------------------------------
+TOTAL                            $11,569.57        100.0%
+
+================================================================================
+                     YEAR-TO-DATE SUMMARY
+================================================================================
+YTD Deposits:                    $18,750.00
+YTD Withdrawals:                 $11,534.56
+YTD Owner Draws:                  $5,000.00
+YTD Tax Payments:                 $3,500.00
+YTD Contractor Payments:          $1,500.00
+
+================================================================================
+                    IMPORTANT NOTICES
+================================================================================
+- Business Credit Line Available: $25,000
+- Free incoming wires as Business Premier member
+- Schedule quarterly tax review with your accountant
+
+Thank you for your business with Pacific Coast Bank!
+Business Support: 1-888-555-BIZZ (2499)
+Online Banking: business.pacificcoastbank.com
+
+================================================================================
+FDIC Insured | Member FDIC | Equal Housing Lender | SBA Preferred Lender
+Pacific Coast Bank | 500 Broadway | Oakland, CA 94607
+================================================================================

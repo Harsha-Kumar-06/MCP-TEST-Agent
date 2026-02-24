@@ -17,6 +17,8 @@ class StrategyType(Enum):
     RISK_MINIMIZATION = "risk_minimization"
     SECTOR_ROTATION = "sector_rotation"
     DIVIDEND_GROWTH = "dividend_growth"
+    MOMENTUM = "momentum"
+    VALUE_INVESTING = "value_investing"
     CUSTOM = "custom"
 
 
@@ -31,6 +33,11 @@ class OptimizationStrategy:
     strategy_type: StrategyType
     name: str
     description: str
+    
+    # Star rating (1-5) and effectiveness label
+    star_rating: int = 3  # 1-5 stars
+    effectiveness: str = "Moderate"  # Poor, Fair, Moderate, Good, Excellent
+    best_for: str = ""  # When this strategy works best
     
     # Target allocations
     target_sector_weights: Dict[str, float] = field(default_factory=dict)
@@ -70,13 +77,17 @@ class OptimizationStrategy:
     priorities: Dict[str, int] = field(default_factory=dict)
 
 
-# Pre-defined strategy templates
+# Pre-defined strategy templates with star ratings (1-5 stars)
 STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
     
+    # ⭐ 1-Star Strategy - High Risk, Speculative
     StrategyType.AGGRESSIVE_GROWTH: OptimizationStrategy(
         strategy_type=StrategyType.AGGRESSIVE_GROWTH,
         name="Aggressive Growth",
         description="Maximize capital appreciation with higher risk tolerance. Focus on growth sectors and momentum.",
+        star_rating=1,
+        effectiveness="High Risk",
+        best_for="Young investors with long time horizons, high risk tolerance",
         target_beta=1.3,
         max_portfolio_beta=2.0,
         min_portfolio_beta=0.8,
@@ -99,10 +110,59 @@ STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
         }
     ),
     
+    # ⭐⭐ 2-Star Strategy - Moderate Risk, Active Trading
+    StrategyType.SECTOR_ROTATION: OptimizationStrategy(
+        strategy_type=StrategyType.SECTOR_ROTATION,
+        name="Sector Rotation",
+        description="Actively rotate between sectors based on economic cycle. Higher turnover with tactical allocation.",
+        star_rating=2,
+        effectiveness="Active/Risky",
+        best_for="Active traders, economic cycle followers",
+        target_beta=1.1,
+        max_turnover=0.60,
+        urgency_level="high",
+        priorities={
+            "growth": 8,
+            "risk": 5,
+            "income": 3,
+            "tax_efficiency": 3,
+            "esg": 4,
+        }
+    ),
+    
+    # ⭐⭐ 2-Star Strategy - Momentum
+    StrategyType.MOMENTUM: OptimizationStrategy(
+        strategy_type=StrategyType.MOMENTUM,
+        name="Momentum Trading",
+        description="Follow price trends and momentum signals. Buy winners, sell losers. Higher turnover.",
+        star_rating=2,
+        effectiveness="Trend-Following",
+        best_for="Technical traders, trend followers",
+        target_beta=1.2,
+        max_portfolio_beta=1.8,
+        min_portfolio_beta=0.6,
+        volatility_target=0.22,
+        max_drawdown_tolerance=0.30,
+        max_turnover=0.55,
+        urgency_level="high",
+        prefer_long_term_gains=False,
+        priorities={
+            "growth": 9,
+            "risk": 4,
+            "income": 2,
+            "tax_efficiency": 3,
+            "esg": 3,
+        }
+    ),
+    
+    # ⭐⭐⭐ 3-Star Strategy - Conservative Income
     StrategyType.CONSERVATIVE_INCOME: OptimizationStrategy(
         strategy_type=StrategyType.CONSERVATIVE_INCOME,
         name="Conservative Income",
         description="Prioritize stable income with capital preservation. Focus on dividends and low volatility.",
+        star_rating=3,
+        effectiveness="Stable/Low Risk",
+        best_for="Retirees, income-focused investors, low risk tolerance",
         target_beta=0.7,
         max_portfolio_beta=1.0,
         min_portfolio_beta=0.4,
@@ -127,29 +187,59 @@ STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
         }
     ),
     
-    StrategyType.BALANCED: OptimizationStrategy(
-        strategy_type=StrategyType.BALANCED,
-        name="Balanced",
-        description="Balanced approach between growth and income. Moderate risk with diversification.",
-        target_beta=1.0,
-        max_portfolio_beta=1.3,
-        min_portfolio_beta=0.7,
-        volatility_target=0.15,
-        max_drawdown_tolerance=0.20,
-        max_sector_concentration=0.25,
+    # ⭐⭐⭐ 3-Star Strategy - Dividend Growth
+    StrategyType.DIVIDEND_GROWTH: OptimizationStrategy(
+        strategy_type=StrategyType.DIVIDEND_GROWTH,
+        name="Dividend Growth",
+        description="Focus on companies with growing dividends. Balance current yield with dividend growth potential.",
+        star_rating=3,
+        effectiveness="Income Growth",
+        best_for="Long-term income investors, dividend reinvestment",
+        target_beta=0.9,
+        min_dividend_yield=0.02,
+        prefer_dividend_growth=True,
+        max_turnover=0.20,
         priorities={
             "growth": 6,
             "risk": 6,
-            "income": 5,
+            "income": 9,
             "tax_efficiency": 6,
-            "esg": 6,
+            "esg": 5,
         }
     ),
     
+    # ⭐⭐⭐ 3-Star Strategy - Value Investing
+    StrategyType.VALUE_INVESTING: OptimizationStrategy(
+        strategy_type=StrategyType.VALUE_INVESTING,
+        name="Value Investing",
+        description="Find undervalued stocks with strong fundamentals. Long-term buy and hold approach.",
+        star_rating=3,
+        effectiveness="Fundamental",
+        best_for="Patient investors, Warren Buffett style",
+        target_beta=0.85,
+        max_portfolio_beta=1.2,
+        min_portfolio_beta=0.5,
+        volatility_target=0.14,
+        max_drawdown_tolerance=0.18,
+        max_turnover=0.15,
+        prefer_long_term_gains=True,
+        priorities={
+            "growth": 7,
+            "risk": 6,
+            "income": 5,
+            "tax_efficiency": 8,
+            "esg": 5,
+        }
+    ),
+    
+    # ⭐⭐⭐⭐ 4-Star Strategy - Tax Efficient
     StrategyType.TAX_EFFICIENT: OptimizationStrategy(
         strategy_type=StrategyType.TAX_EFFICIENT,
         name="Tax Efficient",
         description="Minimize tax impact while achieving reasonable returns. Prioritize long-term gains and loss harvesting.",
+        star_rating=4,
+        effectiveness="Tax Optimized",
+        best_for="High tax bracket investors, taxable accounts",
         target_beta=1.0,
         prefer_long_term_gains=True,
         harvest_losses=True,
@@ -165,10 +255,14 @@ STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
         }
     ),
     
+    # ⭐⭐⭐⭐ 4-Star Strategy - ESG Focused
     StrategyType.ESG_FOCUSED: OptimizationStrategy(
         strategy_type=StrategyType.ESG_FOCUSED,
         name="ESG Focused",
         description="Prioritize environmental, social, and governance factors. Exclude controversial sectors.",
+        star_rating=4,
+        effectiveness="Sustainable",
+        best_for="Socially conscious investors, institutional mandates",
         target_beta=1.0,
         target_esg_score=80.0,
         min_esg_score=75,
@@ -182,10 +276,14 @@ STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
         }
     ),
     
+    # ⭐⭐⭐⭐ 4-Star Strategy - Risk Minimization
     StrategyType.RISK_MINIMIZATION: OptimizationStrategy(
         strategy_type=StrategyType.RISK_MINIMIZATION,
         name="Risk Minimization",
         description="Minimize portfolio risk and volatility. Focus on defensive positions and hedging.",
+        star_rating=4,
+        effectiveness="Defensive",
+        best_for="Risk-averse investors, market uncertainty",
         target_beta=0.5,
         max_portfolio_beta=0.8,
         min_portfolio_beta=0.3,
@@ -208,36 +306,26 @@ STRATEGY_TEMPLATES: Dict[StrategyType, OptimizationStrategy] = {
         }
     ),
     
-    StrategyType.SECTOR_ROTATION: OptimizationStrategy(
-        strategy_type=StrategyType.SECTOR_ROTATION,
-        name="Sector Rotation",
-        description="Actively rotate between sectors based on economic cycle. Higher turnover with tactical allocation.",
-        target_beta=1.1,
-        max_turnover=0.60,
-        urgency_level="high",
-        priorities={
-            "growth": 8,
-            "risk": 5,
-            "income": 3,
-            "tax_efficiency": 3,
-            "esg": 4,
-        }
-    ),
-    
-    StrategyType.DIVIDEND_GROWTH: OptimizationStrategy(
-        strategy_type=StrategyType.DIVIDEND_GROWTH,
-        name="Dividend Growth",
-        description="Focus on companies with growing dividends. Balance current yield with dividend growth potential.",
-        target_beta=0.9,
-        min_dividend_yield=0.02,
-        prefer_dividend_growth=True,
-        max_turnover=0.20,
+    # ⭐⭐⭐⭐⭐ 5-Star Strategy - Balanced (Best Overall)
+    StrategyType.BALANCED: OptimizationStrategy(
+        strategy_type=StrategyType.BALANCED,
+        name="Balanced",
+        description="Balanced approach between growth and income. Moderate risk with diversification. Best for most investors.",
+        star_rating=5,
+        effectiveness="Excellent",
+        best_for="Most investors, long-term wealth building",
+        target_beta=1.0,
+        max_portfolio_beta=1.3,
+        min_portfolio_beta=0.7,
+        volatility_target=0.15,
+        max_drawdown_tolerance=0.20,
+        max_sector_concentration=0.25,
         priorities={
             "growth": 6,
             "risk": 6,
-            "income": 9,
+            "income": 5,
             "tax_efficiency": 6,
-            "esg": 5,
+            "esg": 6,
         }
     ),
 }
@@ -313,7 +401,7 @@ def create_custom_strategy(
 
 
 def list_available_strategies() -> List[Dict]:
-    """Get list of available strategy templates for UI display"""
+    """Get list of available strategy templates for UI display, sorted by star rating"""
     strategies = []
     for strategy_type, strategy in STRATEGY_TEMPLATES.items():
         strategies.append({
@@ -323,7 +411,16 @@ def list_available_strategies() -> List[Dict]:
             "target_beta": strategy.target_beta,
             "risk_level": _get_risk_level(strategy),
             "priorities": strategy.priorities,
+            "star_rating": strategy.star_rating,
+            "effectiveness": strategy.effectiveness,
+            "best_for": strategy.best_for,
+            "min_esg": strategy.min_esg_score,
+            "max_drawdown": f"{strategy.max_drawdown_tolerance:.0%}",
+            "max_turnover": f"{strategy.max_turnover:.0%}",
+            "volatility_target": f"{strategy.volatility_target:.0%}",
         })
+    # Sort by star rating (highest first)
+    strategies.sort(key=lambda x: x["star_rating"], reverse=True)
     return strategies
 
 

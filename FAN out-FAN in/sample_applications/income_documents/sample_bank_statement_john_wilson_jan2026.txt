@@ -1,0 +1,99 @@
+================================================================================
+                         FIRST NATIONAL BANK
+                    CHECKING ACCOUNT STATEMENT
+================================================================================
+
+Statement Period: January 1, 2026 - January 31, 2026
+Statement Date: February 1, 2026
+Page 1 of 2
+
+================================================================================
+                       ACCOUNT INFORMATION
+================================================================================
+Account Holder: John A. Wilson
+Account Number: XXXXXX4532
+Account Type: Premium Checking
+Routing Number: XXXXXX789
+
+Mailing Address:
+John A. Wilson
+456 Oak Avenue
+San Francisco, CA 94102
+
+================================================================================
+                       ACCOUNT SUMMARY
+================================================================================
+Beginning Balance (01/01/2026):              $24,567.89
+Total Deposits & Credits:                    $11,170.94
+Total Withdrawals & Debits:                   $8,234.56
+Ending Balance (01/31/2026):                 $27,504.27
+Average Daily Balance:                       $26,012.45
+
+================================================================================
+                     DEPOSITS AND CREDITS
+================================================================================
+Date        Description                              Amount
+--------------------------------------------------------------------------------
+01/02/2026  ACH TRANSFER FROM SAVINGS               $500.00
+01/15/2026  DIRECT DEPOSIT - TECHCORP IND LLC     $5,320.94
+01/20/2026  VENMO PAYMENT RECEIVED                  $150.00
+01/31/2026  DIRECT DEPOSIT - TECHCORP IND LLC     $5,320.94
+--------------------------------------------------------------------------------
+                              TOTAL DEPOSITS:     $11,291.88
+
+================================================================================
+                    WITHDRAWALS AND DEBITS
+================================================================================
+Date        Description                              Amount
+--------------------------------------------------------------------------------
+01/03/2026  DEBIT CARD - WHOLE FOODS #4521          $156.78
+01/05/2026  AUTO PAY - RENT PAYMENT               $2,800.00
+01/05/2026  AUTO PAY - PG&E UTILITIES               $124.56
+01/08/2026  DEBIT CARD - SHELL GAS STATION           $58.92
+01/10/2026  ACH - COMCAST XFINITY                   $129.99
+01/12/2026  DEBIT CARD - AMAZON.COM                 $234.56
+01/15/2026  ACH - STUDENT LOAN PAYMENT              $425.00
+01/15/2026  DEBIT CARD - TRADER JOES                 $98.45
+01/18/2026  ZELLE PAYMENT - JOHN DOE                $200.00
+01/20/2026  DEBIT CARD - TARGET                     $156.23
+01/22/2026  ACH - CAR INSURANCE GEICO               $145.00
+01/25/2026  DEBIT CARD - COSTCO                     $287.34
+01/28/2026  ATM WITHDRAWAL - CHASE ATM              $200.00
+01/30/2026  AUTO PAY - CREDIT CARD PAYMENT        $1,500.00
+01/31/2026  MONTHLY SERVICE FEE                       $0.00*
+--------------------------------------------------------------------------------
+                           TOTAL WITHDRAWALS:      $6,516.83
+
+* Monthly service fee waived - minimum balance requirement met
+
+================================================================================
+                        DAILY BALANCES
+================================================================================
+Date           Balance          Date           Balance
+01/01/2026    $24,567.89       01/17/2026    $25,789.45
+01/05/2026    $21,486.55       01/20/2026    $25,583.22
+01/10/2026    $21,356.56       01/25/2026    $25,295.88
+01/15/2026    $26,152.50       01/31/2026    $27,504.27
+
+================================================================================
+                     INTEREST INFORMATION
+================================================================================
+Interest Earned This Period:                      $12.45
+Annual Percentage Yield Earned:                    0.55%
+Interest Paid YTD:                                $12.45
+
+================================================================================
+                    IMPORTANT NOTICES
+================================================================================
+- Your account qualifies for overdraft protection
+- Mobile deposit limit: $5,000 per day
+- No holds on deposits this period
+
+Thank you for banking with First National Bank!
+Customer Service: 1-800-555-BANK (2265)
+Online Banking: www.firstnationalbank.com
+
+================================================================================
+FDIC Insured | Member FDIC | Equal Housing Lender
+First National Bank | 100 Financial Center Drive | San Francisco, CA 94105
+================================================================================

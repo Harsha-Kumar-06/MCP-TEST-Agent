@@ -1,0 +1,51 @@
+FIRST-TIME HOMEBUYER MORTGAGE APPLICATION
+==========================================
+
+Applicant Information:
+----------------------
+First Name: Emily
+Last Name: Rodriguez  
+SSN Last Four: 2847
+Birth Date: 1995-11-20
+Email Address: emily.rodriguez@outlook.com
+Phone: 303-555-6789
+Current Living Address: 567 Pearl Street, Apt 305, Boulder, CO 80302
+
+Work Information:
+-----------------
+Employment Type: Employed Full-Time
+Company: Mountain Health Systems
+Job Title: Registered Nurse
+Time at Job: 3 years
+Yearly Salary: $78,000
+
+Property Being Purchased:
+-------------------------
+Address: 1234 Baseline Road
+City: Boulder
+State: CO
+Zip: 80303
+Home Type: Townhouse
+Built In: 2017
+Size: 1,200 square feet
+Beds: 2
+Baths: 1.5
+
+Purchase Information:
+---------------------
+Sale Price: $385,000
+My Down Payment: $38,500 (10%)
+Loan Needed: $346,500
+First Time Buyer: Yes
+
+Documents I'm Providing:
+------------------------
+- W2 from employer: Yes
+- Last 2 years tax returns: Yes
+- Last 3 months paystubs: Yes  
+- Bank statements 6 months: Yes
+
+I confirm this information is accurate.
+
+Signed: Emily Rodriguez
+Date: February 13, 2026

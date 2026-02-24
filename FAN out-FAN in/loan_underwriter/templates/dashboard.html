@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MortgageClear{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 class="text-primary" id="totalApps">-</h2>
+                    <small class="text-muted">Total Applications</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 class="text-success" id="approvedApps">-</h2>
+                    <small class="text-muted">Approved</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 class="text-warning" id="reviewApps">-</h2>
+                    <small class="text-muted">Manual Review</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 class="text-danger" id="deniedApps">-</h2>
+                    <small class="text-muted">Denied</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-table me-2"></i>Recent Applications</h5>
+            <div>
+                <button class="btn btn-outline-danger btn-sm me-2" onclick="clearAllApplications()" id="clearAllBtn" style="display: none;">
+                    <i class="bi bi-trash me-1"></i>Clear All
+                </button>
+                <button class="btn btn-outline-primary btn-sm" onclick="loadApplications()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Application ID</th>
+                            <th>Applicant</th>
+                            <th>Submitted</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTable">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/application" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-plus me-2"></i>New Application
+                        </a>
+                        <button class="btn btn-outline-primary" id="runDemoBtn">
+                            <i class="bi bi-play-circle me-2"></i>Run Demo Application
+                        </button>
+                        <button class="btn btn-success" id="runApprovalDemoBtn">
+                            <i class="bi bi-check-circle me-2"></i>Run Approval Demo (Strong Profile)
+                        </button>
+                        <a href="/docs" target="_blank" class="btn btn-outline-secondary">
+                            <i class="bi bi-book me-2"></i>API Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>System Info</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td>Architecture</td>
+                            <td><span class="badge bg-primary">Fan-Out/Fan-In</span></td>
+                        </tr>
+                        <tr>
+                            <td>Agents</td>
+                            <td>Credit, Property, Fraud, Person, Aggregator</td>
+                        </tr>
+                        <tr>
+                            <td>LLM Backend</td>
+                            <td>Google Gemini (ADK)</td>
+                        </tr>
+                        <tr>
+                            <td>Parallel Processing</td>
+                            <td><span class="text-success">Enabled</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function loadApplications() {
+    try {
+        const response = await fetch('/api/v1/applications');
+        const data = await response.json();
+        
+        const apps = data.applications;
+        
+        // Update stats
+        document.getElementById('totalApps').textContent = data.total;
+        document.getElementById('approvedApps').textContent = apps.filter(a => a.status === 'approved').length;
+        document.getElementById('reviewApps').textContent = apps.filter(a => a.status === 'manual_review').length;
+        document.getElementById('deniedApps').textContent = apps.filter(a => a.status === 'denied').length;
+        
+        // Show/hide Clear All button
+        document.getElementById('clearAllBtn').style.display = apps.length > 0 ? 'inline-block' : 'none';
+        
+        // Update table
+        const tbody = document.getElementById('applicationsTable');
+        
+        if (apps.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        No applications yet. <a href="/application">Submit one</a> or <a href="#" onclick="runDemo()">run a demo</a>.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = apps.map(app => `
+            <tr id="row-${app.application_id}">
+                <td><code>${app.application_id}</code></td>
+                <td>${app.applicant_name || 'N/A'}</td>
+                <td>${new Date(app.submitted_at).toLocaleString()}</td>
+                <td>
+                    <span class="badge bg-${getStatusColor(app.status)}">
+                        ${app.status.replace('_', ' ').toUpperCase()}
+                    </span>
+                </td>
+                <td>
+                    <a href="/results/${app.application_id}" class="btn btn-sm btn-outline-primary me-1">
+                        <i class="bi bi-eye"></i> View
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteApplication('${app.application_id}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading applications:', error);
+    }
+}
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'approved': return 'success';
+        case 'manual_review': return 'warning';
+        case 'denied': return 'danger';
+        case 'processing': return 'info';
+        default: return 'secondary';
+    }
+}
+
+async function runDemo() {
+    try {
+        const btn = document.getElementById('runDemoBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        
+        const response = await fetch('/api/v1/applications/demo', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        window.location.href = `/results/${result.application_id}`;
+    } catch (error) {
+        alert('Error running demo: ' + error.message);
+        const btn = document.getElementById('runDemoBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Run Demo Application';
+    }
+}
+
+async function deleteApplication(applicationId) {
+    if (!confirm(`Are you sure you want to delete application ${applicationId}?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/v1/applications/${applicationId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            // Reload the applications list
+            loadApplications();
+        } else {
+            const error = await response.json();
+            alert('Error deleting application: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Error deleting application: ' + error.message);
+    }
+}
+
+async function clearAllApplications() {
+    if (!confirm('Are you sure you want to delete ALL applications? This cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/v1/applications', {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            // Reload the applications list
+            loadApplications();
+        } else {
+            const error = await response.json();
+            alert('Error clearing applications: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('Error clearing applications: ' + error.message);
+    }
+}
+
+async function runApprovalDemo() {
+    try {
+        const btn = document.getElementById('runApprovalDemoBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        
+        const response = await fetch('/api/v1/applications/demo-approval', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        window.location.href = `/results/${result.application_id}`;
+    } catch (error) {
+        alert('Error running approval demo: ' + error.message);
+        const btn = document.getElementById('runApprovalDemoBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Run Approval Demo (Strong Profile)';
+    }
+}
+
+document.getElementById('runDemoBtn').addEventListener('click', runDemo);
+document.getElementById('runApprovalDemoBtn').addEventListener('click', runApprovalDemo);
+
+// Load applications on page load
+loadApplications();
+</script>
+{% endblock %}

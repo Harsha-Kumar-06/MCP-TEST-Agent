@@ -15,15 +15,9 @@ try:
     from google.genai import types
     GEMINI_AVAILABLE = True
 except ImportError:
-    try:
-        # Fallback to old package if new one not available
-        import google.generativeai as genai
-        types = None
-        GEMINI_AVAILABLE = True
-    except ImportError:
-        GEMINI_AVAILABLE = False
-        genai = None
-        types = None
+    GEMINI_AVAILABLE = False
+    genai = None
+    types = None
 
 try:
     from .models import Portfolio, Position

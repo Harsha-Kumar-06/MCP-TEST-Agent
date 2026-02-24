@@ -184,10 +184,29 @@
 ### 1. Agent Base Class
 ```python
 BaseAgent (Abstract)
-├── analyze(portfolio) → AgentAnalysis
-├── propose_solution() → AgentProposal
-├── vote_on_proposal() → AgentVote
-└── send_message() → void
+├── analyze(portfolio) → AgentAnalysis     # Uses AI (Gemini)
+├── propose_solution() → AgentProposal     # Rule-based
+├── vote_on_proposal() → AgentVote         # Rule-based (optimized)
+├── send_message() → void
+├── _should_use_cached_analysis() → bool   # Caching support
+└── _cache_analysis() → void               # Caching support
+```
+
+### 2. API Integration
+```python
+# New google.genai API (v1.64.0+)
+from google import genai
+from google.genai import types
+
+client = genai.Client(api_key=GEMINI_API_KEY)
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=prompt,
+    config=types.GenerateContentConfig(
+        temperature=0.5,
+        max_output_tokens=4096,
+    )
+)
 ```
 
 ### 2. Specialized Agents
@@ -241,15 +260,18 @@ Message Structure:
 ## 🎯 Consensus Algorithm
 
 ```
-For each iteration (max 10):
-  1. All agents analyze portfolio
-  2. Agents debate via messages
-  3. Collect proposals from agents
+For each iteration (max 15):
+  1. All agents analyze portfolio (AI - cached after first iteration)
+  2. Agents debate via messages (AI)
+  3. Collect proposals from agents (rule-based)
   4. Select best proposal (highest conviction)
-  5. All agents vote on proposal
+  5. All agents vote on proposal (rule-based - no AI)
   6. Calculate approval rate
   
-  If approval_rate >= threshold (60%):
+  If iteration < min_iterations:
+    CONTINUE regardless of approval rate
+  
+  If approval_rate >= threshold (configurable 50-85%):
     CONSENSUS ACHIEVED ✅
     Execute trade plan
     EXIT
@@ -259,6 +281,70 @@ For each iteration (max 10):
     Execute fallback (compliance-first)
     EXIT
 ```
+
+---
+
+## ⚡ Performance Optimizations
+
+### 1. Rule-Based Voting (50% API reduction)
+
+Voting now uses deterministic logic instead of AI calls:
+
+| Agent | Voting Logic |
+|-------|-------------|
+| **Market Analysis** | Checks trade count, sector alignment |
+| **Risk Assessment** | Evaluates compliance violations |
+| **Tax Strategy** | Calculates tax liability % of portfolio |
+| **ESG Compliance** | Checks portfolio avg ESG ≥ 60 |
+| **Algorithmic Trading** | Estimates execution cost in bps |
+
+### 1b. Iteration-Aware Voting (Feb 2026)
+
+Voting thresholds now adjust progressively to encourage consensus:
+
+| Agent | Base Threshold | Per-Iteration Adjustment |
+|-------|----------------|--------------------------|
+| **Market Analysis** | 30% bad trades | +5% tolerance per iteration |
+| **Risk Assessment** | 3 violations | +1 allowed per iteration |
+| **Tax Strategy** | 15% tax liability | +3% tolerance per iteration |
+| **ESG Compliance** | ESG avg ≥ 60 | -3 threshold per iteration |
+| **Algorithmic Trading** | 50 bps cost | +10 bps tolerance per iteration |
+
+**Behavior:**
+- Iteration 1: Strict thresholds for high-quality proposals
+- Iteration 2-3: Moderate leniency, some compromise
+- Iteration 4+: High leniency, focus on reaching consensus
+- Vote rationale includes iteration context (e.g., "Iter 3: threshold 45%")
+
+```python
+# Example: Tax Strategy voting logic
+total_value = portfolio.total_value
+gain_pct = (total_tax / total_value) * 100
+if total_tax > 100000 and gain_pct > 2.0:
+    vote_type = VoteType.REJECT
+else:
+    vote_type = VoteType.APPROVE
+```
+
+### 2. Analysis Caching (eliminates redundant AI calls)
+
+```python
+def _should_use_cached_analysis(self, portfolio):
+    if self.current_iteration == 0:
+        return False
+    return self._get_portfolio_hash(portfolio) == self._last_portfolio_hash
+
+# Result: 5 AI calls on iteration 1, 0 AI calls on iterations 2+
+```
+
+### 3. API Call Summary
+
+| Operation | Before | After |
+|-----------|--------|-------|
+| Analysis (per agent) | 1 AI call | 1 AI call (cached) |
+| Debate (per agent) | 1 AI call | 1 AI call |
+| Voting (per agent) | 1 AI call | 0 (rule-based) |
+| **Total per iteration** | 15 calls | 5-10 calls |
 
 ---
 
@@ -288,6 +374,55 @@ For each iteration (max 10):
 │     • Output validation                 │
 │     • Trade limit checks                │
 └─────────────────────────────────────────┘
+```
+
+---
+
+## 🎯 Strategy Selection System
+
+### 10 Available Strategies
+
+| Strategy | Stars | Effectiveness | Best For |
+|----------|-------|---------------|----------|
+| **Balanced** | ⭐⭐⭐⭐⭐ | Excellent | Most investors |
+| **Tax Efficient** | ⭐⭐⭐⭐ | Excellent | High-tax situations |
+| **ESG Focused** | ⭐⭐⭐⭐ | Very Good | Sustainable investors |
+| **Risk Minimization** | ⭐⭐⭐⭐ | Very Good | Conservative investors |
+| **Conservative Income** | ⭐⭐⭐ | Good | Retirees, income seekers |
+| **Dividend Growth** | ⭐⭐⭐ | Good | Long-term holders |
+| **Value Investing** | ⭐⭐⭐ | Good | Patient investors |
+| **Sector Rotation** | ⭐⭐ | Moderate | Active traders |
+| **Momentum Trading** | ⭐⭐ | Moderate | Trend followers |
+| **Aggressive Growth** | ⭐ | Variable | High risk tolerance |
+
+### Portfolio-Adaptive Ratings
+
+Ratings adjust ±2 stars based on portfolio characteristics:
+
+```
+getStrategyRating(strategy, portfolio):
+  baseRating = strategy.star_rating
+  adjustment = 0
+  reason = []
+  
+  # High-beta portfolios need risk management
+  if portfolio.beta > 1.2:
+    if strategy == "Risk Minimization": adjustment += 1.5
+    if strategy == "Aggressive Growth": adjustment -= 1.5
+  
+  # Low-ESG portfolios benefit from ESG strategy
+  if portfolio.avg_esg < 65:
+    if strategy == "ESG Focused": adjustment += 1.5
+  
+  # High sector concentration needs diversification
+  if portfolio.max_sector_pct > 35%:
+    if strategy == "Balanced": adjustment += 1.0
+  
+  # Large portfolios benefit from tax optimization
+  if portfolio.total_value > $1M:
+    if strategy == "Tax Efficient": adjustment += 1.0
+  
+  return clamp(baseRating + adjustment, 1, 5)
 ```
 
 ---

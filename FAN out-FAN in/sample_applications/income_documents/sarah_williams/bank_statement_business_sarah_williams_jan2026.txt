@@ -1,0 +1,109 @@
+═══════════════════════════════════════════════════════════════════════════════
+                             ╔════════════════════╗
+                             ║   WELLS FARGO      ║
+                             ╚════════════════════╝
+                         BUSINESS CHECKING STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+Statement Period: January 1, 2026 - January 31, 2026
+Account Type: Business Market Rate Checking
+Account Number: ****9847
+Statement Date: February 1, 2026
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT HOLDER INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Business Name: Williams Design Studio LLC
+DBA: Williams Design Studio
+Owner: Sarah Elizabeth Williams
+Address: 234 Congress Avenue
+         Austin, TX 78701
+EIN: 84-2947156
+
+───────────────────────────────────────────────────────────────────────────────
+ACCOUNT SUMMARY
+───────────────────────────────────────────────────────────────────────────────
+
+Beginning Balance (01/01/2026) .......................... $   42,847.15
+Total Deposits and Credits .............................. $   14,200.00
+Total Withdrawals and Debits ............................ $   (8,547.82)
+                                                          ──────────────
+Ending Balance (01/31/2026) ............................. $   48,499.33
+
+───────────────────────────────────────────────────────────────────────────────
+DEPOSITS AND CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/03/2026  ACH CREDIT AUSTIN TECH CORP INV#2026-001          $4,800.00
+01/08/2026  ZELLE FROM DOWNTOWN DENTAL BRANDING               $2,400.00
+01/15/2026  ACH CREDIT RIVERSIDE REALTY INV#2026-002          $3,200.00
+01/22/2026  CHECK DEPOSIT #4847 - BLOOM CAFE                  $1,800.00
+01/28/2026  WIRE TRANSFER - NEXGEN SOLUTIONS LOGO             $2,000.00
+                                                            ──────────
+Total Deposits and Credits                                   $14,200.00
+
+───────────────────────────────────────────────────────────────────────────────
+WITHDRAWALS AND DEBITS
+───────────────────────────────────────────────────────────────────────────────
+
+Date        Description                                        Amount
+──────────  ─────────────────────────────────────────────    ──────────
+01/02/2026  ACH DEBIT ADOBE CREATIVE CLOUD                    ($659.88)
+01/03/2026  DEBIT CARD OFFICE DEPOT #847                       ($84.27)
+01/05/2026  ACH DEBIT FIGMA INC                               ($144.00)
+01/05/2026  TRANSFER TO PERSONAL CHECKING ****3421          ($4,000.00)
+01/08/2026  DEBIT CARD ENVATO ELEMENTS                        ($198.00)
+01/10/2026  ACH DEBIT CANVA PTY LTD                           ($149.99)
+01/12/2026  CHECK #1047 - MARIA SANTOS (CONTRACTOR)           ($800.00)
+01/15/2026  DEBIT CARD STAPLES                                 ($67.42)
+01/18/2026  ACH DEBIT SQUARESPACE HOSTING                     ($192.00)
+01/20/2026  TRANSFER TO PERSONAL CHECKING ****3421          ($1,500.00)
+01/22/2026  DEBIT CARD GOOGLE WORKSPACE                        ($72.00)
+01/25/2026  DEBIT CARD SHUTTERSTOCK                           ($249.00)
+01/28/2026  ACH DEBIT IRS EFTPS Q4 EST TAX                    ($350.00)
+01/30/2026  DEBIT CARD DROPBOX BUSINESS                        ($81.26)
+                                                            ──────────
+Total Withdrawals and Debits                                ($8,547.82)
+
+───────────────────────────────────────────────────────────────────────────────
+YEAR-TO-DATE SUMMARY (2026)
+───────────────────────────────────────────────────────────────────────────────
+
+Total Revenue Deposited (YTD) ........................... $   14,200.00
+Total Business Expenses (YTD) ........................... $    3,047.82
+Owner Draws (YTD) ....................................... $    5,500.00
+Estimated Tax Payments (YTD) ............................ $      350.00
+
+───────────────────────────────────────────────────────────────────────────────
+LINKED ACCOUNTS
+───────────────────────────────────────────────────────────────────────────────
+
+Account Type                    Account Number       Balance
+────────────────────────────    ──────────────       ───────────
+Personal Checking               ****3421             $ 18,456.00
+Business Savings                ****9850             $ 25,000.00
+Business Credit Card            ****4782             $  1,247.00 (balance)
+
+═══════════════════════════════════════════════════════════════════════════════
+                          AVERAGE MONTHLY DEPOSITS
+                         (Rolling 12-Month History)
+═══════════════════════════════════════════════════════════════════════════════
+
+Month          Deposits       Month          Deposits
+─────────      ───────────    ─────────      ───────────
+Feb 2025       $ 10,800.00    Aug 2025       $ 11,400.00
+Mar 2025       $ 13,600.00    Sep 2025       $ 13,800.00
+Apr 2025       $ 12,400.00    Oct 2025       $ 14,600.00
+May 2025       $ 11,800.00    Nov 2025       $ 13,200.00
+Jun 2025       $ 14,200.00    Dec 2025       $ 14,800.00
+Jul 2025       $ 10,600.00    Jan 2026       $ 14,200.00
+
+12-Month Average: $12,950.00/month
+═══════════════════════════════════════════════════════════════════════════════
+
+Questions? Call Business Banking at 1-800-225-5935 or visit wellsfargo.com
+
+   Member FDIC                              © 2026 Wells Fargo Bank, N.A.
+═══════════════════════════════════════════════════════════════════════════════

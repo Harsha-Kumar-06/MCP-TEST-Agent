@@ -1,0 +1,47 @@
+================================================================================
+                              FORM W-2 WAGE AND TAX STATEMENT
+                                     TAX YEAR 2025
+================================================================================
+
+EMPLOYER INFORMATION                          EMPLOYEE INFORMATION
+--------------------------------------------------------------------------------
+Employer Name: TechCorp Industries LLC        Employee Name: John Wilson
+Employer Address: 1500 Innovation Drive       Employee SSN: XXX-XX-4521
+                  San Jose, CA 95110          Employee Address: 456 Oak Avenue
+Employer EIN: 94-3847562                                       San Francisco, CA 94102
+
+================================================================================
+                              WAGES AND TAX INFORMATION
+================================================================================
+
+Box 1 - Wages, tips, other compensation:         $127,500.00
+Box 2 - Federal income tax withheld:             $25,500.00
+Box 3 - Social Security wages:                   $127,500.00
+Box 4 - Social Security tax withheld:            $7,905.00
+Box 5 - Medicare wages and tips:                 $127,500.00
+Box 6 - Medicare tax withheld:                   $1,848.75
+
+--------------------------------------------------------------------------------
+Box 12 - Codes and amounts:
+    D - Elective deferrals to 401(k):            $20,500.00
+    DD - Cost of employer-sponsored health:      $8,400.00
+
+Box 13 - Checkboxes:
+    [X] Statutory employee
+    [ ] Retirement plan
+    [X] Third-party sick pay
+
+Box 14 - Other:
+    CA SDI:                                      $1,275.00
+    
+================================================================================
+STATE AND LOCAL TAX INFORMATION
+================================================================================
+Box 15 - State: CA                   Employer State ID: 123-4567-8
+Box 16 - State wages: $127,500.00
+Box 17 - State income tax: $10,200.00
+
+================================================================================
+This is an official W-2 form. Copy B - To Be Filed With Employee's FEDERAL Tax Return
+Form W-2 Department of the Treasury - Internal Revenue Service
+================================================================================

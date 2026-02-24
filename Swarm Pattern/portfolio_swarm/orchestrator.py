@@ -77,6 +77,12 @@ class SwarmOrchestrator:
         if self.progress_callback:
             self.progress_callback(0, "Initializing", "Starting multi-agent optimization")
         
+        # Clear rejection feedback from any previous run
+        self._last_rejection_feedback = []
+        for agent in self.agents:
+            if hasattr(agent, 'clear_rejection_feedback'):
+                agent.clear_rejection_feedback()
+        
         # Check initial compliance
         violations = portfolio.get_compliance_violations()
         if violations:
@@ -92,9 +98,13 @@ class SwarmOrchestrator:
             if self.progress_callback:
                 self.progress_callback(iteration + 1, "Analyzing", f"Iteration {iteration + 1}/{self.max_iterations}")
             
-            # Update all agents with current iteration
+            # Update all agents with current iteration and pass rejection feedback
             for agent in self.agents:
                 agent.set_iteration(iteration)
+                agent.set_swarm_context(self.consensus_threshold, len(self.agents), self.max_iterations)
+                # Pass rejection feedback from previous iteration (if any)
+                if iteration > 0 and hasattr(self, '_last_rejection_feedback'):
+                    agent.set_rejection_feedback(self._last_rejection_feedback)
             
             # Phase 1: All agents analyze current state
             if self.progress_callback:
@@ -125,10 +135,37 @@ class SwarmOrchestrator:
             # Save last consensus for fallback
             self.last_consensus = consensus
             
+            # Collect rejection feedback for next iteration
+            # This helps agents adapt their proposals to address concerns
+            self._last_rejection_feedback = []
+            for vote in consensus.votes:
+                if vote.vote == VoteType.REJECT:
+                    # Extract key reason from rationale
+                    self._last_rejection_feedback.append(f"{vote.agent_type.value}: {vote.rationale}")
+                    # Also add specific concerns
+                    if vote.concerns:
+                        self._last_rejection_feedback.extend(vote.concerns)
+            
             # Track iteration history for timeline visualization
             iteration_record = {
                 'iteration': iteration + 1,
                 'approval_rate': consensus.approval_rate,
+                'proposal': {
+                    'from_agent': best_proposal.agent_type.value.replace('_', ' ').title(),
+                    'conviction': best_proposal.conviction,
+                    'rationale': best_proposal.rationale[:150] if len(best_proposal.rationale) > 150 else best_proposal.rationale,
+                    'trades': [
+                        {
+                            'action': t.action,
+                            'ticker': t.ticker,
+                            'shares': t.shares,
+                            'value': t.notional_value
+                        }
+                        for t in best_proposal.trade_plan.trades
+                    ],
+                    'total_notional': best_proposal.trade_plan.total_notional,
+                    'num_trades': len(best_proposal.trade_plan.trades)
+                },
                 'votes': [
                     {
                         'agent': v.agent_type.value.replace('_', ' ').title(),
@@ -138,6 +175,7 @@ class SwarmOrchestrator:
                     for v in consensus.votes
                 ],
                 'key_concerns': self._extract_key_concerns(consensus.votes),
+                'rejection_feedback': self._last_rejection_feedback[:3] if self._last_rejection_feedback else [],
                 'consensus_reached': self._check_consensus(consensus) and (iteration + 1 >= self.min_iterations)
             }
             self.iteration_history.append(iteration_record)
@@ -154,8 +192,23 @@ class SwarmOrchestrator:
                     self.progress_callback(iteration + 1, "Stopped", f"API quota exhausted - stopping early")
                 return self._fallback_strategy(portfolio)
             
-            # Check for consensus (only after min_iterations)
-            if iteration + 1 >= self.min_iterations and self._check_consensus(consensus):
+            # Check for consensus
+            # ALWAYS stop on 100% (unanimous) approval - no point continuing
+            # Otherwise, respect min_iterations setting
+            unanimous = consensus.approval_rate >= 0.99  # 100% or very close
+            consensus_reached = self._check_consensus(consensus)
+            past_min_iterations = iteration + 1 >= self.min_iterations
+            
+            if unanimous and consensus_reached:
+                # 100% approval - always stop immediately
+                logger.info("\n" + "="*80)
+                logger.info("UNANIMOUS CONSENSUS ACHIEVED!")
+                logger.info("="*80)
+                self.consensus_result = consensus
+                if self.progress_callback:
+                    self.progress_callback(iteration + 1, "Complete", f"Unanimous consensus! ({consensus.approval_rate:.0%} approval)")
+                return consensus
+            elif past_min_iterations and consensus_reached:
                 logger.info("\n" + "="*80)
                 logger.info("CONSENSUS ACHIEVED!")
                 logger.info("="*80)

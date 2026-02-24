@@ -1,0 +1,21 @@
+{
+    "name": "loan-underwriter-agent",
+    "version": "1.0.0",
+    "description": "Multi-Agent Loan Underwriting System using Google ADK",
+    "main": "main.py",
+    "scripts": {
+        "start": "python main.py",
+        "dev": "python run.py"
+    },
+    "keywords": [
+        "ai",
+        "agents",
+        "loan",
+        "underwriting",
+        "google-adk",
+        "fastapi",
+        "fan-out-fan-in"
+    ],
+    "author": "",
+    "license": "MIT"
+}

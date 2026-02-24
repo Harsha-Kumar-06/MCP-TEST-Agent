@@ -1,0 +1,128 @@
+═══════════════════════════════════════════════════════════════════════════════
+                                    Form 1040
+                        U.S. Individual Income Tax Return
+                                 Tax Year 2025
+═══════════════════════════════════════════════════════════════════════════════
+
+Department of the Treasury—Internal Revenue Service
+
+Filing Status: ☑ Single  □ Married filing jointly  □ Married filing separately
+               □ Head of household  □ Qualifying surviving spouse
+
+───────────────────────────────────────────────────────────────────────────────
+YOUR INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Your first name and middle initial    Your last name
+Jennifer A.                           Martinez
+
+Your social security number
+XXX-XX-8734
+
+Home address (number and street)
+1250 Pearl Street, Unit 304
+
+City, town, or post office            State    ZIP code
+Denver                                CO       80203
+
+───────────────────────────────────────────────────────────────────────────────
+INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+1   Wages, salaries, tips (from W-2, box 1) .............. $  185,000.00
+2a  Tax-exempt interest ..................................         0.00
+2b  Taxable interest .....................................     1,245.87
+3a  Qualified dividends ..................................     2,150.00
+3b  Ordinary dividends ...................................     2,875.00
+4a  IRA distributions ....................................         0.00
+4b  Taxable amount .......................................         0.00
+5a  Pensions and annuities ...............................         0.00
+5b  Taxable amount .......................................         0.00
+6a  Social security benefits .............................         0.00
+6b  Taxable amount .......................................         0.00
+7   Capital gain or (loss) ...............................     3,450.00
+8   Other income (Schedule 1) ............................         0.00
+9   Total income (add lines 1-8) ......................... $  192,570.87
+
+───────────────────────────────────────────────────────────────────────────────
+ADJUSTMENTS TO INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+10  Adjustments to income (from Schedule 1) ..............     4,150.00
+    (HSA contribution)
+11  Adjusted gross income (line 9 minus line 10) ......... $  188,420.87
+
+───────────────────────────────────────────────────────────────────────────────
+DEDUCTIONS
+───────────────────────────────────────────────────────────────────────────────
+
+12  Standard deduction or itemized deductions ............    14,600.00
+    ☑ Standard deduction
+13  Qualified business income deduction ..................         0.00
+14  Total deductions (add lines 12 and 13) ...............    14,600.00
+
+───────────────────────────────────────────────────────────────────────────────
+TAXABLE INCOME AND TAX
+───────────────────────────────────────────────────────────────────────────────
+
+15  Taxable income (line 11 minus line 14) ............... $  173,820.87
+16  Tax (from Tax Table or Tax Computation Worksheet) ....    34,482.65
+17  Amount from Schedule 2 ...............................         0.00
+18  Add lines 16 and 17 ..................................    34,482.65
+
+───────────────────────────────────────────────────────────────────────────────
+CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+19  Child tax credit/credit for other dependents .........         0.00
+20  Amount from Schedule 3 ...............................         0.00
+21  Add lines 19 and 20 ..................................         0.00
+22  Subtract line 21 from line 18 ........................    34,482.65
+
+───────────────────────────────────────────────────────────────────────────────
+OTHER TAXES
+───────────────────────────────────────────────────────────────────────────────
+
+23  Other taxes (Schedule 2) .............................         0.00
+24  Total tax (add lines 22 and 23) ...................... $   34,482.65
+
+───────────────────────────────────────────────────────────────────────────────
+PAYMENTS
+───────────────────────────────────────────────────────────────────────────────
+
+25  Federal tax withheld (from W-2) ......................    37,185.00
+26  2025 estimated tax payments ..........................         0.00
+27  Earned income credit .................................         0.00
+28  Additional child tax credit ..........................         0.00
+29  American opportunity credit ..........................         0.00
+30  Amount from Schedule 3 ...............................         0.00
+31  Other payments .......................................         0.00
+32  Total payments (add lines 25-31) ..................... $   37,185.00
+
+───────────────────────────────────────────────────────────────────────────────
+REFUND / AMOUNT OWED
+───────────────────────────────────────────────────────────────────────────────
+
+33  Overpayment (line 32 minus line 24) .................. $    2,702.35
+34a Amount to be refunded to you .........................     2,702.35
+34b Routing number: 102000076
+34c Type: ☑ Checking □ Savings
+34d Account number: ****8521
+
+───────────────────────────────────────────────────────────────────────────────
+SIGNATURE
+───────────────────────────────────────────────────────────────────────────────
+
+Under penalties of perjury, I declare that I have examined this return and
+accompanying schedules and statements, and to the best of my knowledge and
+belief, they are true, correct, and complete.
+
+Your signature                                    Date
+Jennifer A. Martinez                              04/12/2026
+
+Your occupation
+Director of Marketing
+
+═══════════════════════════════════════════════════════════════════════════════
+                     Form 1040 - U.S. Individual Income Tax Return
+                                    Tax Year 2025
+═══════════════════════════════════════════════════════════════════════════════

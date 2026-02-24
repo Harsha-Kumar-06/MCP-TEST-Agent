@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="apiGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891B2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="apiGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="apiGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EA580C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="apiGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DB2777;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="500" fill="#F1F5F9"/>
+  
+  <!-- Title -->
+  <text x="400" y="35" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#1E293B" text-anchor="middle">External API Integrations</text>
+  
+  <!-- Center System Box -->
+  <rect x="300" y="200" width="200" height="100" rx="12" fill="#1E293B" filter="url(#shadow2)"/>
+  <text x="400" y="240" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">🏦 LOAN UNDERWRITER</text>
+  <text x="400" y="265" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8" text-anchor="middle">Multi-Agent System</text>
+  <text x="400" y="285" font-family="Arial, sans-serif" font-size="10" fill="#64748B" text-anchor="middle">Google Gemini 2.0 Flash</text>
+  
+  <!-- Google AI Box -->
+  <rect x="300" y="60" width="200" height="70" rx="10" fill="url(#apiGrad1)" filter="url(#shadow2)"/>
+  <text x="400" y="90" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">🤖 Google AI</text>
+  <text x="400" y="110" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Gemini 2.0 Flash LLM</text>
+  <text x="400" y="122" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">AI Analysis Engine</text>
+  <line x1="400" y1="130" x2="400" y2="200" stroke="#06B6D4" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Experian Box -->
+  <rect x="50" y="80" width="180" height="90" rx="10" fill="url(#apiGrad2)" filter="url(#shadow2)"/>
+  <text x="140" y="110" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">📊 Experian</text>
+  <text x="140" y="130" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Credit Reports</text>
+  <text x="140" y="145" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">OAuth2 Password Grant</text>
+  <text x="140" y="160" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">Sandbox Available</text>
+  <path d="M 230 125 L 300 220" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Equifax Box -->
+  <rect x="50" y="200" width="180" height="90" rx="10" fill="url(#apiGrad3)" filter="url(#shadow2)"/>
+  <text x="140" y="230" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">📈 Equifax</text>
+  <text x="140" y="250" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Credit Reports</text>
+  <text x="140" y="265" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">OAuth2 Client Credentials</text>
+  <text x="140" y="280" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">Prequalification API</text>
+  <line x1="230" y1="245" x2="300" y2="245" stroke="#F97316" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- RentCast Box -->
+  <rect x="570" y="80" width="180" height="90" rx="10" fill="#22C55E" filter="url(#shadow2)"/>
+  <text x="660" y="110" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">🏠 RentCast</text>
+  <text x="660" y="130" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Property Valuation</text>
+  <text x="660" y="145" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">API Key Auth</text>
+  <text x="660" y="160" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">✓ WORKING</text>
+  <path d="M 570 125 L 500 220" stroke="#22C55E" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Persona Box -->
+  <rect x="570" y="200" width="180" height="90" rx="10" fill="url(#apiGrad4)" filter="url(#shadow2)"/>
+  <text x="660" y="230" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">🔐 Persona</text>
+  <text x="660" y="250" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Identity Verification</text>
+  <text x="660" y="265" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">KYC / Fraud Detection</text>
+  <text x="660" y="280" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">Sandbox Available</text>
+  <line x1="570" y1="245" x2="500" y2="245" stroke="#EC4899" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Simulated Data Box -->
+  <rect x="300" y="350" width="200" height="70" rx="10" fill="#64748B" filter="url(#shadow2)"/>
+  <text x="400" y="378" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle" font-weight="bold">🎭 Simulated Data</text>
+  <text x="400" y="398" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)" text-anchor="middle">Fallback for Demo/Testing</text>
+  <text x="400" y="413" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">No API Keys Required</text>
+  <line x1="400" y1="300" x2="400" y2="350" stroke="#64748B" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="420" width="700" height="60" rx="8" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="70" y="445" font-family="Arial, sans-serif" font-size="11" fill="#475569" font-weight="bold">API Status:</text>
+  <circle cx="160" cy="442" r="6" fill="#22C55E"/>
+  <text x="175" y="446" font-family="Arial, sans-serif" font-size="10" fill="#475569">Working</text>
+  <circle cx="260" cy="442" r="6" fill="#F59E0B"/>
+  <text x="275" y="446" font-family="Arial, sans-serif" font-size="10" fill="#475569">Configured</text>
+  <circle cx="370" cy="442" r="6" fill="#64748B"/>
+  <text x="385" y="446" font-family="Arial, sans-serif" font-size="10" fill="#475569">Simulated</text>
+  
+  <text x="70" y="468" font-family="Arial, sans-serif" font-size="10" fill="#64748B">Set CREDIT_BUREAU=equifax|experian|simulated in .env to switch credit data source</text>
+</svg>

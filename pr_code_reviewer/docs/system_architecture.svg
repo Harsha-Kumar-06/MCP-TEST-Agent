@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100">
+  <defs>
+    <style>
+      .github-box { fill: #f6f8fa; stroke: #0969da; stroke-width: 2; }
+      .api-box { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .service-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .agent-box { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; }
+      .output-box { fill: #d1fae5; stroke: #059669; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 13px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 15px; font-weight: bold; fill: #1f2937; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #4b5563; }
+      .tiny-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .webhook-arrow { stroke: #0969da; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#0969da" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" class="title-text" font-size="18">System Architecture Overview</text>
+
+  <!-- GitHub Repository -->
+  <rect x="150" y="55" width="600" height="70" rx="8" class="github-box"/>
+  <text x="450" y="80" text-anchor="middle" class="title-text">GitHub Repository</text>
+  <text x="450" y="100" text-anchor="middle" class="small-text">Developer pushes commit to PR</text>
+  <text x="450" y="117" text-anchor="middle" class="tiny-text">Triggers webhook: pull_request event</text>
+  <path d="M 450 125 L 450 165" class="webhook-arrow"/>
+  <text x="475" y="148" class="tiny-text">Webhook</text>
+
+  <!-- FastAPI Webhook Server -->
+  <rect x="100" y="165" width="700" height="110" rx="8" class="api-box"/>
+  <text x="450" y="190" text-anchor="middle" class="title-text">FastAPI Webhook Server</text>
+  <text x="450" y="208" text-anchor="middle" class="small-text">(server.py)</text>
+  <g transform="translate(120, 220)">
+    <text x="0" y="0" class="tiny-text">• POST /webhook - Validate event type</text>
+    <text x="0" y="15" class="tiny-text">• Extract: repo, PR#, commit SHA</text>
+    <text x="0" y="30" class="tiny-text">• Queue background task: process_pr_review()</text>
+    <text x="0" y="45" class="tiny-text">• Return 202 Accepted (prevents timeout)</text>
+  </g>
+  <path d="M 450 275 L 450 315" class="arrow"/>
+
+  <!-- GitHub Service Layer -->
+  <rect x="100" y="315" width="700" height="100" rx="8" class="service-box"/>
+  <text x="450" y="340" text-anchor="middle" class="title-text">GitHub Service Layer</text>
+  <text x="450" y="358" text-anchor="middle" class="small-text">(github_service.py - PyGithub)</text>
+  <g transform="translate(120, 370)">
+    <text x="0" y="0" class="tiny-text">1. Set status checks → "pending"</text>
+    <text x="0" y="15" class="tiny-text">2. Fetch PR metadata (title, author, files)</text>
+    <text x="0" y="30" class="tiny-text">3. Fetch raw unified diff via GitHub API</text>
+  </g>
+  <path d="M 450 415 L 450 455" class="arrow"/>
+  <text x="475" y="438" class="tiny-text">diff_text</text>
+
+  <!-- Google ADK Agent Pipeline -->
+  <rect x="80" y="455" width="740" height="320" rx="8" class="agent-box"/>
+  <text x="450" y="480" text-anchor="middle" class="title-text">Google ADK Agent Pipeline</text>
+  <text x="450" y="498" text-anchor="middle" class="small-text">(agent.py)</text>
+
+  <!-- Parallel Review Swarm -->
+  <rect x="100" y="515" width="700" height="140" rx="6" style="fill: #faf5ff; stroke: #a855f7; stroke-width: 1.5;"/>
+  <text x="450" y="535" text-anchor="middle" class="text" font-weight="bold">Parallel Review Swarm (ParallelAgent)</text>
+  
+  <g transform="translate(120, 555)">
+    <rect x="0" y="0" width="120" height="55" rx="4" style="fill: #fff; stroke: #9ca3af; stroke-width: 1;"/>
+    <text x="60" y="18" text-anchor="middle" class="tiny-text" font-weight="bold">Security</text>
+    <text x="60" y="32" text-anchor="middle" class="tiny-text">Auditor</text>
+    <text x="60" y="46" text-anchor="middle" class="tiny-text" fill="#dc2626">Vulnerabilities</text>
+    
+    <rect x="135" y="0" width="120" height="55" rx="4" style="fill: #fff; stroke: #9ca3af; stroke-width: 1;"/>
+    <text x="195" y="18" text-anchor="middle" class="tiny-text" font-weight="bold">Style</text>
+    <text x="195" y="32" text-anchor="middle" class="tiny-text">Checker</text>
+    <text x="195" y="46" text-anchor="middle" class="tiny-text" fill="#2563eb">Formatting</text>
+    
+    <rect x="270" y="0" width="120" height="55" rx="4" style="fill: #fff; stroke: #9ca3af; stroke-width: 1;"/>
+    <text x="330" y="18" text-anchor="middle" class="tiny-text" font-weight="bold">Performance</text>
+    <text x="330" y="32" text-anchor="middle" class="tiny-text">Analyzer</text>
+    <text x="330" y="46" text-anchor="middle" class="tiny-text" fill="#f59e0b">Bottlenecks</text>
+    
+    <rect x="405" y="0" width="120" height="55" rx="4" style="fill: #fff; stroke: #9ca3af; stroke-width: 1;"/>
+    <text x="465" y="18" text-anchor="middle" class="tiny-text" font-weight="bold">Logic</text>
+    <text x="465" y="32" text-anchor="middle" class="tiny-text">Verifier</text>
+    <text x="465" y="46" text-anchor="middle" class="tiny-text" fill="#7c3aed">Correctness</text>
+    
+    <rect x="540" y="0" width="120" height="55" rx="4" style="fill: #fff; stroke: #9ca3af; stroke-width: 1;"/>
+    <text x="600" y="18" text-anchor="middle" class="tiny-text" font-weight="bold">Docs</text>
+    <text x="600" y="32" text-anchor="middle" class="tiny-text">Reviewer</text>
+    <text x="600" y="46" text-anchor="middle" class="tiny-text" fill="#059669">Comments</text>
+  </g>
+  
+  <text x="450" y="632" text-anchor="middle" class="tiny-text" style="fill: #7c3aed;">↓ 5 markdown reports ↓</text>
+
+  <!-- Review Synthesizer -->
+  <rect x="150" y="645" width="600" height="110" rx="6" style="fill: #faf5ff; stroke: #a855f7; stroke-width: 1.5;"/>
+  <text x="450" y="665" text-anchor="middle" class="text" font-weight="bold">Review Synthesizer (Decision Engine)</text>
+  <g transform="translate(170, 680)">
+    <text x="0" y="0" class="tiny-text">• Aggregate all reports</text>
+    <text x="0" y="15" class="tiny-text">• Apply decision rules (security HIGH → block merge)</text>
+    <text x="0" y="30" class="tiny-text">• Generate unified summary markdown</text>
+    <text x="0" y="45" class="tiny-text">• Output: {decision, summary_markdown, checks}</text>
+  </g>
+
+  <path d="M 450 775 L 450 815" class="arrow"/>
+  <text x="480" y="798" class="tiny-text">{decision, summary}</text>
+
+  <!-- GitHub Service Layer (Write) -->
+  <rect x="100" y="815" width="700" height="115" rx="8" class="output-box"/>
+  <text x="450" y="840" text-anchor="middle" class="title-text">GitHub Service Layer (Write)</text>
+  <g transform="translate(120, 855)">
+    <text x="0" y="0" class="small-text">1. Post comment on PR with summary_markdown</text>
+    <text x="0" y="18" class="small-text">2. Set status checks per category (security, style, etc.)</text>
+    <text x="0" y="36" class="small-text">3. Set overall-decision status (success/failure)</text>
+    <text x="0" y="58" class="tiny-text" font-weight="bold" fill="#dc2626">If REQUEST_CHANGES → Merge button blocked ❌</text>
+    <text x="0" y="73" class="tiny-text" font-weight="bold" fill="#059669">If APPROVE → Merge button enabled ✅</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(100, 980)">
+    <text x="0" y="0" class="title-text" font-size="14">Legend:</text>
+    <rect x="0" y="10" width="50" height="20" rx="4" class="github-box"/>
+    <text x="58" y="24" class="tiny-text">GitHub</text>
+    <rect x="120" y="10" width="50" height="20" rx="4" class="api-box"/>
+    <text x="178" y="24" class="tiny-text">FastAPI</text>
+    <rect x="240" y="10" width="50" height="20" rx="4" class="service-box"/>
+    <text x="298" y="24" class="tiny-text">Service</text>
+    <rect x="360" y="10" width="50" height="20" rx="4" class="agent-box"/>
+    <text x="418" y="24" class="tiny-text">Agents</text>
+    <rect x="480" y="10" width="50" height="20" rx="4" class="output-box"/>
+    <text x="538" y="24" class="tiny-text">Output</text>
+  </g>
+</svg>

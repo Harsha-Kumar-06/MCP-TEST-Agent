@@ -1,0 +1,109 @@
+═══════════════════════════════════════════════════════════════════════════════
+                          MOUNTAIN HEALTH SYSTEMS
+                          EMPLOYEE EARNINGS STATEMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+COMPANY INFORMATION                      PAY PERIOD INFORMATION
+──────────────────────                   ──────────────────────
+Mountain Health Systems                  Pay Period: 01/05/2026 - 01/18/2026
+4700 Arapahoe Avenue                     Pay Date: 01/24/2026
+Boulder, CO 80303                        Check Number: DIR-DEP-284715
+EIN: 84-1592847
+
+EMPLOYEE INFORMATION
+────────────────────
+Name: Emily M. Rodriguez                 Employee ID: MHS-2023-2847
+SSN: XXX-XX-2847                         Department: Medical-Surgical Unit
+Address: 567 Pearl Street, Apt 305       Position: Registered Nurse (RN)
+         Boulder, CO 80302               Hourly Rate: $35.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                                  EARNINGS
+═══════════════════════════════════════════════════════════════════════════════
+
+Description                    Hours      Rate           Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Regular Hours                  72.00      $35.00      $2,520.00    $5,040.00
+Overtime (1.5x)                 4.00      $52.50        $210.00      $420.00
+Evening Shift Diff              8.00       $3.00         $24.00       $48.00
+Weekend Shift Diff             16.00       $4.50         $72.00      $144.00
+                                                     ──────────   ──────────
+GROSS EARNINGS                                       $2,826.00    $5,652.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                                DEDUCTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+TAXES                                                Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Federal Income Tax                                    $339.12      $678.24
+Social Security (OASDI)                               175.21       350.42
+Medicare                                               40.98        81.96
+CO State Income Tax                                   124.34       248.68
+                                                   ──────────   ──────────
+Total Taxes                                          $679.65    $1,359.30
+
+PRE-TAX DEDUCTIONS                                   Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+403(b) Contribution (6%)                             $169.56      $339.12
+Health Insurance - Employee                           120.00       240.00
+Dental Insurance                                       22.50        45.00
+Vision Insurance                                        8.00        16.00
+HSA Contribution                                       50.00       100.00
+                                                   ──────────   ──────────
+Total Pre-Tax Deductions                             $370.06      $740.12
+
+POST-TAX DEDUCTIONS                                  Current        YTD
+─────────────────────────────────────────────────────────────────────────────
+Supplemental Life Insurance                           $12.00       $24.00
+                                                   ──────────   ──────────
+Total Post-Tax Deductions                             $12.00       $24.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                             PAY SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+                                                    Current        YTD
+                                                   ──────────   ──────────
+Gross Earnings                                     $2,826.00    $5,652.00
+Pre-Tax Deductions                                  (370.06)     (740.12)
+Taxable Gross                                      $2,455.94    $4,911.88
+Taxes                                               (679.65)   (1,359.30)
+Post-Tax Deductions                                  (12.00)      (24.00)
+                                                   ══════════   ══════════
+NET PAY                                            $1,764.29    $3,528.58
+
+═══════════════════════════════════════════════════════════════════════════════
+                          PAYMENT INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+Payment Method: Direct Deposit
+Bank: First Bank of Boulder
+Account: ****4892
+Routing: ****1023
+Amount Deposited: $1,764.29
+
+═══════════════════════════════════════════════════════════════════════════════
+                           LEAVE BALANCES
+═══════════════════════════════════════════════════════════════════════════════
+
+Leave Type                    Accrued    Used      Available
+─────────────────────────────────────────────────────────────
+PTO (Vacation + Sick)          92.00    16.00       76.00 hours
+Personal Days                  16.00     0.00       16.00 hours
+Floating Holiday               8.00      0.00        8.00 hours
+
+═══════════════════════════════════════════════════════════════════════════════
+                          SCHEDULE INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+Current Schedule: 3x12 hour shifts (36 hrs/week base)
+Unit: Medical-Surgical Unit, 3rd Floor
+Primary Shift: Days (7:00 AM - 7:00 PM)
+Certification: RN-BSN, BLS, ACLS
+License: Colorado RN #RN.0123456 (exp: 09/30/2026)
+
+═══════════════════════════════════════════════════════════════════════════════
+Questions about your pay? Contact HR at hr@mountainhealth.org or ext. 2500
+Employee Self-Service Portal: https://employees.mountainhealth.org
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 1650">
+  <defs>
+    <style>
+      .step-box { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .decision-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .process-box { fill: #fff; stroke: #6b7280; stroke-width: 2; }
+      .agent-box { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; }
+      .success-box { fill: #d1fae5; stroke: #059669; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 13px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 15px; font-weight: bold; fill: #1f2937; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #4b5563; }
+      .tiny-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .decision-arrow { stroke: #f59e0b; stroke-width: 2; fill: none; marker-end: url(#arrowhead-orange); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+    <marker id="arrowhead-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#f59e0b" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="425" y="30" text-anchor="middle" class="title-text" font-size="18">End-to-End Process Flow</text>
+
+  <!-- Step 1 -->
+  <rect x="150" y="55" width="550" height="50" rx="8" class="step-box"/>
+  <text x="425" y="83" text-anchor="middle" class="text">Developer pushes code to PR</text>
+  <path d="M 425 105 L 425 140" class="arrow"/>
+
+  <!-- Step 2 -->
+  <rect x="200" y="140" width="450" height="45" rx="8" class="process-box"/>
+  <text x="425" y="167" text-anchor="middle" class="text">GitHub triggers webhook event</text>
+  <path d="M 425 185 L 425 220" class="arrow"/>
+
+  <!-- Step 3 -->
+  <rect x="150" y="220" width="550" height="60" rx="8" class="step-box"/>
+  <text x="425" y="243" text-anchor="middle" class="text">Webhook received by FastAPI</text>
+  <text x="425" y="261" text-anchor="middle" class="small-text">POST /webhook with PR payload</text>
+  <path d="M 425 280 L 425 315" class="arrow"/>
+
+  <!-- Decision 1 -->
+  <polygon points="425,315 545,355 425,395 305,355" class="decision-box"/>
+  <text x="425" y="360" text-anchor="middle" class="small-text">PR event?</text>
+  <path d="M 305 355 L 200 355" class="decision-arrow"/>
+  <text x="265" y="347" class="tiny-text">No</text>
+  <rect x="80" y="335" width="120" height="40" rx="6" class="process-box"/>
+  <text x="140" y="358" text-anchor="middle" class="tiny-text">Return 200</text>
+  <text x="140" y="372" text-anchor="middle" class="tiny-text">(ignored)</text>
+  
+  <path d="M 425 395 L 425 435" class="decision-arrow"/>
+  <text x="445" y="420" class="tiny-text">Yes</text>
+
+  <!-- Step 4 -->
+  <rect x="200" y="435" width="450" height="55" rx="8" class="step-box"/>
+  <text x="425" y="458" text-anchor="middle" class="text">Extract metadata</text>
+  <text x="425" y="476" text-anchor="middle" class="small-text">(repo, PR#, SHA)</text>
+  <path d="M 425 490 L 425 525" class="arrow"/>
+
+  <!-- Step 5 -->
+  <rect x="200" y="525" width="450" height="50" rx="8" class="step-box"/>
+  <text x="425" y="548" text-anchor="middle" class="text">Queue background task</text>
+  <text x="425" y="565" text-anchor="middle" class="small-text">process_pr_review()</text>
+  <path d="M 425 575 L 425 610" class="arrow"/>
+
+  <!-- Step 6 -->
+  <rect x="200" y="610" width="450" height="50" rx="8" class="success-box"/>
+  <text x="425" y="635" text-anchor="middle" class="text" font-weight="bold">Return 202 to GitHub</text>
+  <text x="425" y="652" text-anchor="middle" class="small-text">(prevents timeout)</text>
+
+  <!-- Background execution marker -->
+  <line x1="50" y1="690" x2="800" y2="690" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="425" y="709" text-anchor="middle" class="text" font-weight="bold" fill="#dc2626">Background Task Execution</text>
+  <line x1="50" y1="720" x2="800" y2="720" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,5"/>
+
+  <!-- Step 7 -->
+  <rect x="150" y="735" width="550" height="45" rx="8" class="step-box"/>
+  <text x="425" y="762" text-anchor="middle" class="text">Set status checks → "pending"</text>
+  <path d="M 425 780 L 425 810" class="arrow"/>
+
+  <!-- Step 8 -->
+  <rect x="200" y="810" width="450" height="45" rx="8" class="step-box"/>
+  <text x="425" y="837" text-anchor="middle" class="text">Fetch PR diff from GitHub</text>
+  <path d="M 425 855 L 425 885" class="arrow"/>
+
+  <!-- Step 9 -->
+  <rect x="150" y="885" width="550" height="70" rx="8" class="step-box"/>
+  <text x="425" y="908" text-anchor="middle" class="text">Create ADK session</text>
+  <text x="425" y="926" text-anchor="middle" class="small-text">session_id = repo_prnum_uuid</text>
+  <text x="425" y="943" text-anchor="middle" class="small-text">Construct input: {repo, pr_number, language, diff}</text>
+  <path d="M 425 955 L 425 990" class="arrow"/>
+
+  <!-- Step 10 -->
+  <rect x="100" y="990" width="650" height="55" rx="8" class="agent-box"/>
+  <text x="425" y="1013" text-anchor="middle" class="text" font-weight="bold">Run root_agent via runner.run_async()</text>
+  <text x="425" y="1031" text-anchor="middle" class="small-text">parallel_review_swarm → review_synthesizer</text>
+  <path d="M 425 1045 L 425 1080" class="arrow"/>
+
+  <!-- Step 11 -->
+  <rect x="150" y="1080" width="550" height="60" rx="8" class="agent-box"/>
+  <text x="425" y="1103" text-anchor="middle" class="text" font-weight="bold">Parse JSON response</text>
+  <text x="425" y="1121" text-anchor="middle" class="small-text">{decision, summary_markdown, checks}</text>
+  <path d="M 425 1140 L 425 1175" class="arrow"/>
+
+  <!-- Step 12 -->
+  <rect x="150" y="1175" width="550" height="55" rx="8" class="step-box"/>
+  <text x="425" y="1198" text-anchor="middle" class="text">Post comment on GitHub PR</text>
+  <text x="425" y="1216" text-anchor="middle" class="small-text">(summary_markdown with fixes)</text>
+  <path d="M 425 1230 L 425 1265" class="arrow"/>
+
+  <!-- Step 13 -->
+  <rect x="150" y="1265" width="550" height="55" rx="8" class="step-box"/>
+  <text x="425" y="1288" text-anchor="middle" class="text">Set status checks per category</text>
+  <text x="425" y="1306" text-anchor="middle" class="small-text">(security, style, performance, logic)</text>
+  <path d="M 425 1320 L 425 1355" class="arrow"/>
+
+  <!-- Step 14 -->
+  <rect x="150" y="1355" width="550" height="65" rx="8" class="step-box"/>
+  <text x="425" y="1378" text-anchor="middle" class="text">Set overall-decision status</text>
+  <text x="425" y="1396" text-anchor="middle" class="tiny-text">success → unblocks merge button</text>
+  <text x="425" y="1411" text-anchor="middle" class="tiny-text">failure → blocks merge button</text>
+  <path d="M 425 1420 L 425 1455" class="arrow"/>
+
+  <!-- Step 15 -->
+  <rect x="100" y="1455" width="650" height="70" rx="8" class="success-box"/>
+  <text x="425" y="1483" text-anchor="middle" class="title-text">Review complete ✅</text>
+  <text x="425" y="1503" text-anchor="middle" class="small-text">Developer sees comment &amp; status checks on PR</text>
+
+  <!-- Legend -->
+  <g transform="translate(150, 1570)">
+    <text x="0" y="0" class="title-text" font-size="14">Legend:</text>
+    <rect x="0" y="10" width="50" height="20" rx="4" class="step-box"/>
+    <text x="58" y="24" class="tiny-text">Step</text>
+    <polygon points="140,10 165,20 140,30 115,20" class="decision-box"/>
+    <text x="173" y="24" class="tiny-text">Decision</text>
+    <rect x="250" y="10" width="50" height="20" rx="4" class="agent-box"/>
+    <text x="308" y="24" class="tiny-text">Agent</text>
+    <rect x="380" y="10" width="50" height="20" rx="4" class="success-box"/>
+    <text x="438" y="24" class="tiny-text">Success</text>
+  </g>
+</svg>

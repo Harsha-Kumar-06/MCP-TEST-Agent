@@ -16,6 +16,8 @@ When a developer submits code, this agent wakes up, reads the specific lines of 
 ## ⚙️ Technical Deep Dive
 **Architecture**: Event-Driven Parallel Swarm with Decision Engine.
 
+![System Architecture](docs/system_architecture.svg)
+
 ### Event Listener (`server.py`)
 - A FastAPI server listening for GitHub Webhooks (`pull_request` events).
 - When GitHub pings the server, it triggers a `BackgroundTask` so GitHub doesn't time out.
@@ -29,6 +31,8 @@ When a developer submits code, this agent wakes up, reads the specific lines of 
 - **Processing**: The `ParallelAgent` sends this diff to 5 sub-agents (security, style, performance, logic, docs) simultaneously.
 - **Specialized Output**: We forced these agents to output structured data: File | Line | Issue | Fix.
 
+![Parallel Pipeline](docs/parallel_pipeline.svg)
+
 ### The Synthesizer (Decision Engine)
 - This is the brain. It waits for all 5 reports.
 - It executes **Logic Rules**:
@@ -38,6 +42,9 @@ When a developer submits code, this agent wakes up, reads the specific lines of 
 
 ### Action
 - The `server.py` takes the final decision and posts it back to GitHub as a comment. It also marks the Status Checks as "Success" or "Failure" to physically enable/disable the "Merge" button.
+
+### Complete Process Flow
+![Process Flow](docs/process_flow.svg)
 
 ## Setup & Running
 1. Install dependencies:

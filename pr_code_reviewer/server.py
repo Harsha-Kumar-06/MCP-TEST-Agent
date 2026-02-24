@@ -98,12 +98,7 @@ async def process_pr_review(repo_name: str, pr_number: int, commit_sha: str, lan
         logger.info(f"📋 Fetching PR metadata...")
         pr_metadata = gh_service.get_pr_metadata(repo_name, pr_number)
         
-        # 2. Update Status to Pending
-        logger.info(f"⏳ Setting status checks to pending...")
-        gh_service.set_status_check(repo_name, commit_sha, "pending", "AI Agents are reviewing code...", "security")
-        gh_service.set_status_check(repo_name, commit_sha, "pending", "AI Agents are reviewing code...", "logic")
-
-        # 3. Fetch Diff
+        # 2. Fetch Diff
         logger.info(f"📥 Fetching PR diff...")
         diff_text = gh_service.get_pr_diff(repo_name, pr_number)
         
@@ -163,24 +158,11 @@ async def process_pr_review(repo_name: str, pr_number: int, commit_sha: str, lan
         logger.info(f"💬 Posting review comment on PR #{pr_number}...")
         comment_header = f"## 🤖 AI Code Review: {decision}\n\n"
         gh_service.post_comment(repo_name, pr_number, comment_header + summary)
-
-        # 8. Update Status Checks
-        logger.info(f"🔄 Updating status checks...")
-        for check_name, check_status in checks.items():
-            state = "success" if check_status == "success" else "failure"
-            desc = f"{check_name.capitalize()} check {state}."
-            gh_service.set_status_check(repo_name, commit_sha, state, desc, check_name)
-            logger.info(f"  ✓ {check_name}: {state}")
-
-        # 9. Final Decision Check
-        final_state = "success" if decision == "APPROVE" else "failure"
-        gh_service.set_status_check(repo_name, commit_sha, final_state, f"Overall Decision: {decision}", "overall-decision")
         
         logger.info(f"🎉 Completed review for {repo_name} PR #{pr_number} - Decision: {decision}")
 
     except Exception as e:
         logger.error(f"❌ Error in processing PR: {e}")
-        gh_service.set_status_check(repo_name, commit_sha, "error", "Internal Agent Error", "overall-decision")
 
 @app.post("/webhook")
 async def github_webhook(request: Request, background_tasks: BackgroundTasks):

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="creditGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="propertyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="fraudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="aggregatorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6D28D9;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#F8FAFC"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1E293B" text-anchor="middle">Loan Underwriter - Fan-Out/Fan-In Architecture</text>
+  
+  <!-- Input Box -->
+  <rect x="325" y="60" width="250" height="50" rx="8" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="450" y="92" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">📋 Loan Application Input</text>
+  
+  <!-- Fan-Out Arrow -->
+  <path d="M 450 110 L 450 140" stroke="#64748B" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  
+  <!-- Fan-Out Box -->
+  <rect x="350" y="145" width="200" height="35" rx="6" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+  <text x="450" y="168" font-family="Arial, sans-serif" font-size="12" fill="#475569" text-anchor="middle" font-weight="bold">⚡ FAN-OUT (Parallel Execution)</text>
+  
+  <!-- Parallel Lines -->
+  <path d="M 450 180 L 450 210 L 150 210 L 150 240" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  <path d="M 450 180 L 450 240" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  <path d="M 450 180 L 450 210 L 750 210 L 750 240" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  
+  <!-- Credit Agent Box -->
+  <rect x="50" y="240" width="200" height="160" rx="10" fill="url(#creditGrad)" filter="url(#shadow)"/>
+  <text x="150" y="270" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">🏦 CREDIT AGENT</text>
+  <line x1="70" y1="285" x2="230" y2="285" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="150" y="310" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Experian/Equifax API</text>
+  <text x="150" y="330" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Credit Score Analysis</text>
+  <text x="150" y="350" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• DTI Calculation</text>
+  <text x="150" y="370" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Payment History</text>
+  <rect x="70" y="380" width="160" height="15" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="150" y="391" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Weight: 40%</text>
+  
+  <!-- Property Agent Box -->
+  <rect x="350" y="240" width="200" height="160" rx="10" fill="url(#propertyGrad)" filter="url(#shadow)"/>
+  <text x="450" y="270" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">🏠 PROPERTY AGENT</text>
+  <line x1="370" y1="285" x2="530" y2="285" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="450" y="310" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• RentCast API</text>
+  <text x="450" y="330" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Property Valuation</text>
+  <text x="450" y="350" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• LTV Analysis</text>
+  <text x="450" y="370" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Market Trends</text>
+  <rect x="370" y="380" width="160" height="15" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="450" y="391" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Weight: 35%</text>
+  
+  <!-- Fraud Agent Box -->
+  <rect x="650" y="240" width="200" height="160" rx="10" fill="url(#fraudGrad)" filter="url(#shadow)"/>
+  <text x="750" y="270" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">🔍 FRAUD AGENT</text>
+  <line x1="670" y1="285" x2="830" y2="285" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="750" y="310" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Persona API</text>
+  <text x="750" y="330" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Identity Verification</text>
+  <text x="750" y="350" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Watchlist Check</text>
+  <text x="750" y="370" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">• Behavioral Analysis</text>
+  <rect x="670" y="380" width="160" height="15" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="750" y="391" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Weight: 25%</text>
+  
+  <!-- Convergence Lines -->
+  <path d="M 150 400 L 150 440 L 450 440 L 450 470" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  <path d="M 450 400 L 450 470" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  <path d="M 750 400 L 750 440 L 450 440 L 450 470" stroke="#94A3B8" stroke-width="2" fill="none"/>
+  
+  <!-- Fan-In Box -->
+  <rect x="350" y="425" width="200" height="35" rx="6" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+  <text x="450" y="448" font-family="Arial, sans-serif" font-size="12" fill="#475569" text-anchor="middle" font-weight="bold">🔄 FAN-IN (Aggregate Results)</text>
+  
+  <!-- Aggregator Box -->
+  <rect x="300" y="475" width="300" height="100" rx="10" fill="url(#aggregatorGrad)" filter="url(#shadow)"/>
+  <text x="450" y="505" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" font-weight="bold">🤖 AGGREGATOR AGENT</text>
+  <line x1="320" y1="520" x2="580" y2="520" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  <text x="450" y="545" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">Google Gemini 2.0 Flash • Weighted Risk Calculation</text>
+  <text x="450" y="565" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)" text-anchor="middle">Final Decision: APPROVE | MANUAL_REVIEW | DENY</text>
+  
+  <!-- Output Arrow -->
+  <path d="M 450 575 L 450 605" stroke="#64748B" stroke-width="3" fill="none"/>
+  
+  <!-- Output Box -->
+  <rect x="300" y="610" width="300" height="60" rx="10" fill="#22C55E" filter="url(#shadow)"/>
+  <text x="450" y="640" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle" font-weight="bold">✅ Decision Output</text>
+  <text x="450" y="660" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)" text-anchor="middle">Score: 85% | Processing: ~45 seconds</text>
+  
+  <!-- Performance Badge -->
+  <rect x="720" y="620" width="150" height="40" rx="20" fill="#EF4444"/>
+  <text x="795" y="645" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle" font-weight="bold">⚡ 20x FASTER</text>
+</svg>

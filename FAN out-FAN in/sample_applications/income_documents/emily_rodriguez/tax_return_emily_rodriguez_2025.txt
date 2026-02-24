@@ -1,0 +1,131 @@
+═══════════════════════════════════════════════════════════════════════════════
+                                    Form 1040
+                        U.S. Individual Income Tax Return
+                                 Tax Year 2025
+═══════════════════════════════════════════════════════════════════════════════
+
+Department of the Treasury—Internal Revenue Service
+
+Filing Status: ☑ Single  □ Married filing jointly  □ Married filing separately
+               □ Head of household  □ Qualifying surviving spouse
+
+───────────────────────────────────────────────────────────────────────────────
+YOUR INFORMATION
+───────────────────────────────────────────────────────────────────────────────
+Your first name and middle initial    Your last name
+Emily M.                              Rodriguez
+
+Your social security number
+XXX-XX-2847
+
+Home address (number and street)
+567 Pearl Street, Apt 305
+
+City, town, or post office            State    ZIP code
+Boulder                               CO       80302
+
+───────────────────────────────────────────────────────────────────────────────
+INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+1   Wages, salaries, tips (from W-2, box 1) .............. $   78,000.00
+2a  Tax-exempt interest ..................................          0.00
+2b  Taxable interest .....................................        124.56
+3a  Qualified dividends ..................................          0.00
+3b  Ordinary dividends ...................................          0.00
+4a  IRA distributions ....................................          0.00
+4b  Taxable amount .......................................          0.00
+5a  Pensions and annuities ...............................          0.00
+5b  Taxable amount .......................................          0.00
+6a  Social security benefits .............................          0.00
+6b  Taxable amount .......................................          0.00
+7   Capital gain or (loss) ...............................          0.00
+8   Other income (Schedule 1) ............................          0.00
+9   Total income (add lines 1-8) ......................... $   78,124.56
+
+───────────────────────────────────────────────────────────────────────────────
+ADJUSTMENTS TO INCOME
+───────────────────────────────────────────────────────────────────────────────
+
+10  Student loan interest deduction ...................... $    2,500.00
+11  HSA deduction ........................................      1,200.00
+                                                          ──────────────
+12  Total adjustments .................................... $    3,700.00
+
+13  Adjusted gross income (line 9 minus line 12) ......... $   74,424.56
+
+───────────────────────────────────────────────────────────────────────────────
+DEDUCTIONS
+───────────────────────────────────────────────────────────────────────────────
+
+14  Standard deduction (Single) .......................... $   14,600.00
+    ☑ Standard deduction (not itemizing)
+15  Qualified business income deduction ..................          0.00
+16  Total deductions (add lines 14 and 15) ...............     14,600.00
+
+───────────────────────────────────────────────────────────────────────────────
+TAXABLE INCOME AND TAX
+───────────────────────────────────────────────────────────────────────────────
+
+17  Taxable income (line 13 minus line 16) ............... $   59,824.56
+18  Tax (from Tax Table) .................................      8,447.35
+19  Amount from Schedule 2 ...............................          0.00
+20  Add lines 18 and 19 ..................................      8,447.35
+
+───────────────────────────────────────────────────────────────────────────────
+CREDITS
+───────────────────────────────────────────────────────────────────────────────
+
+21  Child tax credit .....................................          0.00
+22  Amount from Schedule 3:
+    - Lifetime Learning Credit (continuing ed) ...........        800.00
+23  Total credits ........................................        800.00
+24  Tax after credits (line 20 minus line 23) ............ $    7,647.35
+
+───────────────────────────────────────────────────────────────────────────────
+OTHER TAXES
+───────────────────────────────────────────────────────────────────────────────
+
+25  Other taxes (Schedule 2) .............................          0.00
+26  Total tax (add lines 24 and 25) ...................... $    7,647.35
+
+───────────────────────────────────────────────────────────────────────────────
+PAYMENTS
+───────────────────────────────────────────────────────────────────────────────
+
+27  Federal tax withheld (from W-2) ...................... $    9,360.00
+28  2025 estimated tax payments ..........................          0.00
+29  Earned income credit .................................          0.00
+30  Additional child tax credit ..........................          0.00
+31  American opportunity credit ..........................          0.00
+32  Amount from Schedule 3 ...............................          0.00
+33  Other payments .......................................          0.00
+34  Total payments (add lines 27-33) ..................... $    9,360.00
+
+───────────────────────────────────────────────────────────────────────────────
+REFUND OR AMOUNT OWED
+───────────────────────────────────────────────────────────────────────────────
+
+35  Overpayment (line 34 minus line 26) .................. $    1,712.65
+36  Amount to be refunded ................................      1,712.65
+37  Amount applied to 2026 estimated tax .................          0.00
+38  Amount you owe .......................................          0.00
+
+═══════════════════════════════════════════════════════════════════════════════
+                              SIGNATURE SECTION
+═══════════════════════════════════════════════════════════════════════════════
+
+Under penalties of perjury, I declare that I have examined this return and
+accompanying schedules and statements, and to the best of my knowledge and
+belief, they are true, correct, and complete.
+
+Your signature                         Date
+Emily M. Rodriguez                     04/15/2026
+
+Your occupation
+Registered Nurse (RN)
+
+Phone number
+(303) 555-6789
+
+═══════════════════════════════════════════════════════════════════════════════

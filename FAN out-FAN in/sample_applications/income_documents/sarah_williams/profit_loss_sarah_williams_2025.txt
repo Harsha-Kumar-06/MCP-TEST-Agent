@@ -1,0 +1,125 @@
+═══════════════════════════════════════════════════════════════════════════════
+                         WILLIAMS DESIGN STUDIO LLC
+                        PROFIT & LOSS STATEMENT (YTD)
+                       January 1, 2025 - December 31, 2025
+═══════════════════════════════════════════════════════════════════════════════
+
+Business Information:
+   Williams Design Studio LLC
+   234 Congress Avenue
+   Austin, TX 78701
+   EIN: 84-2947156
+
+Owner: Sarah Elizabeth Williams
+
+───────────────────────────────────────────────────────────────────────────────
+                                    REVENUE
+───────────────────────────────────────────────────────────────────────────────
+
+INCOME
+   Design Services - Corporate Clients              $  89,400.00
+   Design Services - Small Business                    42,600.00
+   Logo & Branding Projects                            15,200.00
+   Website Design                                       5,200.00
+                                                    ────────────
+TOTAL REVENUE                                       $ 152,400.00
+
+───────────────────────────────────────────────────────────────────────────────
+                               COST OF GOODS SOLD
+───────────────────────────────────────────────────────────────────────────────
+
+   Stock Photos & Assets                            $   3,400.00
+   Fonts & Typefaces (Commercial)                       1,200.00
+   Print Materials for Clients                          3,600.00
+                                                    ────────────
+TOTAL COGS                                          $   8,200.00
+
+───────────────────────────────────────────────────────────────────────────────
+GROSS PROFIT                                        $ 144,200.00
+───────────────────────────────────────────────────────────────────────────────
+
+───────────────────────────────────────────────────────────────────────────────
+                              OPERATING EXPENSES
+───────────────────────────────────────────────────────────────────────────────
+
+ADVERTISING & MARKETING
+   Online Advertising (Google, Meta)                $   1,800.00
+   Portfolio Website Hosting                              600.00
+                                                    ────────────
+   Subtotal                                         $   2,400.00
+
+PROFESSIONAL SERVICES
+   Accounting Services                              $     900.00
+   Legal Services                                         600.00
+   Contract Designer (overflow work)                    4,800.00
+   Platform Fees (Behance Pro, etc.)                      450.00
+                                                    ────────────
+   Subtotal                                         $   6,750.00
+
+OFFICE & ADMINISTRATIVE
+   Office Supplies                                  $     840.00
+   General Supplies                                     1,240.00
+   Software Subscriptions (Adobe Creative Cloud,        2,400.00
+     Figma, Sketch, Canva Pro)
+   Business Insurance                                   1,200.00
+   Licenses & Permits                                     480.00
+                                                    ────────────
+   Subtotal                                         $   6,160.00
+
+FACILITIES
+   Co-working Space Membership                      $   3,600.00
+   Home Office (Form 8829)                              5,200.00
+   Utilities (allocated)                                  840.00
+                                                    ────────────
+   Subtotal                                         $   9,640.00
+
+TRAVEL & TRANSPORTATION  
+   Vehicle Expenses (mileage)                       $   1,850.00
+   Business Travel                                      1,200.00
+   Client Meals                                           450.00
+   Equipment Rental                                       600.00
+                                                    ────────────
+   Subtotal                                         $   4,100.00
+
+OTHER
+   Depreciation (equipment)                         $   2,400.00
+   Professional Development                               600.00
+   Repairs & Maintenance                                  350.00
+                                                    ────────────
+   Subtotal                                         $   3,350.00
+
+                                                    ────────────
+TOTAL OPERATING EXPENSES                            $  32,400.00
+
+───────────────────────────────────────────────────────────────────────────────
+NET OPERATING INCOME                                $ 111,800.00
+───────────────────────────────────────────────────────────────────────────────
+
+───────────────────────────────────────────────────────────────────────────────
+MONTHLY REVENUE BREAKDOWN - 2025
+───────────────────────────────────────────────────────────────────────────────
+
+Month          Revenue        Expenses       Net Income
+─────────      ───────────    ───────────    ───────────
+January        $ 11,200.00    $  2,450.00    $  8,750.00
+February       $ 10,800.00    $  2,380.00    $  8,420.00
+March          $ 13,600.00    $  2,720.00    $ 10,880.00
+April          $ 12,400.00    $  2,650.00    $  9,750.00
+May            $ 11,800.00    $  2,580.00    $  9,220.00
+June           $ 14,200.00    $  2,840.00    $ 11,360.00
+July           $ 10,600.00    $  2,320.00    $  8,280.00
+August         $ 11,400.00    $  2,480.00    $  8,920.00
+September      $ 13,800.00    $  2,760.00    $ 11,040.00
+October        $ 14,600.00    $  2,920.00    $ 11,680.00
+November       $ 13,200.00    $  2,640.00    $ 10,560.00
+December       $ 14,800.00    $  2,660.00    $ 12,140.00
+               ───────────    ───────────    ───────────
+TOTAL          $152,400.00    $ 32,400.00    $120,000.00
+
+Note: Slight variance from P&L due to timing of expense recognition.
+
+═══════════════════════════════════════════════════════════════════════════════
+Prepared by: Williams Design Studio LLC
+Date: January 31, 2026
+This is an internal document for informational purposes.
+═══════════════════════════════════════════════════════════════════════════════
