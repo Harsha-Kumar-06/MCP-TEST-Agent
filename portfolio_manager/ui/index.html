@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Manager | AI-Powered Investment</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">📈</div>
+            <span>Portfolio Manager</span>
+        </div>
+        <div class="header-actions">
+            <span class="status-badge" id="statusBadge">● Connecting...</span>
+            <button class="btn btn-success" id="downloadBtn" onclick="downloadPortfolioPDF()" style="display: none;">
+                <span>📥</span> Download PDF
+            </button>
+            <button class="btn btn-secondary" onclick="resetForm()">New Portfolio</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Panel - Profile Form -->
+        <div class="profile-panel">
+            <div class="panel-title">
+                <span>📋</span> Investment Profile
+            </div>
+
+            <!-- Form -->
+            <form id="profileForm">
+                <div class="form-section">
+                    <label class="form-label">Investment Capital *</label>
+                    <div class="input-prefix">
+                        <input type="number" class="form-input" id="capital" placeholder="10000" min="100" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Investment Goal *</label>
+                    <select class="form-select" id="goal" required>
+                        <option value="">Select your goal...</option>
+                        <option value="preserve_capital">Preserve Capital - Low risk</option>
+                        <option value="income">Generate Income - Dividends</option>
+                        <option value="balanced_growth">Balanced Growth - Moderate</option>
+                        <option value="aggressive_growth">Aggressive Growth - High risk</option>
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Time Horizon</label>
+                    <select class="form-select" id="horizon">
+                        <option value="">Select time horizon...</option>
+                        <option value="less_than_1_year">Less than 1 year</option>
+                        <option value="1_3_years">1-3 years</option>
+                        <option value="3_5_years" selected>3-5 years</option>
+                        <option value="5_10_years">5-10 years</option>
+                        <option value="10_plus_years">10+ years</option>
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Maximum Acceptable Loss</label>
+                    <select class="form-select" id="maxLoss">
+                        <option value="">Select loss tolerance...</option>
+                        <option value="5">Up to 5%</option>
+                        <option value="10">Up to 10%</option>
+                        <option value="15" selected>Up to 15%</option>
+                        <option value="20">Up to 20%</option>
+                        <option value="30">Up to 30%+</option>
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Investment Experience</label>
+                    <select class="form-select" id="experience">
+                        <option value="">Select experience level...</option>
+                        <option value="none">None - First time investor</option>
+                        <option value="beginner">Beginner - Less than 1 year</option>
+                        <option value="intermediate" selected>Intermediate - 1-5 years</option>
+                        <option value="advanced">Advanced - 5+ years</option>
+                        <option value="expert">Expert - Professional</option>
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Income Stability</label>
+                    <select class="form-select" id="income">
+                        <option value="">Select income stability...</option>
+                        <option value="very_unstable">Very Unstable</option>
+                        <option value="unstable">Somewhat Unstable</option>
+                        <option value="stable" selected>Stable</option>
+                        <option value="very_stable">Very Stable</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="generateBtn">
+                    <span>🚀</span> Generate Portfolio
+                </button>
+            </form>
+
+            <div style="margin-top: 16px; padding: 12px; background: var(--bg-input); border-radius: 8px; font-size: 12px; color: var(--text-secondary);">
+                <strong>How it works:</strong> The AI agent will analyze market conditions, select optimal sectors, 
+                pick quality stocks, and construct a diversified portfolio tailored to your profile.
+            </div>
+        </div>
+
+        <!-- Right Panel - Results -->
+        <div class="results-panel">
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">Overview</div>
+                <div class="tab" onclick="switchTab('holdings')">Holdings</div>
+                <div class="tab" onclick="switchTab('analysis')">Analysis</div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📊</div>
+                <div class="empty-title">No Portfolio Generated</div>
+                <p>Complete your investment profile to generate a personalized portfolio recommendation.</p>
+                <p style="margin-top: 16px; font-size: 13px;">
+                    The AI agent will perform:
+                </p>
+                <div style="margin-top: 12px; text-align: left; display: inline-block;">
+                    <div style="padding: 4px 0; color: var(--text-secondary);">1. 🌍 Macroeconomic Analysis</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">2. 🎯 Sector Selection</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">3. 📈 Stock Selection</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">4. 💼 Portfolio Construction</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">5. 📊 Performance Analysis</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">6. 🔬 Backtesting</div>
+                    <div style="padding: 4px 0; color: var(--text-secondary);">7. 📝 Report Generation</div>
+                </div>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overviewTab" style="display:none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Investment</div>
+                        <div class="stat-value" id="statCapital">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Risk Score</div>
+                        <div class="stat-value" id="statRisk">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Positions</div>
+                        <div class="stat-value" id="statPositions">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sectors</div>
+                        <div class="stat-value" id="statSectors">-</div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Sector Allocation</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="sectorChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Portfolio Composition</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="compositionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holdings Tab -->
+            <div id="holdingsTab" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Portfolio Holdings</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Stock</th>
+                                    <th>Sector</th>
+                                    <th>Shares</th>
+                                    <th>Price</th>
+                                    <th>Value</th>
+                                    <th>Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holdingsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Tab -->
+            <div id="analysisTab" style="display:none;">
+                <div id="analysisContent">
+                    <!-- Populated by JavaScript with agent responses -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">AI Agent Processing Your Portfolio...</div>
+        <div class="loading-steps">
+            <div class="loading-step" id="step1">
+                <div class="step-icon">1</div>
+                <span>Analyzing macroeconomic conditions</span>
+            </div>
+            <div class="loading-step" id="step2">
+                <div class="step-icon">2</div>
+                <span>Selecting optimal sectors</span>
+            </div>
+            <div class="loading-step" id="step3">
+                <div class="step-icon">3</div>
+                <span>Evaluating stock candidates</span>
+            </div>
+            <div class="loading-step" id="step4">
+                <div class="step-icon">4</div>
+                <span>Constructing portfolio allocation</span>
+            </div>
+            <div class="loading-step" id="step5">
+                <div class="step-icon">5</div>
+                <span>Calculating performance metrics</span>
+            </div>
+            <div class="loading-step" id="step6">
+                <div class="step-icon">6</div>
+                <span>Running historical backtest</span>
+            </div>
+            <div class="loading-step" id="step7">
+                <div class="step-icon">7</div>
+                <span>Generating investment report</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
