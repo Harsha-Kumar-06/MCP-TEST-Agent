@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1400">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; }
+      .title-box { fill: #3b82f6; stroke: #2563eb; stroke-width: 2; }
+      .service-box { fill: #f0f9ff; stroke: #3b82f6; stroke-width: 2; }
+      .agent-box { fill: #eff6ff; stroke: #3b82f6; stroke-width: 2; }
+      .tools-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .external-box { fill: #f3f4f6; stroke: #6b7280; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 14px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 16px; font-weight: bold; fill: #ffffff; }
+      .subtitle { font-family: 'Arial', sans-serif; font-size: 12px; fill: #4b5563; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #374151; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .label-bg { fill: #ffffff; stroke: #e5e7eb; stroke-width: 1; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" class="title-text" fill="#1f2937" font-size="24">Access Controller Agent - System Architecture</text>
+
+  <!-- Layer 1: Gmail Inbox -->
+  <rect x="100" y="60" width="1000" height="80" rx="8" class="title-box"/>
+  <text x="600" y="90" text-anchor="middle" class="title-text">Gmail Inbox</text>
+  <text x="600" y="115" text-anchor="middle" class="subtitle" fill="#e5e7eb">User sends: "Give john@co.com Jira access"</text>
+
+  <!-- Arrow -->
+  <path d="M 600 140 L 600 180" class="arrow"/>
+
+  <!-- Layer 2: FastAPI Polling -->
+  <rect x="100" y="180" width="1000" height="140" rx="8" class="box"/>
+  <text x="600" y="210" text-anchor="middle" class="text" font-weight="bold">FastAPI Background Polling Task</text>
+  <text x="600" y="230" text-anchor="middle" class="subtitle">(every 30 seconds)</text>
+  
+  <rect x="150" y="250" width="900" height="55" rx="5" class="label-bg"/>
+  <text x="600" y="270" text-anchor="middle" class="small-text">1. Fetch unread emails via EmailService.fetch_unread()</text>
+  <text x="600" y="285" text-anchor="middle" class="small-text">2. Filter: is_access_request() checks keywords/senders</text>
+  <text x="600" y="300" text-anchor="middle" class="small-text">3. For each access request: process_single_email()</text>
+
+  <!-- Arrow -->
+  <path d="M 600 320 L 600 360" class="arrow"/>
+
+  <!-- Layer 3: Google ADK Agent Pipeline -->
+  <rect x="100" y="360" width="1000" height="240" rx="8" class="agent-box"/>
+  <text x="600" y="390" text-anchor="middle" class="text" font-weight="bold">Google ADK Agent Pipeline</text>
+  <text x="600" y="410" text-anchor="middle" class="subtitle">(agent.py)</text>
+
+  <!-- Coordinator -->
+  <rect x="200" y="430" width="800" height="70" rx="5" class="box"/>
+  <text x="600" y="455" text-anchor="middle" class="text" font-weight="bold">AccessControllerCoordinator (root_agent)</text>
+  <text x="600" y="475" text-anchor="middle" class="small-text">- Parses email intent (platform, user, action)</text>
+  <text x="600" y="490" text-anchor="middle" class="small-text">- Applies intelligent defaults (role: Member, etc.)</text>
+
+  <!-- Sub-agents -->
+  <line x1="600" y1="500" x2="600" y2="520" stroke="#2563eb" stroke-width="2"/>
+  <line x1="250" y1="520" x2="950" y2="520" stroke="#2563eb" stroke-width="2"/>
+  
+  <text x="250" y="545" class="small-text">→ JiraAgent</text>
+  <text x="400" y="545" class="small-text">→ ConfluenceAgent</text>
+  <text x="570" y="545" class="small-text">→ BitbucketAgent</text>
+  <text x="730" y="545" class="small-text">→ GitHubAgent</text>
+  <text x="870" y="545" class="small-text">→ EmailAgent</text>
+  
+  <text x="250" y="565" class="subtitle">(jira_grant_access)</text>
+  <text x="400" y="565" class="subtitle">(confluence_grant_*)</text>
+  <text x="570" y="565" class="subtitle">(bitbucket_grant_*)</text>
+  <text x="730" y="565" class="subtitle">(github_grant_*)</text>
+  <text x="870" y="565" class="subtitle">(email_reply)</text>
+
+  <!-- Arrow -->
+  <path d="M 600 600 L 600 640" class="arrow"/>
+
+  <!-- Layer 4: Tools Layer -->
+  <rect x="100" y="640" width="1000" height="120" rx="8" class="tools-box"/>
+  <text x="600" y="670" text-anchor="middle" class="text" font-weight="bold">Tools Layer (tools.py)</text>
+  <text x="600" y="690" text-anchor="middle" class="subtitle">70+ platform-specific functions</text>
+  
+  <text x="600" y="715" text-anchor="middle" class="small-text">jira_grant_access() → calls JiraService</text>
+  <text x="600" y="730" text-anchor="middle" class="small-text">confluence_grant_space_access() → calls ConfluenceService</text>
+  <text x="600" y="745" text-anchor="middle" class="small-text">bitbucket_grant_repository_access() → calls BitbucketService</text>
+
+  <!-- Arrow -->
+  <path d="M 600 760 L 600 800" class="arrow"/>
+
+  <!-- Layer 5: Service Layer -->
+  <rect x="100" y="800" width="1000" height="180" rx="8" class="service-box"/>
+  <text x="600" y="830" text-anchor="middle" class="text" font-weight="bold">Service Layer (API Clients)</text>
+  
+  <g transform="translate(200, 860)">
+    <rect x="0" y="0" width="800" height="110" rx="5" class="label-bg"/>
+    <text x="20" y="25" class="text">JiraService</text>
+    <text x="350" y="25" class="subtitle">→ Jira Cloud REST API v3</text>
+    
+    <text x="20" y="45" class="text">ConfluenceService</text>
+    <text x="350" y="45" class="subtitle">→ Confluence Cloud REST API v2</text>
+    
+    <text x="20" y="65" class="text">BitbucketService</text>
+    <text x="350" y="65" class="subtitle">→ Bitbucket Cloud API 2.0</text>
+    
+    <text x="20" y="85" class="text">GitHubService</text>
+    <text x="350" y="85" class="subtitle">→ GitHub REST API (GitHub App JWT auth)</text>
+    
+    <text x="20" y="105" class="text">EmailService</text>
+    <text x="350" y="105" class="subtitle">→ Gmail IMAP (read) + SMTP (send)</text>
+  </g>
+
+  <!-- Arrow -->
+  <path d="M 600 980 L 600 1020" class="arrow"/>
+
+  <!-- Layer 6: External APIs -->
+  <rect x="100" y="1020" width="1000" height="120" rx="8" class="external-box"/>
+  <text x="600" y="1050" text-anchor="middle" class="text" font-weight="bold">External Platform APIs</text>
+  
+  <text x="600" y="1080" text-anchor="middle" class="text">Atlassian (Jira, Confluence, Bitbucket)</text>
+  <text x="600" y="1100" text-anchor="middle" class="text">GitHub</text>
+  <text x="600" y="1120" text-anchor="middle" class="text">Gmail (IMAP/SMTP)</text>
+
+  <!-- Arrow -->
+  <path d="M 600 1140 L 600 1180" class="arrow"/>
+
+  <!-- Layer 7: Response -->
+  <rect x="100" y="1180" width="1000" height="100" rx="8" class="title-box"/>
+  <text x="600" y="1215" text-anchor="middle" class="title-text">Email Reply Sent to User</text>
+  <text x="600" y="1245" text-anchor="middle" class="subtitle" fill="#e5e7eb">"✓ Granted john@co.com Member access to KAN project in Jira"</text>
+  <text x="600" y="1265" text-anchor="middle" class="subtitle" fill="#e5e7eb">(Threaded reply maintains conversation)</text>
+</svg>

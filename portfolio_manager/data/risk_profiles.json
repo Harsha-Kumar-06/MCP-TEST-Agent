@@ -1,0 +1,301 @@
+{
+  "description": "Risk profile configurations for portfolio construction",
+  "methodology": "Asset allocation based on Modern Portfolio Theory and investor risk tolerance",
+  "risk_profiles": {
+    "1": {
+      "name": "Ultra Conservative",
+      "description": "Capital preservation focus with minimal risk exposure",
+      "risk_score_range": [1, 2],
+      "allocation": {
+        "stocks": 20,
+        "bonds": 60,
+        "cash": 20
+      },
+      "sector_constraints": {
+        "max_single_sector": 15,
+        "required_defensive": 60,
+        "max_growth": 20
+      },
+      "stock_style_preference": {
+        "value": 80,
+        "growth": 20
+      },
+      "max_individual_stock": 5,
+      "min_positions": 8,
+      "target_dividend_yield": 3.0,
+      "max_beta": 0.6
+    },
+    "2": {
+      "name": "Conservative",
+      "description": "Income-focused with limited growth exposure",
+      "risk_score_range": [2, 3],
+      "allocation": {
+        "stocks": 35,
+        "bonds": 50,
+        "cash": 15
+      },
+      "sector_constraints": {
+        "max_single_sector": 18,
+        "required_defensive": 50,
+        "max_growth": 30
+      },
+      "stock_style_preference": {
+        "value": 70,
+        "growth": 30
+      },
+      "max_individual_stock": 6,
+      "min_positions": 7,
+      "target_dividend_yield": 2.5,
+      "max_beta": 0.75
+    },
+    "3": {
+      "name": "Moderately Conservative",
+      "description": "Balanced with bias towards stability",
+      "risk_score_range": [3, 4],
+      "allocation": {
+        "stocks": 45,
+        "bonds": 40,
+        "cash": 15
+      },
+      "sector_constraints": {
+        "max_single_sector": 20,
+        "required_defensive": 40,
+        "max_growth": 40
+      },
+      "stock_style_preference": {
+        "value": 60,
+        "growth": 40
+      },
+      "max_individual_stock": 8,
+      "min_positions": 6,
+      "target_dividend_yield": 2.0,
+      "max_beta": 0.85
+    },
+    "4": {
+      "name": "Moderate",
+      "description": "Balanced approach between growth and income",
+      "risk_score_range": [4, 5],
+      "allocation": {
+        "stocks": 55,
+        "bonds": 35,
+        "cash": 10
+      },
+      "sector_constraints": {
+        "max_single_sector": 22,
+        "required_defensive": 30,
+        "max_growth": 50
+      },
+      "stock_style_preference": {
+        "value": 50,
+        "growth": 50
+      },
+      "max_individual_stock": 10,
+      "min_positions": 6,
+      "target_dividend_yield": 1.5,
+      "max_beta": 0.95
+    },
+    "5": {
+      "name": "Balanced",
+      "description": "Equal emphasis on growth and stability",
+      "risk_score_range": [5, 6],
+      "allocation": {
+        "stocks": 65,
+        "bonds": 25,
+        "cash": 10
+      },
+      "sector_constraints": {
+        "max_single_sector": 25,
+        "required_defensive": 25,
+        "max_growth": 55
+      },
+      "stock_style_preference": {
+        "value": 45,
+        "growth": 55
+      },
+      "max_individual_stock": 12,
+      "min_positions": 5,
+      "target_dividend_yield": 1.2,
+      "max_beta": 1.0
+    },
+    "6": {
+      "name": "Moderately Aggressive",
+      "description": "Growth-focused with some stability",
+      "risk_score_range": [6, 7],
+      "allocation": {
+        "stocks": 75,
+        "bonds": 20,
+        "cash": 5
+      },
+      "sector_constraints": {
+        "max_single_sector": 28,
+        "required_defensive": 20,
+        "max_growth": 65
+      },
+      "stock_style_preference": {
+        "value": 35,
+        "growth": 65
+      },
+      "max_individual_stock": 15,
+      "min_positions": 5,
+      "target_dividend_yield": 0.8,
+      "max_beta": 1.1
+    },
+    "7": {
+      "name": "Growth",
+      "description": "Significant growth exposure with controlled risk",
+      "risk_score_range": [7, 8],
+      "allocation": {
+        "stocks": 85,
+        "bonds": 10,
+        "cash": 5
+      },
+      "sector_constraints": {
+        "max_single_sector": 30,
+        "required_defensive": 15,
+        "max_growth": 75
+      },
+      "stock_style_preference": {
+        "value": 25,
+        "growth": 75
+      },
+      "max_individual_stock": 18,
+      "min_positions": 4,
+      "target_dividend_yield": 0.5,
+      "max_beta": 1.2
+    },
+    "8": {
+      "name": "Aggressive Growth",
+      "description": "High growth focus with elevated risk tolerance",
+      "risk_score_range": [8, 9],
+      "allocation": {
+        "stocks": 90,
+        "bonds": 5,
+        "cash": 5
+      },
+      "sector_constraints": {
+        "max_single_sector": 35,
+        "required_defensive": 10,
+        "max_growth": 85
+      },
+      "stock_style_preference": {
+        "value": 20,
+        "growth": 80
+      },
+      "max_individual_stock": 20,
+      "min_positions": 4,
+      "target_dividend_yield": 0.3,
+      "max_beta": 1.35
+    },
+    "9": {
+      "name": "Very Aggressive",
+      "description": "Maximum growth with high volatility acceptance",
+      "risk_score_range": [9, 10],
+      "allocation": {
+        "stocks": 95,
+        "bonds": 0,
+        "cash": 5
+      },
+      "sector_constraints": {
+        "max_single_sector": 40,
+        "required_defensive": 5,
+        "max_growth": 90
+      },
+      "stock_style_preference": {
+        "value": 15,
+        "growth": 85
+      },
+      "max_individual_stock": 25,
+      "min_positions": 3,
+      "target_dividend_yield": 0.0,
+      "max_beta": 1.5
+    },
+    "10": {
+      "name": "Ultra Aggressive",
+      "description": "Maximum risk tolerance, full equity exposure",
+      "risk_score_range": [10, 10],
+      "allocation": {
+        "stocks": 100,
+        "bonds": 0,
+        "cash": 0
+      },
+      "sector_constraints": {
+        "max_single_sector": 45,
+        "required_defensive": 0,
+        "max_growth": 100
+      },
+      "stock_style_preference": {
+        "value": 10,
+        "growth": 90
+      },
+      "max_individual_stock": 30,
+      "min_positions": 3,
+      "target_dividend_yield": 0.0,
+      "max_beta": 2.0
+    }
+  },
+  "time_horizon_adjustments": {
+    "description": "Adjustments based on investment time horizon",
+    "short_term": {
+      "years": [0, 3],
+      "risk_adjustment": -2,
+      "note": "Reduce risk score by 2 for short horizons"
+    },
+    "medium_term": {
+      "years": [3, 7],
+      "risk_adjustment": 0,
+      "note": "No adjustment for medium horizons"
+    },
+    "long_term": {
+      "years": [7, 15],
+      "risk_adjustment": 1,
+      "note": "Can increase risk score by 1 for long horizons"
+    },
+    "very_long_term": {
+      "years": [15, 100],
+      "risk_adjustment": 2,
+      "note": "Can increase risk score by 2 for very long horizons"
+    }
+  },
+  "questionnaire_scoring": {
+    "description": "Scoring rules for risk assessment questionnaire",
+    "questions": {
+      "investment_goal": {
+        "preserve_capital": 1,
+        "generate_income": 3,
+        "balanced_growth": 5,
+        "aggressive_growth": 8,
+        "maximum_growth": 10
+      },
+      "time_horizon": {
+        "less_than_1_year": 1,
+        "1_to_3_years": 3,
+        "3_to_5_years": 5,
+        "5_to_10_years": 7,
+        "more_than_10_years": 9
+      },
+      "loss_tolerance": {
+        "cannot_tolerate_any_loss": 1,
+        "tolerate_5_percent": 3,
+        "tolerate_10_percent": 5,
+        "tolerate_20_percent": 7,
+        "tolerate_30_percent_plus": 10
+      },
+      "income_stability": {
+        "very_unstable": 2,
+        "somewhat_unstable": 4,
+        "stable": 6,
+        "very_stable": 8
+      },
+      "investment_experience": {
+        "none": 2,
+        "beginner": 4,
+        "intermediate": 6,
+        "advanced": 8,
+        "expert": 10
+      }
+    }
+  },
+  "defensive_sectors": ["Utilities", "Consumer Staples", "Healthcare"],
+  "growth_sectors": ["Technology", "Consumer Discretionary", "Communication Services"],
+  "cyclical_sectors": ["Financials", "Industrials", "Materials", "Energy"]
+}

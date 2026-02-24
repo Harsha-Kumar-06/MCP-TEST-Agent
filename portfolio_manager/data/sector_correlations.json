@@ -1,0 +1,225 @@
+{
+  "description": "Sector performance correlation matrix based on economic conditions",
+  "methodology": "Historical analysis of sector ETF performance during different economic cycles",
+  "economic_conditions": {
+    "high_growth_low_inflation": {
+      "description": "Strong GDP growth (>3%), low inflation (<2.5%)",
+      "favored_sectors": ["Technology", "Consumer Discretionary", "Financials", "Industrials"],
+      "sector_scores": {
+        "Technology": 95,
+        "Consumer Discretionary": 88,
+        "Financials": 82,
+        "Industrials": 78,
+        "Communication Services": 75,
+        "Healthcare": 65,
+        "Materials": 68,
+        "Energy": 55,
+        "Real Estate": 60,
+        "Consumer Staples": 45,
+        "Utilities": 40
+      }
+    },
+    "moderate_growth": {
+      "description": "Moderate GDP growth (1-3%), moderate inflation (2-4%)",
+      "favored_sectors": ["Healthcare", "Technology", "Consumer Staples", "Financials"],
+      "sector_scores": {
+        "Technology": 80,
+        "Healthcare": 85,
+        "Financials": 72,
+        "Consumer Staples": 75,
+        "Consumer Discretionary": 68,
+        "Industrials": 70,
+        "Communication Services": 65,
+        "Materials": 60,
+        "Real Estate": 65,
+        "Energy": 58,
+        "Utilities": 62
+      }
+    },
+    "low_growth_high_inflation": {
+      "description": "Stagflation - Low growth (<1%), high inflation (>4%)",
+      "favored_sectors": ["Energy", "Utilities", "Consumer Staples", "Healthcare"],
+      "sector_scores": {
+        "Energy": 90,
+        "Utilities": 85,
+        "Consumer Staples": 82,
+        "Healthcare": 78,
+        "Materials": 72,
+        "Real Estate": 55,
+        "Financials": 45,
+        "Industrials": 50,
+        "Communication Services": 48,
+        "Consumer Discretionary": 40,
+        "Technology": 42
+      }
+    },
+    "recession": {
+      "description": "Negative GDP growth, rising unemployment",
+      "favored_sectors": ["Utilities", "Consumer Staples", "Healthcare"],
+      "sector_scores": {
+        "Utilities": 92,
+        "Consumer Staples": 88,
+        "Healthcare": 85,
+        "Communication Services": 58,
+        "Real Estate": 50,
+        "Technology": 45,
+        "Financials": 35,
+        "Energy": 40,
+        "Materials": 38,
+        "Industrials": 35,
+        "Consumer Discretionary": 30
+      }
+    },
+    "recovery": {
+      "description": "Early recovery from recession, improving indicators",
+      "favored_sectors": ["Consumer Discretionary", "Financials", "Industrials", "Technology"],
+      "sector_scores": {
+        "Consumer Discretionary": 90,
+        "Financials": 88,
+        "Industrials": 85,
+        "Technology": 82,
+        "Materials": 80,
+        "Real Estate": 75,
+        "Communication Services": 70,
+        "Energy": 72,
+        "Healthcare": 65,
+        "Consumer Staples": 55,
+        "Utilities": 50
+      }
+    },
+    "rising_rates": {
+      "description": "Fed raising interest rates to combat inflation",
+      "favored_sectors": ["Financials", "Energy", "Healthcare"],
+      "sector_scores": {
+        "Financials": 85,
+        "Energy": 80,
+        "Healthcare": 75,
+        "Consumer Staples": 70,
+        "Materials": 65,
+        "Industrials": 62,
+        "Technology": 55,
+        "Communication Services": 52,
+        "Consumer Discretionary": 48,
+        "Utilities": 45,
+        "Real Estate": 40
+      }
+    },
+    "falling_rates": {
+      "description": "Fed cutting interest rates to stimulate economy",
+      "favored_sectors": ["Real Estate", "Utilities", "Technology", "Consumer Discretionary"],
+      "sector_scores": {
+        "Real Estate": 90,
+        "Utilities": 85,
+        "Technology": 82,
+        "Consumer Discretionary": 80,
+        "Communication Services": 75,
+        "Healthcare": 70,
+        "Financials": 55,
+        "Industrials": 68,
+        "Materials": 65,
+        "Consumer Staples": 60,
+        "Energy": 50
+      }
+    }
+  },
+  "sector_correlations": {
+    "description": "Pairwise correlations between sectors (historical)",
+    "correlations": {
+      "Technology-Communication Services": 0.82,
+      "Technology-Consumer Discretionary": 0.75,
+      "Technology-Financials": 0.65,
+      "Technology-Healthcare": 0.55,
+      "Technology-Industrials": 0.68,
+      "Consumer Staples-Utilities": 0.78,
+      "Consumer Staples-Healthcare": 0.62,
+      "Financials-Real Estate": 0.58,
+      "Energy-Materials": 0.72,
+      "Industrials-Materials": 0.76,
+      "Consumer Discretionary-Communication Services": 0.70,
+      "Healthcare-Consumer Staples": 0.62,
+      "Utilities-Real Estate": 0.65,
+      "Technology-Energy": 0.25,
+      "Utilities-Technology": 0.18,
+      "Healthcare-Energy": 0.32
+    }
+  },
+  "sector_characteristics": {
+    "Technology": {
+      "beta": 1.25,
+      "dividend_yield_avg": 0.8,
+      "growth_orientation": "high_growth",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "high"
+    },
+    "Healthcare": {
+      "beta": 0.85,
+      "dividend_yield_avg": 1.5,
+      "growth_orientation": "mixed",
+      "cyclicality": "defensive",
+      "interest_rate_sensitivity": "low"
+    },
+    "Financials": {
+      "beta": 1.15,
+      "dividend_yield_avg": 2.2,
+      "growth_orientation": "value",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "high"
+    },
+    "Consumer Discretionary": {
+      "beta": 1.20,
+      "dividend_yield_avg": 1.0,
+      "growth_orientation": "high_growth",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "medium"
+    },
+    "Consumer Staples": {
+      "beta": 0.65,
+      "dividend_yield_avg": 2.5,
+      "growth_orientation": "value",
+      "cyclicality": "defensive",
+      "interest_rate_sensitivity": "low"
+    },
+    "Energy": {
+      "beta": 1.10,
+      "dividend_yield_avg": 3.5,
+      "growth_orientation": "value",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "low"
+    },
+    "Industrials": {
+      "beta": 1.05,
+      "dividend_yield_avg": 1.8,
+      "growth_orientation": "mixed",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "medium"
+    },
+    "Materials": {
+      "beta": 1.10,
+      "dividend_yield_avg": 2.0,
+      "growth_orientation": "value",
+      "cyclicality": "cyclical",
+      "interest_rate_sensitivity": "medium"
+    },
+    "Utilities": {
+      "beta": 0.45,
+      "dividend_yield_avg": 3.2,
+      "growth_orientation": "income",
+      "cyclicality": "defensive",
+      "interest_rate_sensitivity": "very_high"
+    },
+    "Real Estate": {
+      "beta": 0.80,
+      "dividend_yield_avg": 3.8,
+      "growth_orientation": "income",
+      "cyclicality": "mixed",
+      "interest_rate_sensitivity": "very_high"
+    },
+    "Communication Services": {
+      "beta": 1.00,
+      "dividend_yield_avg": 1.2,
+      "growth_orientation": "mixed",
+      "cyclicality": "mixed",
+      "interest_rate_sensitivity": "medium"
+    }
+  }
+}

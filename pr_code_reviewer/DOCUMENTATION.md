@@ -1,5 +1,3 @@
-# PR Code Reviewer Agent
-
 An autonomous AI agent system that performs comprehensive code reviews on GitHub Pull Requests using a Parallel Swarm pattern with Decision Engine. Built with Google ADK, Gemini 2.0 Flash, FastAPI, and PyGithub.
 
 ## Table of Contents
@@ -16,6 +14,7 @@ An autonomous AI agent system that performs comprehensive code reviews on GitHub
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 
+
 ---
 
 ## Project Overview
@@ -27,11 +26,11 @@ This system automates the code review process end-to-end using a **parallel mult
 1. **Listens for PR events** via GitHub webhooks (`opened`, `synchronized`, `reopened`)
 2. **Fetches the PR diff** (changed lines of code)
 3. **Dispatches to 5 specialized review agents in parallel**:
-   - **Security Auditor** — Detects vulnerabilities, hardcoded secrets, injection risks
-   - **Style Checker** — Enforces formatting, naming conventions, readability
-   - **Performance Analyzer** — Identifies bottlenecks, inefficiencies, resource leaks
-   - **Logic Verifier** — Checks correctness, edge cases, potential bugs
-   - **Documentation Reviewer** — Ensures comments, docstrings, and explanations exist
+- **Security Auditor** — Detects vulnerabilities, hardcoded secrets, injection risks
+- **Style Checker** — Enforces formatting, naming conventions, readability
+- **Performance Analyzer** — Identifies bottlenecks, inefficiencies, resource leaks
+- **Logic Verifier** — Checks correctness, edge cases, potential bugs
+- **Documentation Reviewer** — Ensures comments, docstrings, and explanations exist
 4. **Aggregates findings** through a Decision Engine that applies strict logic rules
 5. **Posts comprehensive feedback** as a PR comment with file/line-specific fixes
 6. **Sets GitHub Status Checks** to physically block or allow merging based on severity
@@ -45,6 +44,7 @@ This system automates the code review process end-to-end using a **parallel mult
 - **Status check integration** — Visual pass/fail indicators on GitHub UI
 - **Language-agnostic** — Works with Python, JavaScript, TypeScript, Go, etc.
 
+
 ---
 
 ## Architecture & Design Pattern
@@ -55,7 +55,8 @@ The system is structured around three layers:
 
 ### 1. Event Listener Layer
 
-**FastAPI Webhook Server** ([server.py](server.py))
+**FastAPI Webhook Server** ([server.py](https://markdown-confluence.herokuapp.com/md-editor?action=edit&xdm_e=https%3A%2F%2Fprocaltech.atlassian.net&xdm_c=channel-Narva.Apps.Markdown__md-editor&cp=%2Fwiki&xdm_deprecated_addon_key_do_not_use=Narva.Apps.Markdown&lic=none&userAccess=true&cv=1000.0.0-228febe09c7d&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MTIwMjA6YmViYTdjMWItYzBiMy00OTUyLWFkYjktNjUyNTlhODdkZTJlIiwicXNoIjoiZDcwYmMzNDAyOWUyNTM2ZDk2ZjRmODk3MWMzYzgyYmZmN2VkYjRiNWJmNjQ5ODYyNzM4ODNkNWIzMGUxZDQ3ZSIsImlzcyI6IjZmNDZlMmY3LTQ5MDctMzI3Zi05MzUxLWRhNjZiMTljMGE0NCIsImNvbnRleHQiOnt9LCJleHAiOjE3NzE4NDMxODEsImlhdCI6MTc3MTg0MzAwMX0.VHHfEtiuyJCsrMjFoHCbCxPQRyP2X08v-SlXTgcSK0I#))
+
 - Receives `POST /webhook` events from GitHub
 - Validates event type and PR action
 - Immediately queues review as a `BackgroundTask` and returns 202 to prevent GitHub timeout
@@ -63,7 +64,8 @@ The system is structured around three layers:
 
 ### 2. GitHub Integration Layer
 
-**GitHubService** ([github_service.py](github_service.py))
+**GitHubService** ([github_service.py](https://markdown-confluence.herokuapp.com/md-editor?action=edit&xdm_e=https%3A%2F%2Fprocaltech.atlassian.net&xdm_c=channel-Narva.Apps.Markdown__md-editor&cp=%2Fwiki&xdm_deprecated_addon_key_do_not_use=Narva.Apps.Markdown&lic=none&userAccess=true&cv=1000.0.0-228febe09c7d&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MTIwMjA6YmViYTdjMWItYzBiMy00OTUyLWFkYjktNjUyNTlhODdkZTJlIiwicXNoIjoiZDcwYmMzNDAyOWUyNTM2ZDk2ZjRmODk3MWMzYzgyYmZmN2VkYjRiNWJmNjQ5ODYyNzM4ODNkNWIzMGUxZDQ3ZSIsImlzcyI6IjZmNDZlMmY3LTQ5MDctMzI3Zi05MzUxLWRhNjZiMTljMGE0NCIsImNvbnRleHQiOnt9LCJleHAiOjE3NzE4NDMxODEsImlhdCI6MTc3MTg0MzAwMX0.VHHfEtiuyJCsrMjFoHCbCxPQRyP2X08v-SlXTgcSK0I#))
+
 - Authenticates via `GITHUB_TOKEN` using PyGithub SDK
 - Fetches PR metadata (title, files, stats, labels, reviewers)
 - Retrieves raw unified diff via GitHub API
@@ -74,7 +76,7 @@ The system is structured around three layers:
 
 **Three-tier agent hierarchy**:
 
-```
+``` 
 root_agent (SequentialAgent)
  └── parallel_review_swarm (ParallelAgent)
       ├── security_auditor (LlmAgent)
@@ -86,15 +88,17 @@ root_agent (SequentialAgent)
 ```
 
 **Execution Flow**:
+
 1. `parallel_review_swarm` fans out to 5 sub-agents simultaneously
 2. Each agent reads the same diff but focuses on its specialty
 3. All agents return markdown reports in File | Line | Issue | Fix format
 4. `review_synthesizer` receives all 5 reports and applies decision rules:
-   - **High-severity security issue** → `REQUEST_CHANGES` (blocks merge)
-   - **Logic/correctness failure** → `REQUEST_CHANGES`
-   - **Only style/docs issues** → `COMMENT` (doesn't block)
-   - **No issues** → `APPROVE`
+- **High-severity security issue** → `REQUEST_CHANGES` (blocks merge)
+- **Logic/correctness failure** → `REQUEST_CHANGES`
+- **Only style/docs issues** → `COMMENT` (doesn't block)
+- **No issues** → `APPROVE`
 5. Synthesizer outputs structured JSON with final decision, summary markdown, and per-category status
+
 
 ---
 
@@ -102,7 +106,7 @@ root_agent (SequentialAgent)
 
 ### 1. System Architecture Overview
 
-```
+``` 
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           GitHub Repository                          │
 │                  (Developer pushes commit to PR)                     │
@@ -175,7 +179,7 @@ root_agent (SequentialAgent)
 
 ### 2. End-to-End Process Flow
 
-```
+``` 
 ┌─────────────────────────────────────────────────────────────────────┐
 │                  Developer pushes code to PR                         │
 └──────────────────────────┬──────────────────────────────────────────┘
@@ -283,7 +287,7 @@ root_agent (SequentialAgent)
 
 ### 3. Parallel Agent Pipeline Detail
 
-```
+``` 
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        Input (from server.py)                         │
 │                                                                        │
@@ -397,40 +401,44 @@ root_agent (SequentialAgent)
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
+
 ---
 
 ## Component Deep Dive
 
-### server.py
+### [server.py](http://server.py/)
 
 The FastAPI webhook listener and orchestrator.
 
 #### Key Functions
 
-**`validate_environment_variables()`**
+`validate_environment_variables()`
+
 - Runs on startup before initializing services
 - Checks for required env vars: `GITHUB_TOKEN`, `GEMINI_MODEL`, `GOOGLE_API_KEY` (or `GOOGLE_CLOUD_PROJECT` if using VertexAI)
 - Exits with detailed error message if any are missing or empty
 - Prevents silent failures from missing credentials
 
-**`process_pr_review(repo_name, pr_number, commit_sha, language)`**
+`process_pr_review(repo_name, pr_number, commit_sha, language)`
+
 - **Async background task** — runs after webhook returns 202 to GitHub
 - Execution steps:
-  1. Fetch PR metadata via `gh_service.get_pr_metadata()`
-  2. Set status checks to "pending" for all categories
-  3. Fetch raw diff via `gh_service.get_pr_diff()`
-  4. Truncate diff to 50KB if needed (to fit LLM context window)
-  5. Create isolated ADK session (unique session_id per PR)
-  6. Construct agent input JSON: `{repo, pr_number, language, diff}`
-  7. Run `runner.run_async()` and collect final JSON response
-  8. Strip code fences from response (```json ... ```)
-  9. Parse JSON into `{decision, summary_markdown, checks}` dict
-  10. Post `summary_markdown` as PR comment
-  11. Set status checks per category (security, style, etc.) based on `checks` dict
-  12. Set overall-decision status (success if APPROVE, failure if REQUEST_CHANGES)
+1. Fetch PR metadata via `gh_service.get_pr_metadata()`
+2. Set status checks to "pending" for all categories
+3. Fetch raw diff via `gh_service.get_pr_diff()`
+4. Truncate diff to 50KB if needed (to fit LLM context window)
+5. Create isolated ADK session (unique session_id per PR)
+6. Construct agent input JSON: `{repo, pr_number, language, diff}`
+7. Run `runner.run_async()` and collect final JSON response
+8. Strip code fences from response (`json ... `)
+9. Parse JSON into `{decision, summary_markdown, checks}` dict
+10. Post `summary_markdown` as PR comment
+11. Set status checks per category (security, style, etc.) based on `checks` dict
+12. Set overall-decision status (success if APPROVE, failure if REQUEST_CHANGES)
 - Error handling: Catches all exceptions and sets "error" status on commit
 
-**`@app.post("/webhook")`**
+`@app.post("/webhook")`
+
 - Receives GitHub webhook POST requests
 - Validates `X-GitHub-Event` header (only processes `pull_request` events)
 - Filters PR actions (only processes `opened`, `synchronize`, `reopened`)
@@ -439,7 +447,8 @@ The FastAPI webhook listener and orchestrator.
 - Queues `process_pr_review()` as a `BackgroundTask`
 - Returns `{"message": "Review queued"}` immediately (prevents webhook timeout)
 
-**`@app.get("/health")`**
+`@app.get("/health")`
+
 - Health check endpoint
 - Returns `{"status": "ok"}`
 - Use for monitoring/load balancer checks
@@ -447,6 +456,7 @@ The FastAPI webhook listener and orchestrator.
 #### Session Management
 
 Uses `InMemorySessionService` from Google ADK:
+
 - Each PR gets a unique session ID: `{repo_name}_{pr_number}_{uuid}`
 - Session is created before running agents
 - Isolates context per PR (prevents cross-contamination)
@@ -457,123 +467,137 @@ GitHub API wrapper built on PyGithub.
 
 #### Key Functions
 
-**`__init__()`**
+`__init__()`
+
 - Authenticates with `GITHUB_TOKEN` from environment
 - Creates `Github` client via `Auth.Token`
 - Verifies connection by fetching authenticated user's login
 - Logs connection status
 
-**`get_pr_metadata(repo_name, pr_number) → dict`**
+`get_pr_metadata(repo_name, pr_number) → dict`
+
 - Fetches comprehensive PR metadata:
-  - Title, description, state, author, created/updated timestamps
-  - Base and head branch refs + commit SHAs
-  - Statistics: commits, files changed, additions, deletions
-  - Labels, requested reviewers
-  - Per-file change details: filename, status (added/modified/removed/renamed), additions, deletions, patch size
+- Title, description, state, author, created/updated timestamps
+- Base and head branch refs + commit SHAs
+- Statistics: commits, files changed, additions, deletions
+- Labels, requested reviewers
+- Per-file change details: filename, status (added/modified/removed/renamed), additions, deletions, patch size
 - Logs a detailed ASCII-formatted report to console
 - Returns dict with metadata for further processing
 
-**`get_pr_diff(repo_name, pr_number) → str`**
+`get_pr_diff(repo_name, pr_number) → str`
+
 - Fetches raw unified diff via GitHub API
 - Uses `Accept: application/vnd.github.v3.diff` header to get plain diff text
 - Calls `_parse_and_log_diff()` to log structure
 - Returns diff as string (consumed by agents)
 
-**`_parse_and_log_diff(diff_text)`**
+`_parse_and_log_diff(diff_text)`
+
 - Parses unified diff using regex
 - Splits by `diff --git` headers to separate files
 - For each file:
-  - Extracts old/new filenames
-  - Counts additions (+) and deletions (-)
-  - Detects status (added/deleted/renamed/modified)
-  - Shows preview of first 3 changed lines
+- Extracts old/new filenames
+- Counts additions (+) and deletions (-)
+- Detects status (added/deleted/renamed/modified)
+- Shows preview of first 3 changed lines
 - Logs structured output to console for debugging
 
-**`post_comment(repo_name, pr_number, body)`**
+`post_comment(repo_name, pr_number, body)`
+
 - Posts a comment on the PR via `pr.create_issue_comment()`
 - Used to publish the AI review summary
 
-**`set_status_check(repo_name, sha, state, description, context)`**
+`set_status_check(repo_name, sha, state, description, context)`
+
 - Creates a commit status check on the commit SHA
 - Parameters:
-  - `state`: `"pending"`, `"success"`, `"failure"`, `"error"`
-  - `description`: Human-readable message (max 140 chars)
-  - `context`: Status check name (e.g., `"AI-Review/security"`)
+- `state`: `"pending"`, `"success"`, `"failure"`, `"error"`
+- `description`: Human-readable message (max 140 chars)
+- `context`: Status check name (e.g., `"AI-Review/security"`)
 - GitHub displays these as status indicators on the PR page
 - Required for blocking merges when `state == "failure"`
 - **Permission note**: GitHub Token needs `repo:status` (Classic) or `Commit statuses: Read/Write` (Fine-grained)
 
-### agent.py
+### [agent.py](http://agent.py/)
 
 The Google ADK agent hierarchy.
 
 #### Agents Defined
 
-**`security_auditor`** (LlmAgent)
+`security_auditor` (LlmAgent)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"security_report"`
 - **Focus**: Injection risks, hardcoded secrets, unsafe APIs, auth flaws, insecure dependencies
 - **Output Format**: Markdown with `**File:** ... **Line:** ... **Issue:** ... **Fix:** ` blocks
 - **Instruction**: Act as a Security Auditor; analyze diff for vulnerabilities; output specific locations and code fixes
 
-**`style_checker`** (LlmAgent)
+`style_checker` (LlmAgent)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"style_report"`
 - **Focus**: PEP8/ESLint violations, naming conventions, dead code, readability
 - **Output Format**: Markdown with File/Line/Issue/Fix structure
 - **Instruction**: Review for style consistency and best practices
 
-**`performance_analyzer`** (LlmAgent)
+`performance_analyzer` (LlmAgent)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"performance_report"`
 - **Focus**: Algorithmic bottlenecks, O(n^2) loops, memory leaks, inefficient queries
 - **Output Format**: Markdown with File/Line/Issue/Fix structure
 - **Instruction**: Identify performance issues and suggest optimizations
 
-**`logic_verifier`** (LlmAgent)
+`logic_verifier` (LlmAgent)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"logic_report"`
 - **Focus**: Correctness, edge cases, off-by-one errors, null pointer issues, logic bugs
 - **Output Format**: Markdown with File/Line/Issue/Fix structure
 - **Instruction**: Verify logic correctness and identify potential bugs
 
-**`docs_reviewer`** (LlmAgent)
+`docs_reviewer` (LlmAgent)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"docs_report"`
 - **Focus**: Missing docstrings, unclear comments, outdated README, API documentation
 - **Output Format**: Markdown with File/Line/Issue/Fix structure
 - **Instruction**: Ensure code is well-documented and maintainable
 
-**`parallel_review_swarm`** (ParallelAgent)
+`parallel_review_swarm` (ParallelAgent)
+
 - **Sub-agents**: All 5 review agents listed above
 - **Behavior**: Executes all sub-agents concurrently
 - **Output**: Session context populated with 5 reports (`security_report`, `style_report`, etc.)
 
-**`review_synthesizer`** (LlmAgent - Decision Engine)
+`review_synthesizer` (LlmAgent - Decision Engine)
+
 - **Model**: `gemini-2.0-flash`
 - **Output Key**: `"final_review_decision"`
 - **Input**: All 5 reports from session context (via templating: `{security_report}`, `{style_report}`, etc.)
 - **Decision Logic**:
-  - High-severity security issue → `REQUEST_CHANGES` (blocks merge)
-  - Logic failure → `REQUEST_CHANGES`
-  - Only style/docs issues → `COMMENT` (doesn't block)
-  - No issues → `APPROVE`
+- High-severity security issue → `REQUEST_CHANGES` (blocks merge)
+- Logic failure → `REQUEST_CHANGES`
+- Only style/docs issues → `COMMENT` (doesn't block)
+- No issues → `APPROVE`
 - **Critical Instruction**: Preserve exact File/Line/Fix blocks from sub-agent reports (no generic summarization)
 - **Output Format**: JSON only
-  ```json
-  {
-    "decision": "APPROVE" | "REQUEST_CHANGES" | "COMMENT",
-    "summary_markdown": "### PR Review Summary\n...",
-    "checks": {
-      "security": "success" | "failure",
-      "style": "success" | "failure",
-      "performance": "success" | "failure",
-      "logic": "success" | "failure"
-    }
+``` 
+{
+  "decision": "APPROVE" | "REQUEST_CHANGES" | "COMMENT",
+  "summary_markdown": "### PR Review Summary\n...",
+  "checks": {
+    "security": "success" | "failure",
+    "style": "success" | "failure",
+    "performance": "success" | "failure",
+    "logic": "success" | "failure"
   }
-  ```
+}
+```
 
-**`root_agent`** (SequentialAgent)
+`root_agent` (SequentialAgent)
+
 - **Sub-agents**: `[parallel_review_swarm, review_synthesizer]`
 - **Behavior**: Runs swarm first, then synthesizer with accumulated context
 - **Entry Point**: This is the agent passed to `Runner()` in `server.py`
@@ -583,10 +607,12 @@ The Google ADK agent hierarchy.
 Contains individual agent definitions (`security_auditor.py`, `style_checker.py`, etc.)
 
 Each file exports an `LlmAgent` instance with:
+
 - Specialized instruction prompt
 - Input parsing from JSON (`language`, `diff`, `files_changed`)
 - Structured markdown output requirements
 - Clear File/Line/Issue/Fix format enforcement
+
 
 ---
 
@@ -594,74 +620,75 @@ Each file exports an `LlmAgent` instance with:
 
 ### Sub-Agent Common Properties
 
-| Property | Value |
-|----------|-------|
-| ADK Class | `LlmAgent` |
-| Model | `gemini-2.0-flash` |
-| Tools | None (pure LLM reasoning) |
-| Input | JSON string: `{"repo": "...", "pr_number": 42, "language": "python", "diff": "..."}` |
-| Output | Markdown text with structured File/Line/Issue/Fix blocks |
+| Property  | Value                                                                                |
+| --------- | ------------------------------------------------------------------------------------ |
+| ADK Class | `LlmAgent`                                                                           |
+| Model     | `gemini-2.0-flash`                                                                   |
+| Tools     | None (pure LLM reasoning)                                                            |
+| Input     | JSON string: `{"repo": "...", "pr_number": 42, "language": "python", "diff": "..."}` |
+| Output    | Markdown text with structured File/Line/Issue/Fix blocks                             |
 
 ### Security Auditor
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `security_auditor` |
-| Output Key | `security_report` |
-| Analyzes | Injection risks (SQL, XSS, Command), hardcoded secrets, unsafe API usage, auth/authz flaws, insecure dependencies |
-| Severity Levels | HIGH (blocks merge), MEDIUM, LOW |
-| Example Issue | `Hardcoded API key found in config.py line 23` |
+| Attribute       | Value                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Name            | `security_auditor`                                                                                                |
+| Output Key      | `security_report`                                                                                                 |
+| Analyzes        | Injection risks (SQL, XSS, Command), hardcoded secrets, unsafe API usage, auth/authz flaws, insecure dependencies |
+| Severity Levels | HIGH (blocks merge), MEDIUM, LOW                                                                                  |
+| Example Issue   | `Hardcoded API key found in config.py line 23`                                                                    |
 
 ### Style Checker
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `style_checker` |
-| Output Key | `style_report` |
-| Analyzes | Formatting (PEP8, ESLint), naming conventions, dead/commented code, readability |
-| Severity | Does NOT block merge (feeds into COMMENT decision) |
-| Example Issue | `Variable name 'x' violates naming convention (use 'user_count')` |
+| Attribute     | Value                                                                           |
+| ------------- | ------------------------------------------------------------------------------- |
+| Name          | `style_checker`                                                                 |
+| Output Key    | `style_report`                                                                  |
+| Analyzes      | Formatting (PEP8, ESLint), naming conventions, dead/commented code, readability |
+| Severity      | Does NOT block merge (feeds into COMMENT decision)                              |
+| Example Issue | `Variable name 'x' violates naming convention (use 'user_count')`               |
 
 ### Performance Analyzer
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `performance_analyzer` |
-| Output Key | `performance_report` |
-| Analyzes | Algorithmic complexity (O(n^2)), inefficient queries (N+1), memory leaks, resource exhaustion |
-| Severity | Medium (can block if critical) |
-| Example Issue | `Nested loop causes O(n^2) - use set lookup instead` |
+| Attribute     | Value                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Name          | `performance_analyzer`                                                                        |
+| Output Key    | `performance_report`                                                                          |
+| Analyzes      | Algorithmic complexity (O(n^2)), inefficient queries (N+1), memory leaks, resource exhaustion |
+| Severity      | Medium (can block if critical)                                                                |
+| Example Issue | `Nested loop causes O(n^2) - use set lookup instead`                                          |
 
 ### Logic Verifier
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `logic_verifier` |
-| Output Key | `logic_report` |
-| Analyzes | Correctness, edge cases, off-by-one errors, null/undefined checks, type mismatches |
-| Severity | HIGH (blocks merge if logic is wrong) |
-| Example Issue | `Missing null check - will throw exception if user is None` |
+| Attribute     | Value                                                                              |
+| ------------- | ---------------------------------------------------------------------------------- |
+| Name          | `logic_verifier`                                                                   |
+| Output Key    | `logic_report`                                                                     |
+| Analyzes      | Correctness, edge cases, off-by-one errors, null/undefined checks, type mismatches |
+| Severity      | HIGH (blocks merge if logic is wrong)                                              |
+| Example Issue | `Missing null check - will throw exception if user is None`                        |
 
 ### Documentation Reviewer
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `docs_reviewer` |
-| Output Key | `docs_report` |
-| Analyzes | Missing docstrings, unclear comments, outdated README, public API documentation |
-| Severity | LOW (doesn't block, but surfaces in summary) |
-| Example Issue | `Public function missing docstring (add Args, Returns, Raises)` |
+| Attribute     | Value                                                                           |
+| ------------- | ------------------------------------------------------------------------------- |
+| Name          | `docs_reviewer`                                                                 |
+| Output Key    | `docs_report`                                                                   |
+| Analyzes      | Missing docstrings, unclear comments, outdated README, public API documentation |
+| Severity      | LOW (doesn't block, but surfaces in summary)                                    |
+| Example Issue | `Public function missing docstring (add Args, Returns, Raises)`                 |
 
 ### Review Synthesizer (Decision Engine)
 
-| Attribute | Value |
-|-----------|-------|
-| Name | `review_synthesizer` |
-| Output Key | `final_review_decision` |
-| Input | 5 reports from session context |
-| Output | JSON: `{decision, summary_markdown, checks}` |
-| Decision Rules | Security HIGH → REQUEST_CHANGES; Logic fail → REQUEST_CHANGES; Only style → COMMENT; None → APPROVE |
-| Critical Behavior | Preserves exact File/Line/Fix blocks from sub-agents (no summarization) |
+| Attribute         | Value                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| Name              | `review_synthesizer`                                                                                |
+| Output Key        | `final_review_decision`                                                                             |
+| Input             | 5 reports from session context                                                                      |
+| Output            | JSON: `{decision, summary_markdown, checks}`                                                        |
+| Decision Rules    | Security HIGH → REQUEST_CHANGES; Logic fail → REQUEST_CHANGES; Only style → COMMENT; None → APPROVE |
+| Critical Behavior | Preserves exact File/Line/Fix blocks from sub-agents (no summarization)                             |
+
 
 ---
 
@@ -671,7 +698,7 @@ Each file exports an `LlmAgent` instance with:
 
 Google ADK's `Runner.run_async()` is an async coroutine, but we need to call it from the FastAPI background task context which may have a running event loop.
 
-```python
+``` 
 async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=message):
     if event.is_final_response() and event.content:
         final_json_str = event.content.parts[0].text
@@ -683,7 +710,7 @@ FastAPI handles async natively, so no special bridge code is needed (unlike Stre
 
 Gemini occasionally wraps JSON in markdown fences:
 
-```json
+``` 
 {
   "decision": "APPROVE"
 }
@@ -691,7 +718,7 @@ Gemini occasionally wraps JSON in markdown fences:
 
 The parsing logic handles this:
 
-```python
+``` 
 cleaned = final_json_str.strip()
 if cleaned.startswith("```json"):
     cleaned = cleaned[7:]
@@ -704,7 +731,7 @@ result = json.loads(cleaned.strip())
 
 GitHub diffs for large PRs can exceed LLM context limits. The diff is truncated to 50KB before sending to agents:
 
-```python
+``` 
 agent_input = {
     "repo": repo_name,
     "pr_number": pr_number,
@@ -719,7 +746,7 @@ A warning is logged if truncation occurs.
 
 Each PR gets a unique session ID to prevent context contamination:
 
-```python
+``` 
 session_id = f"{repo_name.replace('/', '_')}_{pr_number}_{uuid.uuid4().hex[:6]}"
 ```
 
@@ -729,7 +756,7 @@ The `InMemorySessionService` stores context per session.
 
 GitHub status checks appear as visual indicators on the PR page:
 
-```
+``` 
 🟡 AI-Review/security — pending
 🟢 AI-Review/style — success
 🔴 AI-Review/logic — failure
@@ -741,29 +768,34 @@ The merge button is blocked if ANY required check is in `failure` or `pending` s
 
 The webhook handler immediately returns 202 Accepted:
 
-```python
+``` 
 background_tasks.add_task(process_pr_review, repo_name, pr_number, commit_sha)
 return {"message": "Review queued"}
 ```
 
 This prevents GitHub from timing out the webhook (10-second limit). The actual review runs asynchronously.
 
+
 ---
 
 ## API & Class Reference
 
-### server.py
+### [server.py](http://server.py/)
 
 #### `validate_environment_variables() → None`
+
 Validates required env vars or exits with error message.
 
 #### `async process_pr_review(repo_name: str, pr_number: int, commit_sha: str, language: str = "python") → None`
+
 Main review pipeline. Runs as a background task.
 
 #### `@app.post("/webhook")`
+
 Webhook endpoint. Receives GitHub PR events.
 
 **Request Headers:**
+
 - `X-GitHub-Event`: Event type (e.g., `"pull_request"`)
 
 **Request Body:** GitHub webhook payload (JSON)
@@ -771,6 +803,7 @@ Webhook endpoint. Receives GitHub PR events.
 **Response:** `{"message": "Review queued"}` (202 Accepted)
 
 #### `@app.get("/health")`
+
 Health check endpoint.
 
 **Response:** `{"status": "ok"}` (200 OK)
@@ -778,13 +811,16 @@ Health check endpoint.
 ### github_service.py
 
 #### `GitHubService()`
+
 Constructor. Authenticates with `GITHUB_TOKEN` and creates PyGithub client.
 
 #### `get_pr_metadata(repo_name: str, pr_number: int) → dict`
+
 Fetches PR metadata.
 
 **Returns:**
-```python
+
+``` 
 {
     "title": str,
     "author": str,
@@ -796,48 +832,61 @@ Fetches PR metadata.
 ```
 
 #### `get_pr_diff(repo_name: str, pr_number: int) → str`
+
 Fetches raw unified diff.
 
 **Returns:** Diff text (string)
 
 #### `post_comment(repo_name: str, pr_number: int, body: str) → None`
+
 Posts a comment on the PR.
 
 #### `set_status_check(repo_name: str, sha: str, state: str, description: str, context: str) → None`
+
 Sets a commit status check.
 
 **Parameters:**
+
 - `state`: `"pending"` | `"success"` | `"failure"` | `"error"`
 - `description`: Human-readable message (max 140 chars)
 - `context`: Check name (e.g., `"security"`)
 
 **GitHub Context Name:** `AI-Review/{context}`
 
-### agent.py
+### [agent.py](http://agent.py/)
 
 #### `security_auditor: LlmAgent`
+
 Security review agent.
 
 #### `style_checker: LlmAgent`
+
 Style review agent.
 
 #### `performance_analyzer: LlmAgent`
+
 Performance review agent.
 
 #### `logic_verifier: LlmAgent`
+
 Logic review agent.
 
 #### `docs_reviewer: LlmAgent`
+
 Documentation review agent.
 
 #### `parallel_review_swarm: ParallelAgent`
+
 Orchestrates 5 sub-agents in parallel.
 
 #### `review_synthesizer: LlmAgent`
+
 Decision engine. Aggregates reports and outputs JSON verdict.
 
 #### `root_agent: SequentialAgent`
+
 Top-level orchestrator. Entry point for runner.
+
 
 ---
 
@@ -846,14 +895,12 @@ Top-level orchestrator. Entry point for runner.
 ### Webhook Setup
 
 1. **Navigate to your GitHub repository** → Settings → Webhooks → Add webhook
-
 2. **Configure webhook:**
-   - **Payload URL**: `https://your-server.com/webhook`
-   - **Content type**: `application/json`
-   - **Secret**: (optional, for security)
-   - **SSL verification**: Enable (recommended)
-   - **Which events**: Select "Let me select individual events" → Check **Pull requests**
-
+- **Payload URL**: `https://your-server.com/webhook`
+- **Content type**: `application/json`
+- **Secret**: (optional, for security)
+- **SSL verification**: Enable (recommended)
+- **Which events**: Select "Let me select individual events" → Check **Pull requests**
 3. **Save webhook**
 
 GitHub will now send POST requests to your server when PR events occur.
@@ -863,17 +910,14 @@ GitHub will now send POST requests to your server when PR events occur.
 For local development:
 
 1. **Run the server locally:**
-   ```bash
-   uvicorn server:app --reload
-   ```
-
+``` 
+uvicorn server:app --reload
+```
 2. **Expose via ngrok:**
-   ```bash
-   ngrok http 8000
-   ```
-
+``` 
+ngrok http 8000
+```
 3. **Copy the ngrok HTTPS URL** (e.g., `https://abc123.ngrok.io`)
-
 4. **Set as webhook URL in GitHub**: `https://abc123.ngrok.io/webhook`
 
 ### Required GitHub Token Permissions
@@ -881,15 +925,17 @@ For local development:
 The `GITHUB_TOKEN` must have:
 
 **Classic Token:**
+
 - ✅ `repo` (Full control of private repositories)
 - ✅ `repo:status` (Access commit status)
 
 **Fine-Grained Token:**
+
 - ✅ Repository access: Select repositories
 - ✅ Permissions:
-  - **Pull requests**: Read and write
-  - **Commit statuses**: Read and write
-  - **Contents**: Read-only
+- **Pull requests**: Read and write
+- **Commit statuses**: Read and write
+- **Contents**: Read-only
 
 ### Branch Protection Rules (Optional)
 
@@ -899,12 +945,13 @@ To physically block merges when AI review fails:
 2. Branch name pattern: `main` (or your default branch)
 3. ✅ **Require status checks to pass before merging**
 4. Select status checks:
-   - `AI-Review/security`
-   - `AI-Review/logic`
-   - (optionally) `AI-Review/performance`
+- `AI-Review/security`
+- `AI-Review/logic`
+- (optionally) `AI-Review/performance`
 5. Save changes
 
 Now PRs cannot be merged until these checks pass.
+
 
 ---
 
@@ -912,12 +959,13 @@ Now PRs cannot be merged until these checks pass.
 
 ### 1. Install Dependencies
 
-```bash
+``` 
 pip install -r requirements.txt
 ```
 
 **requirements.txt:**
-```
+
+``` 
 fastapi
 uvicorn
 python-dotenv
@@ -930,9 +978,9 @@ requests
 
 ### 2. Set Environment Variables
 
-Create a `.env` file in the project root (use [.env.example](.env.example) as template):
+Create a `.env` file in the project root (use [.env.example](https://markdown-confluence.herokuapp.com/md-editor?action=edit&xdm_e=https%3A%2F%2Fprocaltech.atlassian.net&xdm_c=channel-Narva.Apps.Markdown__md-editor&cp=%2Fwiki&xdm_deprecated_addon_key_do_not_use=Narva.Apps.Markdown&lic=none&userAccess=true&cv=1000.0.0-228febe09c7d&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MTIwMjA6YmViYTdjMWItYzBiMy00OTUyLWFkYjktNjUyNTlhODdkZTJlIiwicXNoIjoiZDcwYmMzNDAyOWUyNTM2ZDk2ZjRmODk3MWMzYzgyYmZmN2VkYjRiNWJmNjQ5ODYyNzM4ODNkNWIzMGUxZDQ3ZSIsImlzcyI6IjZmNDZlMmY3LTQ5MDctMzI3Zi05MzUxLWRhNjZiMTljMGE0NCIsImNvbnRleHQiOnt9LCJleHAiOjE3NzE4NDMxODEsImlhdCI6MTc3MTg0MzAwMX0.VHHfEtiuyJCsrMjFoHCbCxPQRyP2X08v-SlXTgcSK0I#) as template):
 
-```env
+``` 
 # Google AI Configuration
 GOOGLE_GENAI_USE_VERTEXAI=FALSE
 GOOGLE_API_KEY=your_gemini_api_key_here
@@ -943,6 +991,7 @@ GITHUB_TOKEN=your_github_personal_access_token
 ```
 
 **Get API Keys:**
+
 - **Gemini API Key**: [Google AI Studio](https://aistudio.google.com/app/apikey)
 - **GitHub Token**: GitHub → Settings → Developer settings → Personal access tokens → Generate new token
 
@@ -950,7 +999,7 @@ GITHUB_TOKEN=your_github_personal_access_token
 
 **Option A: Local Development**
 
-```bash
+``` 
 uvicorn server:app --reload --port 8000
 ```
 
@@ -958,7 +1007,7 @@ Server will start on `http://localhost:8000`.
 
 **Option B: Production (Docker)**
 
-```bash
+``` 
 docker-compose up --build
 ```
 
@@ -968,7 +1017,7 @@ Server will start on `http://localhost:8000` inside the container.
 
 **For Local Testing:**
 
-```bash
+``` 
 ngrok http 8000
 ```
 
@@ -991,32 +1040,34 @@ Deploy to a cloud provider (AWS, GCP, Azure, Heroku, Render, etc.) with a public
 2. Make code changes and push
 3. Open a Pull Request
 4. The AI agent will automatically:
-   - Set status checks to "pending"
-   - Analyze the diff
-   - Post a detailed review comment
-   - Update status checks (success/failure)
+- Set status checks to "pending"
+- Analyze the diff
+- Post a detailed review comment
+- Update status checks (success/failure)
+
 
 ---
 
 ## Tech Stack
 
-| Tool | Role |
-|------|------|
-| **Google ADK** | Agent orchestration (LlmAgent, ParallelAgent, SequentialAgent, Runner) |
-| **Gemini 2.0 Flash** | LLM for code understanding and review generation |
-| **FastAPI** | Async webhook server and REST API |
-| **PyGithub** | GitHub API client (fetch PR data, post comments, set status checks) |
-| **Pydantic** | Request/response validation |
-| **python-dotenv** | Environment variable loading |
-| **Uvicorn** | ASGI server for FastAPI |
-| **Docker** | Containerization for deployment |
-| **Python 3.11+** | Runtime |
+| Tool                 | Role                                                                   |
+| -------------------- | ---------------------------------------------------------------------- |
+| **Google ADK**       | Agent orchestration (LlmAgent, ParallelAgent, SequentialAgent, Runner) |
+| **Gemini 2.0 Flash** | LLM for code understanding and review generation                       |
+| **FastAPI**          | Async webhook server and REST API                                      |
+| **PyGithub**         | GitHub API client (fetch PR data, post comments, set status checks)    |
+| **Pydantic**         | Request/response validation                                            |
+| **python-dotenv**    | Environment variable loading                                           |
+| **Uvicorn**          | ASGI server for FastAPI                                                |
+| **Docker**           | Containerization for deployment                                        |
+| **Python 3.11+**     | Runtime                                                                |
+
 
 ---
 
 ## Project Structure
 
-```
+``` 
 pr_code_reviewer/
 ├── server.py                      # FastAPI webhook server & orchestrator
 ├── agent.py                       # Google ADK agent hierarchy
@@ -1038,23 +1089,25 @@ pr_code_reviewer/
 └── DOCUMENTATION.md               # This comprehensive guide
 ```
 
+
 ---
 
 ## Methodology
 
-| Concern | Approach |
-|---------|----------|
-| **Parallel execution** | Google ADK `ParallelAgent` — all 5 sub-agents run simultaneously |
-| **Structured output** | Strict instruction prompts enforce File/Line/Issue/Fix format |
-| **Decision logic** | Synthesizer agent applies hardcoded rules (security fail → block) |
-| **Webhook reliability** | FastAPI background tasks prevent GitHub timeout |
-| **Session isolation** | Unique session ID per PR (prevents context leaks) |
-| **Status check integration** | PyGithub sets commit statuses to block/allow merge button |
-| **Error handling** | Try/catch in background task; "error" status on failure |
-| **Diff truncation** | 50KB limit to fit LLM context window |
-| **Code fence handling** | Strip markdown fences from JSON responses |
-| **Language detection** | Currently manual via `language` parameter (future: auto-detect from file extensions) |
-| **Logging** | Structured logging with emoji markers for readability |
+| Concern                      | Approach                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| **Parallel execution**       | Google ADK `ParallelAgent` — all 5 sub-agents run simultaneously                     |
+| **Structured output**        | Strict instruction prompts enforce File/Line/Issue/Fix format                        |
+| **Decision logic**           | Synthesizer agent applies hardcoded rules (security fail → block)                    |
+| **Webhook reliability**      | FastAPI background tasks prevent GitHub timeout                                      |
+| **Session isolation**        | Unique session ID per PR (prevents context leaks)                                    |
+| **Status check integration** | PyGithub sets commit statuses to block/allow merge button                            |
+| **Error handling**           | Try/catch in background task; "error" status on failure                              |
+| **Diff truncation**          | 50KB limit to fit LLM context window                                                 |
+| **Code fence handling**      | Strip markdown fences from JSON responses                                            |
+| **Language detection**       | Currently manual via `language` parameter (future: auto-detect from file extensions) |
+| **Logging**                  | Structured logging with emoji markers for readability                                |
+
 
 ---
 
@@ -1071,7 +1124,7 @@ The **Parallel Swarm** pattern enables **zero-latency multi-perspective analysis
 
 ### Google ADK Implementation
 
-```python
+``` 
 parallel_review_swarm = ParallelAgent(
     name="parallel_review_swarm",
     sub_agents=[
@@ -1086,6 +1139,7 @@ parallel_review_swarm = ParallelAgent(
 ```
 
 The `ParallelAgent` manages:
+
 - Concurrent execution of all sub-agents
 - Context passing (all agents receive the same input)
 - Session variable accumulation (outputs stored by `output_key`)
@@ -1095,7 +1149,7 @@ The `ParallelAgent` manages:
 
 The `review_synthesizer` agent acts as the final arbiter:
 
-```python
+``` 
 review_synthesizer = LlmAgent(
     name="review_synthesizer",
     model=GEMINI_MODEL,
@@ -1104,16 +1158,17 @@ review_synthesizer = LlmAgent(
     - IF Logic/Correctness fail → REQUEST_CHANGES
     - IF only Style/Docs issues → COMMENT
     - IF no issues → APPROVE
-    
     CRITICAL: Preserve exact File/Line/Fix blocks from sub-agents.""",
     output_key="final_review_decision"
 )
 ```
 
 This pattern ensures:
+
 - **Consistent enforcement** of team standards (security always blocks)
 - **Actionable feedback** with specific file/line/fix suggestions
 - **Human-readable summaries** for developers
+
 
 ---
 
@@ -1128,19 +1183,3 @@ This pattern ensures:
 - **Support for GitHub Checks API** (richer UI than commit statuses)
 - **Multi-repository support** with per-repo configuration
 - **Slack/Discord notifications** on review completion
-
----
-
-## License
-
-[Specify your license here]
-
-## Contributing
-
-[Specify contribution guidelines here]
-
-## Support
-
-For issues or questions:
-- Open an issue on GitHub
-- Contact: [your contact info]

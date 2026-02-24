@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 1450">
+  <defs>
+    <style>
+      .input-box { fill: #f3e8ff; stroke: #7c3aed; stroke-width: 2; }
+      .coordinator-box { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .subagent-box { fill: #fef3c7; stroke: #f59e0b; stroke-width: 2; }
+      .execution-box { fill: #ffffff; stroke: #9ca3af; stroke-width: 1; }
+      .result-box { fill: #d1fae5; stroke: #059669; stroke-width: 2; }
+      .text { font-family: 'Arial', sans-serif; font-size: 13px; fill: #1f2937; }
+      .title-text { font-family: 'Arial', sans-serif; font-size: 15px; font-weight: bold; fill: #1f2937; }
+      .small-text { font-family: 'Arial', sans-serif; font-size: 11px; fill: #4b5563; }
+      .tiny-text { font-family: 'Arial', sans-serif; font-size: 10px; fill: #6b7280; }
+      .arrow { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .split-arrow { stroke: #7c3aed; stroke-width: 2; fill: none; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#2563eb" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="650" y="30" text-anchor="middle" class="title-text" font-size="18">Hierarchical Agent Delegation</text>
+
+  <!-- Input Box -->
+  <rect x="80" y="55" width="1140" height="130" rx="8" class="input-box"/>
+  <text x="650" y="80" text-anchor="middle" class="title-text">Input: Email Request</text>
+  
+  <text x="100" y="105" class="small-text">Email: "Grant john@co.com write access to ENG Confluence and Developer role in KAN Jira"</text>
+  
+  <text x="100" y="128" class="tiny-text">From: admin@co.com | Email ID: &lt;abc123@gmail.com&gt;</text>
+  <text x="100" y="145" class="tiny-text">Subject: "Access for new developer"</text>
+  <text x="100" y="162" class="tiny-text">Body: [full email text with access requests]</text>
+
+  <!-- Arrow -->
+  <path d="M 650 185 L 650 230" class="arrow"/>
+
+  <!-- Coordinator Box -->
+  <rect x="100" y="230" width="1100" height="185" rx="8" class="coordinator-box"/>
+  <text x="650" y="255" text-anchor="middle" class="title-text">root_agent: AccessControllerCoordinator</text>
+  
+  <text x="120" y="280" class="text" font-weight="bold">Processing:</text>
+  
+  <!-- Processing steps -->
+  <g transform="translate(130, 295)">
+    <text x="0" y="0" class="small-text">1. Parse intent:</text>
+    <text x="15" y="16" class="tiny-text">Multiple platforms: Confluence AND Jira | User: john@co.com</text>
+    <text x="15" y="30" class="tiny-text">Confluence: space=ENG, write | Jira: project=KAN, Developer</text>
+    
+    <text x="0" y="50" class="small-text">2. Apply intelligent defaults (no confirmation needed)</text>
+    
+    <text x="0" y="70" class="small-text">3. Delegation plan:</text>
+    <text x="15" y="86" class="tiny-text">→ Transfer to ConfluenceAgent + JiraAgent (parallel)</text>
+    <text x="15" y="100" class="tiny-text">→ Collect results and send via EmailAgent</text>
+  </g>
+
+  <!-- Split arrows -->
+  <path d="M 650 415 L 650 455" class="split-arrow"/>
+  <path d="M 650 455 L 280 455" class="split-arrow"/>
+  <path d="M 650 455 L 1020 455" class="split-arrow"/>
+  <line x1="280" y1="455" x2="280" y2="495" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="1020" y1="455" x2="1020" y2="495" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Sub-Agent 1: ConfluenceAgent -->
+  <rect x="30" y="495" width="500" height="315" rx="8" class="subagent-box"/>
+  <text x="280" y="520" text-anchor="middle" class="title-text">ConfluenceAgent</text>
+  <text x="280" y="538" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+  
+  <text x="50" y="560" class="text" font-weight="bold">Input:</text>
+  <text x="50" y="577" class="small-text">"Grant john write access to ENG space"</text>
+  
+  <text x="50" y="600" class="text" font-weight="bold">Tools:</text>
+  <text x="50" y="617" class="tiny-text">confluence_grant_space_*, list_spaces, invite_user_to_org</text>
+  
+  <rect x="45" y="630" width="470" height="105" rx="5" class="execution-box"/>
+  <text x="60" y="648" class="text" font-weight="bold">Execution:</text>
+  <text x="60" y="665" class="small-text">1. confluence_get_space("ENG") → Found</text>
+  <text x="60" y="682" class="small-text">2. confluence_grant_space_*(john, ENG, write)</text>
+  <text x="75" y="698" class="tiny-text">→ ConfluenceService API</text>
+  <text x="75" y="713" class="tiny-text">→ HTTP POST → Success ✓</text>
+  
+  <text x="50" y="760" class="text" font-weight="bold">Output:</text>
+  <text x="50" y="777" class="tiny-text">{status: success, message: "Granted write access"}</text>
+
+  <!-- Sub-Agent 2: JiraAgent -->
+  <rect x="770" y="495" width="500" height="315" rx="8" class="subagent-box"/>
+  <text x="1020" y="520" text-anchor="middle" class="title-text">JiraAgent</text>
+  <text x="1020" y="538" text-anchor="middle" class="tiny-text">(LlmAgent)</text>
+  
+  <text x="790" y="560" class="text" font-weight="bold">Input:</text>
+  <text x="790" y="577" class="small-text">"Grant john Developer role in KAN project"</text>
+  
+  <text x="790" y="600" class="text" font-weight="bold">Tools:</text>
+  <text x="790" y="617" class="tiny-text">jira_grant_access, list_projects, get_user_by_email</text>
+  
+  <rect x="785" y="630" width="470" height="105" rx="5" class="execution-box"/>
+  <text x="800" y="648" class="text" font-weight="bold">Execution:</text>
+  <text x="800" y="665" class="small-text">1. jira_get_user_by_email(john) → ID: 5678</text>
+  <text x="800" y="682" class="small-text">2. jira_list_projects() → Found: KAN</text>
+  <text x="800" y="699" class="small-text">3. jira_grant_access(john, KAN, Developer)</text>
+  <text x="815" y="715" class="tiny-text">→ JiraService API → Success ✓</text>
+  
+  <text x="790" y="760" class="text" font-weight="bold">Output:</text>
+  <text x="790" y="777" class="tiny-text">{status: success, message: "Granted Developer role"}</text>
+
+  <!-- Merge arrows -->
+  <line x1="280" y1="810" x2="280" y2="850" stroke="#059669" stroke-width="2"/>
+  <line x1="1020" y1="810" x2="1020" y2="850" stroke="#059669" stroke-width="2"/>
+  <path d="M 280 850 L 650 850" stroke="#059669" stroke-width="2"/>
+  <path d="M 1020 850 L 650 850" stroke="#059669" stroke-width="2"/>
+  <line x1="650" y1="850" x2="650" y2="890" stroke="#059669" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- Result Synthesis Box -->
+  <rect x="100" y="890" width="1100" height="120" rx="8" class="result-box"/>
+  <text x="650" y="915" text-anchor="middle" class="title-text">Coordinator receives results</text>
+  
+  <text x="120" y="940" class="small-text">confluence_result: {success} | jira_result: {success}</text>
+  
+  <text x="120" y="965" class="text" font-weight="bold">Synthesized response:</text>
+  <text x="120" y="985" class="small-text">"✓ Granted john@co.com: Confluence ENG (write) + Jira KAN (Developer)"</text>
+
+  <!-- Arrow to EmailAgent -->
+  <path d="M 650 1010 L 650 1050" class="arrow"/>
+
+  <!-- EmailAgent Box -->
+  <rect x="150" y="1050" width="1000" height="105" rx="8" class="subagent-box"/>
+  <text x="650" y="1075" text-anchor="middle" class="title-text">EmailAgent</text>
+  
+  <text x="170" y="1100" class="text" font-weight="bold">Input:</text>
+  <text x="170" y="1117" class="small-text">Email ID: &lt;abc123@gmail.com&gt; | Message: "✓ Granted john@co.com: ..."</text>
+  
+  <text x="170" y="1137" class="text" font-weight="bold">Action:</text>
+  <text x="170" y="1154" class="small-text">email_reply(original_email_id, body) → EmailService → SMTP send ✓</text>
+
+  <!-- Arrow to Final -->
+  <path d="M 650 1155 L 650 1195" class="arrow"/>
+
+  <!-- Final Box -->
+  <rect x="150" y="1195" width="1000" height="70" rx="8" class="result-box"/>
+  <text x="650" y="1225" text-anchor="middle" class="title-text">Final Response</text>
+  <text x="650" y="1245" text-anchor="middle" class="small-text">User receives threaded reply in Gmail ✅</text>
+
+  <!-- Legend -->
+  <g transform="translate(150, 1310)">
+    <text x="0" y="12" class="title-text" font-size="14">Legend:</text>
+    
+    <rect x="0" y="20" width="70" height="22" rx="4" class="input-box"/>
+    <text x="78" y="35" class="tiny-text">Input</text>
+    
+    <rect x="150" y="20" width="70" height="22" rx="4" class="coordinator-box"/>
+    <text x="228" y="35" class="tiny-text">Coordinator</text>
+    
+    <rect x="320" y="20" width="70" height="22" rx="4" class="subagent-box"/>
+    <text x="398" y="35" class="tiny-text">Sub-Agent</text>
+    
+    <rect x="490" y="20" width="70" height="22" rx="4" class="result-box"/>
+    <text x="568" y="35" class="tiny-text">Result</text>
+  </g>
+</svg>
