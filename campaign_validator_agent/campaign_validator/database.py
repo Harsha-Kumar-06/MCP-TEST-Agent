@@ -212,14 +212,15 @@ def seed_data():
     conn.commit()
     conn.close()
 
-    # Write image generation guide
+    # Write image generation guide (only if not already present)
     desc_path = IMAGES_DIR / "IMAGE_DESCRIPTIONS.txt"
     desc_path.parent.mkdir(exist_ok=True)
-    with open(desc_path, "w") as f:
-        f.write("=== IMAGE GENERATION GUIDE ===\n")
-        f.write("Generate these images and save them with the filenames below in images/\n\n")
-        for campaign_id, name, img, desc in all_posts:
-            f.write(f"--- {img} ({name}) ---\n{desc}\n\n")
+    if not desc_path.exists():
+        with open(desc_path, "w") as f:
+            f.write("=== IMAGE GENERATION GUIDE ===\n")
+            f.write("Generate these images and save them with the filenames below in images/\n\n")
+            for campaign_id, name, img, desc in all_posts:
+                f.write(f"--- {img} ({name}) ---\n{desc}\n\n")
 
 
 # ── Query helpers ─────────────────────────────────────────────────────────
