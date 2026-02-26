@@ -1,0 +1,24 @@
+=== IMAGE GENERATION GUIDE ===
+Generate these images and save them with the filenames below in images/
+
+--- coke_sarah.jpg (Sarah Chen) ---
+Sarah posted an image at a sunny beach party where she is smiling and drinking from a classic Coca-Cola glass bottle. She is wearing a bright red Coca-Cola branded t-shirt with the logo printed across the front. The Coca-Cola logo is clearly visible on both the bottle and her shirt. The background shows ocean waves, palm trees, and friends playing volleyball. Her caption reads: 'Nothing beats a cold Coca-Cola on a hot summer day! Beach vibes and good times #CocaColaSummer #Refreshing #SummerVibes'
+
+--- coke_mike.jpg (Mike Torres) ---
+Mike shared a photo of himself sitting on a park bench on a cloudy afternoon. He is holding a Pepsi can and taking a sip from it. He is wearing a plain grey hoodie with no branding of any kind. The park behind him has green trees and a jogger in the distance. There are no Coca-Cola products, logos, or branding anywhere in the image. His caption reads: 'Chilling with my favorite drink at the park today! Love this refreshing taste #ParkLife #ChillVibes' — notably, he does not mention Coca-Cola or use the campaign hashtag.
+
+--- nike_emma.jpg (Emma Rodriguez) ---
+Emma posted a photo from her morning trail run in the mountains. She is mid-stride on a dirt path surrounded by pine trees and morning mist. She is wearing bright orange Nike running shoes with the Swoosh clearly visible, a black Nike Dri-FIT tank top with a small white Swoosh on the chest, and grey running leggings. Her expression is focused and determined. The scenery is breathtaking with rolling green hills in the background. Her caption reads: '5am alarm, zero regrets. These Nike Pegasus shoes make every mile feel like the first. Get out there and move! #JustMove #TrailRunning #NikeRunning'
+
+--- nike_jake.png (Jake Williams) ---
+Jake shared a mirror selfie from a fancy coffee shop. He is wearing a plain white dress shirt with rolled-up sleeves and dark jeans. He is holding a latte in one hand and his phone in the other. There is no athletic wear, no Nike products, and no sports equipment visible anywhere in the image. The background shows espresso machines, pastries in a display case, and other customers sitting at tables. His caption reads: 'Morning fuel before a big day! Love this cozy spot #CoffeeTime #MondayMotivation #Lifestyle' — he does not mention Nike or use the campaign hashtag.
+
+--- loreal_priya.jpg (Priya Patel) ---
+Priya posted a close-up beauty shot taken in a bright, minimalist bathroom. She is holding a L'Oreal Paris Revitalift serum bottle next to her face, with the gold L'Oreal Paris logo clearly readable on the product label. Her skin looks radiant and dewy, and she is smiling confidently at the camera. The background shows a clean white marble countertop with soft natural light coming from a window. Her caption reads: 'My morning glow secret? This L'Oreal Paris Revitalift serum has transformed my skin in just 2 weeks. Because we are all worth it! #GlowUpWithLoreal #Skincare #MorningRoutine'
+
+--- loreal_aisha.jpg (Aisha Khan) ---
+Aisha shared a dimly lit selfie taken in her car at night. The photo is slightly blurry and her face is partially in shadow. She is not holding any beauty products, and no L'Oreal items are visible anywhere in the frame. She appears to be wearing heavy makeup but no specific brand can be identified. A Maybelline mascara tube is sitting in the cupholder beside her, clearly showing the Maybelline logo. The background is dark with some streetlight bokeh. Her caption reads: 'Night out glam! Feeling cute tonight #Selfie #NightOut #MakeupLook' — she does not mention L'Oreal Paris or use the campaign hashtag.
+
+--- loreal_lucas.jpg (Lucas Chen) ---
+Lucas posted a well-lit photo from his bathroom vanity. He is applying a L'Oreal Paris Men Expert moisturizer, with the product held at chest height showing the L'Oreal Paris branding on the tube. However, the background is extremely cluttered — towels piled up, toothbrushes scattered, and several other random products from different brands visible on the counter. The lighting is good and his skin looks healthy. His caption reads: 'Skincare isn't just for the ladies! L'Oreal Paris Men Expert keeps my skin fresh all day. #GlowUpWithLoreal #MensSkincare #SelfCare'
+
