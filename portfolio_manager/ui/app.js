@@ -689,10 +689,20 @@ function resetForm() {
     if (downloadBtn) {
         downloadBtn.style.display = 'none';
     }
+    // Reset stat cards to default state
+    ['statCapital', 'statPositions', 'statSectors', 'statRisk'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '-';
+    });
+    // Clear holdings table
     const tbody = document.getElementById('holdingsTable');
     if (tbody) tbody.innerHTML = '';
-    if (sectorChart) sectorChart.destroy();
-    if (compositionChart) compositionChart.destroy();
+    // Clear analysis content
+    const analysisContent = document.getElementById('analysisContent');
+    if (analysisContent) analysisContent.innerHTML = '';
+    // Destroy charts and clear references
+    if (sectorChart) { sectorChart.destroy(); sectorChart = null; }
+    if (compositionChart) { compositionChart.destroy(); compositionChart = null; }
     checkApiHealth();
 }
 
