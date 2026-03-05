@@ -506,7 +506,7 @@ async def root():
     """Serve the main UI page."""
     html_path = os.path.join(UI_DIR, "index.html")
     if os.path.exists(html_path):
-        with open(html_path, "r") as f:
+        with open(html_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     else:
         return HTMLResponse(content="""

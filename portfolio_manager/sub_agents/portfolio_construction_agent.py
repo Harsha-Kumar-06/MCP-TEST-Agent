@@ -64,33 +64,53 @@ Review the conversation history for:
 4. Allocate capital according to constraints
 5. Ensure proper diversification
 
+## CRITICAL CAPITAL CONSTRAINT
+**The total value of all positions combined MUST NOT exceed total_capital.**
+Every dollar calculation below must be derived from the user's total_capital.
+
 ## Allocation Methodology
 
-### Step 1: Determine Stock Weights
-Use a combination of:
-- **Equal Weight**: Start with equal allocation across stocks
-- **Score-Weighted**: Adjust based on composite scores (higher score = more weight)
-- **Risk-Adjusted**: Reduce weight for high-beta stocks if conservative profile
+### Step 1: Determine Cash Reserve
+Based on risk score, decide cash_reserve_percent:
+- Risk score 1-3: cash_reserve_percent = 15 (keep 15% cash)
+- Risk score 4-6: cash_reserve_percent = 7 (keep 7% cash)
+- Risk score 7-10: cash_reserve_percent = 3 (keep 3% cash)
 
-### Step 2: Apply Constraints
+```
+cash_reserve_amount = total_capital * cash_reserve_percent / 100
+invested_capital = total_capital - cash_reserve_amount
+```
+
+### Step 2: Determine Stock Weights
+Assign a weight_percent to each stock such that ALL weights sum to exactly 100%:
+- Equal Weight: start with (100 / number_of_stocks) for each
+- Adjust based on scores and risk constraints
+- Apply max per-stock constraint (see Step 3)
+- **VERIFY: sum of all weight_percent values = 100%**
+
+### Step 3: Apply Constraints
 From risk_profiles.json for the user's risk score:
 - `max_individual_stock`: Maximum % in any single stock
 - `min_positions`: Minimum number of positions required
 - `max_single_sector`: Maximum % in any sector
-- `required_defensive`: Minimum % in defensive sectors (for conservative)
 
-### Step 3: Position Sizing
-Formula for each stock:
+### Step 4: Position Sizing (MANDATORY FORMULA)
+For EACH stock, compute in this exact order:
 ```
-Base Weight = Score / Total Scores
-Adjusted Weight = Base Weight * Risk Adjustment Factor
-Final Weight = MIN(Adjusted Weight, Max Individual Stock)
+allocated_amount = (weight_percent / 100) * invested_capital
+shares = floor(allocated_amount / current_price)
+actual_value = shares * current_price
+actual_weight = (actual_value / total_capital) * 100
 ```
 
-### Step 4: Cash Reserve
-- Risk score 1-3: Keep 10-20% cash
-- Risk score 4-6: Keep 5-10% cash  
-- Risk score 7-10: Keep 0-5% cash
+**Example** (total_capital=$10000, invested_capital=$9300, 5 equal-weight stocks):
+- Each stock weight_percent = 20%
+- Each allocated_amount = 0.20 * $9300 = $1860
+- For a $165 stock: shares = floor($1860 / $165) = 11, actual_value = 11 * $165 = $1815
+
+**VERIFY before output:**
+- sum(actual_value for all positions) + cash_reserve_amount <= total_capital
+- Each weight in output = actual_value / total_capital * 100
 
 ### Step 5: Correlation Check
 Use `calculate_correlation_matrix` to verify diversification:
@@ -120,10 +140,10 @@ Use `calculate_correlation_matrix` to verify diversification:
         "symbol": "<ticker>",
         "name": "<company>",
         "sector": "<sector>",
-        "shares": <number>,
+        "shares": <integer — floor(allocated_amount / price)>,
         "price": <current price>,
-        "value": <position value>,
-        "weight": <percentage>,
+        "value": <shares * price>,
+        "weight": <(value / total_capital) * 100>,
         "allocation_rationale": "<why this weight>"
       }
     ],
@@ -147,9 +167,7 @@ Use `calculate_correlation_matrix` to verify diversification:
     "construction_notes": "<explanation of allocation decisions>"
   }
 }
-```
-
-Calculate shares = Math.floor(allocated_amount / current_price) for each position."""
+```"""
 
 portfolio_construction_agent = LlmAgent(
     name="portfolio_construction_agent",

@@ -84,7 +84,7 @@ Open http://localhost:8000 in your browser.
 ### Option 2: FastAPI Server
 
 ```bash
-uvicorn portfolio_manager.server:app --reload --port 8001
+uvicorn portfolio_manager.server:app --reload --port 8000
 ```
 
 - Web UI: http://localhost:8001
