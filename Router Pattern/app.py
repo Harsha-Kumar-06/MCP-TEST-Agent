@@ -1,7 +1,6 @@
 """
 CorpAssist - Custom FastAPI Web Application
 
-
 A professional chat interface for the CorpAssist router agent.
 Includes authentication, audit logging, specialist chat, and enterprise features.
 """
