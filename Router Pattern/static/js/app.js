@@ -65,27 +65,22 @@ function getCurrentTimeInfo() {
 // Initialize session
 async function initSession() {
     try {
-        // Check if we have a stored session ID
-        const storedSessionId = localStorage.getItem('corpassist_session_id');
-        
-        if (storedSessionId) {
-            sessionId = storedSessionId;
-            console.log('Restored session:', sessionId);
-        } else {
-            const response = await fetch('/api/session/new', { method: 'POST' });
-            const data = await response.json();
-            sessionId = data.session_id;
-            localStorage.setItem('corpassist_session_id', sessionId);
-            console.log('Session initialized:', sessionId);
-        }
-        
         // Initialize agent conversations
         agentConversations = {};
         currentAgent = null;
         lastRoutedAgent = null;
         
-        // Initialize or restore chat session
-        initChatSession();
+        // Initialize or restore chat session (this will handle backend session)
+        const restored = await initChatSession();
+        
+        // If no session was restored, create a new backend session
+        if (!restored) {
+            const response = await fetch('/api/session/new', { method: 'POST' });
+            const data = await response.json();
+            sessionId = data.session_id;
+            localStorage.setItem('corpassist_session_id', sessionId);
+            console.log('New backend session created:', sessionId);
+        }
         
         // Check for active escalation and restore if exists
         await restoreEscalationState();
@@ -345,13 +340,17 @@ function saveCurrentChatSession() {
     const lastMsg = messages[messages.length - 1];
     const preview = lastMsg ? lastMsg.content.substring(0, 80) : '';
     
+    // Get existing session to preserve backendSessionId if already set
+    const existingSession = sessions.find(s => s.id === currentChatSessionId);
+    
     const sessionData = {
         id: currentChatSessionId || generateChatSessionId(),
+        backendSessionId: sessionId, // Store backend session ID for this conversation
         title: title + (title.length >= 50 ? '...' : ''),
         preview: preview + (preview.length >= 80 ? '...' : ''),
         messages: messages,
         messageCount: messages.length,
-        createdAt: sessions.find(s => s.id === currentChatSessionId)?.createdAt || Date.now(),
+        createdAt: existingSession?.createdAt || Date.now(),
         updatedAt: Date.now()
     };
     
@@ -427,7 +426,12 @@ function getCurrentChatMessages() {
 }
 
 // Load a chat session by ID
-function loadChatSession(chatSessionId) {
+async function loadChatSession(chatSessionId, updateTabs = true) {
+    // Save current conversation first
+    if (currentChatSessionId && currentChatSessionId !== chatSessionId) {
+        saveCurrentChatSession();
+    }
+    
     const sessions = getAllChatSessions();
     const session = sessions.find(s => s.id === chatSessionId);
     
@@ -435,6 +439,34 @@ function loadChatSession(chatSessionId) {
         console.error('Session not found or empty:', chatSessionId);
         return false;
     }
+    
+    // Restore or create backend session for this conversation
+    if (session.backendSessionId) {
+        // Use existing backend session
+        sessionId = session.backendSessionId;
+        localStorage.setItem('corpassist_session_id', sessionId);
+        console.log('Restored backend session:', sessionId);
+    } else {
+        // Create new backend session for this conversation
+        try {
+            const response = await fetch('/api/session/new', { method: 'POST' });
+            const data = await response.json();
+            sessionId = data.session_id;
+            localStorage.setItem('corpassist_session_id', sessionId);
+            console.log('Created new backend session for conversation:', sessionId);
+            
+            // Update session with new backend ID
+            session.backendSessionId = sessionId;
+            saveAllChatSessions(sessions);
+        } catch (error) {
+            console.error('Failed to create backend session:', error);
+        }
+    }
+    
+    // Reset agent conversation state
+    agentConversations = {};
+    currentAgent = null;
+    lastRoutedAgent = null;
     
     // Clear current chat
     messagesContainer.innerHTML = '';
@@ -487,8 +519,10 @@ function loadChatSession(chatSessionId) {
     currentChatSessionId = chatSessionId;
     localStorage.setItem(CURRENT_SESSION_KEY, chatSessionId);
     
-    // Close history panel
-    toggleChatHistory();
+    // Update conversation tabs in sidebar
+    if (updateTabs) {
+        renderConversationTabs();
+    }
     
     console.log('Loaded chat session:', chatSessionId);
     return true;
@@ -512,95 +546,115 @@ function deleteChatSession(chatSessionId, event) {
         showWelcome();
     }
     
-    // Refresh the history panel
-    renderChatHistoryPanel();
+    // Refresh the conversation tabs
+    renderConversationTabs();
 }
 
 // Clear all chat sessions
-function clearAllSessions() {
+async function clearAllSessions() {
     if (!confirm('Delete ALL chat history? This cannot be undone.')) return;
     
     localStorage.removeItem(CHAT_SESSIONS_KEY);
     localStorage.removeItem(CURRENT_SESSION_KEY);
-    currentChatSessionId = null;
+    
+    // Create new session IDs
+    currentChatSessionId = generateChatSessionId();
+    localStorage.setItem(CURRENT_SESSION_KEY, currentChatSessionId);
+    
+    // Create new backend session
+    try {
+        const response = await fetch('/api/session/new', { method: 'POST' });
+        const data = await response.json();
+        sessionId = data.session_id;
+        localStorage.setItem('corpassist_session_id', sessionId);
+    } catch (error) {
+        console.error('Failed to create new backend session:', error);
+    }
+    
+    // Reset state
+    agentConversations = {};
+    currentAgent = null;
+    lastRoutedAgent = null;
     
     messagesContainer.innerHTML = '';
     showWelcome();
     
-    renderChatHistoryPanel();
+    renderConversationTabs();
     addSystemMessage('All chat history has been cleared.');
 }
 
-// Toggle chat history panel
-function toggleChatHistory() {
-    const panel = document.getElementById('chatHistoryPanel');
-    if (panel) {
-        panel.classList.toggle('open');
-        if (panel.classList.contains('open')) {
-            renderChatHistoryPanel();
-        }
-    }
-}
-
-// Render chat history panel
-function renderChatHistoryPanel() {
-    const content = document.getElementById('historyPanelContent');
-    if (!content) return;
+// Render conversation tabs in sidebar
+function renderConversationTabs() {
+    const container = document.getElementById('conversationTabs');
+    const section = document.getElementById('conversationHistorySection');
+    if (!container) return;
     
     const sessions = getAllChatSessions();
     
-    if (sessions.length === 0) {
-        content.innerHTML = `
-            <div class="no-history-message">
-                <i class="fas fa-comments"></i>
-                <p>No chat history yet</p>
-                <p style="font-size: 0.8rem;">Your conversations will appear here</p>
-            </div>
-        `;
+    // Hide section if no saved conversations (excluding current empty session)
+    const savedSessions = sessions.filter(s => s.messageCount > 0 || s.id === currentChatSessionId);
+    
+    if (savedSessions.length === 0) {
+        if (section) section.style.display = 'none';
         return;
     }
     
+    if (section) section.style.display = 'block';
+    
     let html = '';
-    sessions.forEach(session => {
+    // Show only the most recent 5 conversations
+    const recentSessions = savedSessions.slice(0, 5);
+    
+    recentSessions.forEach(session => {
         const date = new Date(session.updatedAt);
-        const dateStr = date.toLocaleDateString();
-        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = formatTimeAgo(date);
         const isActive = session.id === currentChatSessionId;
         
         // Strip HTML tags for display
-        const cleanTitle = session.title.replace(/<[^>]*>/g, '').substring(0, 40);
-        const cleanPreview = session.preview.replace(/<[^>]*>/g, '').substring(0, 60);
+        const cleanTitle = session.title.replace(/<[^>]*>/g, '').substring(0, 25);
         
         html += `
-            <div class="history-session-item ${isActive ? 'active' : ''}" onclick="loadChatSession('${session.id}')">
-                <div class="session-title">
-                    <span>${cleanTitle}${cleanTitle.length >= 40 ? '...' : ''}</span>
-                    ${isActive ? '<i class="fas fa-check-circle" style="color: var(--primary-color);"></i>' : ''}
+            <div class="conversation-tab ${isActive ? 'active' : ''}" onclick="loadChatSession('${session.id}')">
+                <i class="fas fa-comment conversation-tab-icon"></i>
+                <div class="conversation-tab-content">
+                    <div class="conversation-tab-title">${cleanTitle}${cleanTitle.length >= 25 ? '...' : ''}</div>
+                    <div class="conversation-tab-meta">${timeStr} · ${session.messageCount} msgs</div>
                 </div>
-                <div class="session-preview">${cleanPreview}${cleanPreview.length >= 60 ? '...' : ''}</div>
-                <div class="session-meta">
-                    <span><i class="fas fa-comment"></i> ${session.messageCount} messages</span>
-                    <span>${dateStr} ${timeStr}</span>
-                </div>
-                <button class="session-delete-btn" onclick="deleteChatSession('${session.id}', event)">
-                    <i class="fas fa-trash"></i> Delete
+                <button class="conversation-tab-delete" onclick="deleteChatSession('${session.id}', event)" title="Delete">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
         `;
     });
     
-    content.innerHTML = html;
+    container.innerHTML = html;
+}
+
+// Format time ago for conversation tabs
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
 }
 
 // Initialize or restore chat session on page load
-function initChatSession() {
+async function initChatSession() {
     const savedSessionId = localStorage.getItem(CURRENT_SESSION_KEY);
     if (savedSessionId) {
         const sessions = getAllChatSessions();
         const session = sessions.find(s => s.id === savedSessionId);
-        if (session) {
+        if (session && session.messages && session.messages.length > 0) {
             currentChatSessionId = savedSessionId;
-            loadChatSession(savedSessionId);
+            await loadChatSession(savedSessionId, false);
+            renderConversationTabs();
             return true;
         }
     }
@@ -608,6 +662,7 @@ function initChatSession() {
     // No session to restore, create new one
     currentChatSessionId = generateChatSessionId();
     localStorage.setItem(CURRENT_SESSION_KEY, currentChatSessionId);
+    renderConversationTabs();
     return false;
 }
 
@@ -1227,7 +1282,6 @@ async function attemptReconnect(escId) {
         addSystemMessage('Failed to reconnect. Please try again or ask for a new specialist.');
     }
 }
-}
 
 // Update chat header to show specialist mode
 function updateChatHeader(text) {
@@ -1260,7 +1314,7 @@ function addSystemMessage(text) {
 }
 
 // Start a new chat session (clears history)
-function startNewChat() {
+async function startNewChat() {
     // Check if there's an active live chat with specialist
     if (isEscalated && escalationWebSocket && escalationWebSocket.readyState === WebSocket.OPEN) {
         // Don't close immediately - warn user and start inactivity timer
@@ -1295,9 +1349,20 @@ function startNewChat() {
     currentAgent = null;
     lastRoutedAgent = null;
     
-    // Create new session ID
+    // Create new chat session ID
     currentChatSessionId = generateChatSessionId();
     localStorage.setItem(CURRENT_SESSION_KEY, currentChatSessionId);
+    
+    // Create new backend session for the new conversation
+    try {
+        const response = await fetch('/api/session/new', { method: 'POST' });
+        const data = await response.json();
+        sessionId = data.session_id;
+        localStorage.setItem('corpassist_session_id', sessionId);
+        console.log('Created new backend session:', sessionId);
+    } catch (error) {
+        console.error('Failed to create new backend session:', error);
+    }
     
     // Hide agent tabs
     const tabsContainer = document.getElementById('agentTabsContainer');
@@ -1307,6 +1372,9 @@ function startNewChat() {
     
     // Show welcome message
     showWelcome();
+    
+    // Update conversation tabs in sidebar
+    renderConversationTabs();
     
     console.log('Started new chat session:', currentChatSessionId);
 }
