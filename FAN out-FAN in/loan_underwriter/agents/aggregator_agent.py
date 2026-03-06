@@ -186,7 +186,7 @@ Output ONLY the JSON — no markdown, no extra text."""
         credit_result, property_result, fraud_result, person_result, fan_out_time = \
             await self._fan_out_analysis(application_data)
 
-        # === FAN-IN: LLM aggregator makes the final decision ===
+        # ===  FAN-IN: LLM aggregator makes the final decision ===
         logger.info("Fan-in: LLM aggregator reasoning over all results")
 
         applicant = application_data.get("applicant", {})
