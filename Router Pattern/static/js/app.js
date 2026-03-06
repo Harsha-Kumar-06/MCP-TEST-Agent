@@ -738,6 +738,9 @@ function showChatEndedState() {
     isEscalated = false;
     escalationId = null;
     
+    // Clear escalation state from localStorage since session is ended
+    clearEscalationState();
+    
     // Disable input with message
     const inputContainer = document.querySelector('.input-container');
     if (inputContainer && !document.getElementById('chatEndedBanner')) {
@@ -1028,6 +1031,66 @@ function handleKeyDown(event) {
     }
 }
 
+// Validate session and reconnect (used for reconnecting after disconnect)
+async function validateAndReconnectUser(escId) {
+    try {
+        const response = await fetch(`/api/escalation/${escId}/status`);
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                addSystemMessage('Session no longer exists. Please ask the AI assistant for a new specialist.');
+                disconnectEscalationSilent();
+                return;
+            }
+            throw new Error('Failed to check session status');
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'closed' || data.status === 'resolved') {
+            // Session has ended - don't reconnect
+            addSystemMessage(`Session has ended (${data.status}). Please ask the AI assistant for a new specialist.`);
+            disconnectEscalationSilent();
+            return;
+        }
+        
+        // Session is still valid - reconnect WebSocket
+        addSystemMessage('Session still active. Reconnecting...');
+        connectEscalationWebSocket(escId);
+        
+    } catch (error) {
+        console.error('Reconnection validation failed:', error);
+        addSystemMessage('Failed to verify session. Attempting direct reconnect...');
+        // Fall back to direct reconnect on network error
+        connectEscalationWebSocket(escId);
+    }
+}
+
+// Disconnect from escalation silently (without calling server API)
+// Used when session is already closed/ended on server
+function disconnectEscalationSilent() {
+    cancelInactivityTimer();
+    pendingNewChat = false;
+    isEscalated = false;
+    
+    if (escalationWebSocket) {
+        escalationWebSocket.close();
+        escalationWebSocket = null;
+    }
+    
+    updateChatHeader('CorpAssist');
+    
+    // Remove banner
+    const banner = document.getElementById('escalationBanner');
+    if (banner) {
+        banner.remove();
+    }
+    
+    hideLiveChatSection();
+    clearEscalationState();
+    escalationId = null;
+}
+
 // Connect to escalation WebSocket for user
 function connectEscalationWebSocket(escId) {
     escalationId = escId;
@@ -1114,7 +1177,7 @@ function connectEscalationWebSocket(escId) {
         if (event.code === 4003 || event.code === 4004) {
             // Session ended or not found - don't reconnect
             addSystemMessage(`Escalation session has ended: ${event.reason || 'Session closed'}`);
-            disconnectEscalation();
+            disconnectEscalationSilent();
             return;
         }
         
@@ -1124,11 +1187,11 @@ function connectEscalationWebSocket(escId) {
             return;
         }
         
-        // Attempt reconnect for other disconnects
+        // Attempt reconnect for other disconnects - but validate session first
         if (isEscalated && escalationId) {
-            addSystemMessage('Connection to specialist lost. Attempting to reconnect...');
+            addSystemMessage('Connection to specialist lost. Checking session status...');
             setTimeout(() => {
-                if (escalationId) connectEscalationWebSocket(escalationId);
+                if (escalationId) validateAndReconnectUser(escalationId);
             }, 3000);
         }
     };
@@ -1198,7 +1261,7 @@ function updateEscalationBanner(connected, escId) {
 }
 
 // Disconnect from escalation (user manually ends chat)
-function disconnectEscalation() {
+async function disconnectEscalation() {
     // Cancel any inactivity timer
     cancelInactivityTimer();
     pendingNewChat = false;
@@ -1206,7 +1269,22 @@ function disconnectEscalation() {
     isEscalated = false;
     const currentEscId = escalationId;
     
-    // Close WebSocket but DON'T clear state yet - keep for history
+    // Call server to mark session as closed BEFORE closing WebSocket
+    // This prevents the specialist from rejoining via email link
+    if (currentEscId) {
+        try {
+            const response = await fetch(`/api/user/end-session/${currentEscId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            console.log('Session end result:', data);
+        } catch (error) {
+            console.error('Failed to end session on server:', error);
+        }
+    }
+    
+    // Close WebSocket
     if (escalationWebSocket) {
         escalationWebSocket.close();
         escalationWebSocket = null;
@@ -1214,16 +1292,13 @@ function disconnectEscalation() {
     
     updateChatHeader('CorpAssist');
     
-    // Update banner to show reconnect option instead of removing it
+    // Update banner to show session ended (no reconnect option since session is closed)
     const banner = document.getElementById('escalationBanner');
     if (banner && currentEscId) {
         banner.className = 'escalation-banner ended';
         banner.querySelector('.banner-content').innerHTML = `
             <i class="fas fa-check-circle"></i>
             <span>Live chat session ended (${currentEscId})</span>
-            <button onclick="attemptReconnect('${currentEscId}')" class="banner-btn">
-                <i class="fas fa-sync"></i> Reconnect
-            </button>
             <button onclick="closeEscalationBanner()" class="banner-btn secondary">
                 <i class="fas fa-times"></i> Dismiss
             </button>
@@ -1233,8 +1308,11 @@ function disconnectEscalation() {
     // Hide sidebar live chat section
     hideLiveChatSection();
     
+    // Clear escalation state since session is now closed
+    clearEscalationState();
     escalationId = null;
-    addSystemMessage('Live chat ended. You can reconnect if the session is still active, or continue chatting with the AI assistant to request a new specialist.');
+    
+    addSystemMessage('Live chat ended. The session has been closed. You can continue chatting with the AI assistant to request a new specialist.');
 }
 
 // Close escalation banner and clear state (final dismissal)

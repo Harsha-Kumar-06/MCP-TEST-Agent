@@ -89,6 +89,48 @@ async function validateAndConnect() {
     }
 }
 
+// Validate session and reconnect (used for reconnecting after disconnect)
+async function validateAndReconnect() {
+    try {
+        updateConnectionStatus('connecting', 'Validating session...');
+        
+        const response = await fetch(`/api/specialist/validate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                escalation_id: escalationId,
+                token: specialistToken
+            })
+        });
+        
+        if (!response.ok) {
+            if (response.status === 410) {
+                // Session has ended - don't reconnect
+                const errorData = await response.json().catch(() => ({}));
+                showSessionEnded(errorData.detail || 'This escalation session has already ended.');
+                return;
+            } else if (response.status === 401) {
+                showInvalidSession('Invalid or expired session token.');
+                return;
+            }
+            throw new Error('Session validation failed');
+        }
+        
+        // Session is still valid - reconnect WebSocket
+        connectWebSocket();
+        
+    } catch (error) {
+        console.error('Reconnection validation failed:', error);
+        // Retry if we haven't exhausted attempts
+        if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+            reconnectAttempts++;
+            setTimeout(validateAndReconnect, 2000 * reconnectAttempts);
+        } else {
+            updateConnectionStatus('error', 'Failed to reconnect');
+        }
+    }
+}
+
 // Connect to WebSocket for real-time messaging
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -137,11 +179,12 @@ function connectWebSocket() {
             return;
         }
         
-        // Attempt to reconnect for other disconnects
+        // Attempt to reconnect for other disconnects - but validate session first
         if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             reconnectAttempts++;
             updateConnectionStatus('connecting', `Reconnecting (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
-            setTimeout(connectWebSocket, 2000 * reconnectAttempts);
+            // Re-validate session before reconnecting to ensure it's still active
+            setTimeout(validateAndReconnect, 2000 * reconnectAttempts);
         }
     };
     
@@ -189,12 +232,11 @@ function handleWebSocketMessage(data) {
             break;
             
         case 'user_disconnected':
-            updateChatStatus('User disconnected');
-            addSystemMessage(`⚠️ ${data.message || 'User has disconnected from the chat.'}`);
+            updateChatStatus('User temporarily disconnected');
+            addSystemMessage(`⚠️ ${data.message || 'User has temporarily disconnected. They may reconnect shortly.'}`);
             playNotificationSound();
-            // Disable input since user is gone
-            disableInput();
-            messageInput.placeholder = 'User has disconnected - chat session ended';
+            // Don't disable input completely - user might reconnect
+            messageInput.placeholder = 'User is disconnected - waiting for reconnection...';
             break;
             
         case 'session_closed':

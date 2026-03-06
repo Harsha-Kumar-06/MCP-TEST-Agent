@@ -804,6 +804,60 @@ async def close_specialist_session(escalation_id: str, data: dict):
     }
 
 
+@app.post("/api/user/end-session/{escalation_id}")
+async def user_end_session(escalation_id: str):
+    """
+    Allow user to end an escalation session.
+    This marks the session as closed so the specialist cannot rejoin via the email link.
+    """
+    session = escalation_sessions.get(escalation_id)
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Escalation not found")
+    
+    # Only allow ending if not already closed
+    if session.get("status") in ("closed", "resolved"):
+        return {
+            "status": "already_closed",
+            "escalation_id": escalation_id,
+            "message": "Session was already closed"
+        }
+    
+    # Mark session as closed by user
+    session["status"] = "closed"
+    session["closed_at"] = datetime.now().isoformat()
+    session["closed_by"] = "user"
+    session["resolution_notes"] = "Session ended by user"
+    
+    print(f"[{escalation_id}] Session ended by user")
+    
+    # Add to chat history
+    chat_histories.setdefault(escalation_id, []).append({
+        "role": "system",
+        "content": "User ended the chat session",
+        "timestamp": datetime.now().isoformat(),
+    })
+    
+    # Notify specialist if connected
+    if escalation_id in active_connections:
+        specialist_ws = active_connections[escalation_id].get("specialist")
+        if specialist_ws:
+            try:
+                await specialist_ws.send_json({
+                    "type": "session_closed",
+                    "message": "User has ended the chat session.",
+                    "closed_by": "user"
+                })
+            except Exception as e:
+                print(f"Error notifying specialist of user-ended session: {e}")
+    
+    return {
+        "status": "closed",
+        "escalation_id": escalation_id,
+        "message": "Session ended successfully"
+    }
+
+
 # =============================================================================
 # ServiceNow Webhook - Called when ticket state changes
 # =============================================================================
@@ -1140,22 +1194,22 @@ async def specialist_websocket(
             session["specialist_disconnected"] = True
             session["specialist_disconnected_at"] = datetime.now().isoformat()
         
-        # Notify user that specialist disconnected and close the session
+        # Notify user that specialist disconnected (but session is still active for reconnection)
         user_ws = active_connections.get(escalation_id, {}).get("user")
         if user_ws:
             try:
                 await user_ws.send_json({
                     "type": "specialist_disconnected",
-                    "message": "The specialist has disconnected from the chat."
+                    "message": "The specialist has temporarily disconnected. They may reconnect shortly."
                 })
-                await user_ws.send_json({"type": "session_closed"})
+                # Do NOT send session_closed - allow reconnection
             except Exception as e:
                 print(f"Error notifying user of specialist disconnect: {e}")
         
         # Add to chat history
         chat_histories.setdefault(escalation_id, []).append({
             "role": "system",
-            "content": "Specialist disconnected from the chat",
+            "content": "Specialist temporarily disconnected (may reconnect)",
             "timestamp": datetime.now().isoformat(),
         })
     finally:
@@ -1284,28 +1338,30 @@ async def user_escalation_websocket(websocket: WebSocket, escalation_id: str):
     except WebSocketDisconnect:
         print(f"User disconnected from escalation {escalation_id}")
         
-        # Update session status
+        # Update session status - mark as disconnected but NOT closed
+        # Session can be reconnected after page refresh
         session = escalation_sessions.get(escalation_id)
         if session:
             session["user_disconnected"] = True
             session["user_disconnected_at"] = datetime.now().isoformat()
+            # Keep user_connected = True so they can reconnect
         
         # Add to chat history
         chat_histories.setdefault(escalation_id, []).append({
             "role": "system",
-            "content": "User disconnected from the chat",
+            "content": "User temporarily disconnected (may reconnect)",
             "timestamp": datetime.now().isoformat(),
         })
         
-        # Notify specialist that user disconnected and end the session
+        # Notify specialist that user disconnected (but session is still active)
         specialist_ws = active_connections.get(escalation_id, {}).get("specialist")
         if specialist_ws:
             try:
                 await specialist_ws.send_json({
                     "type": "user_disconnected",
-                    "message": "User has disconnected from the chat. The live chat session has ended."
+                    "message": "User has temporarily disconnected. They may reconnect shortly."
                 })
-                await specialist_ws.send_json({"type": "session_closed"})
+                # Do NOT send session_closed - allow reconnection
             except Exception as e:
                 print(f"Error notifying specialist of user disconnect: {e}")
     finally:
