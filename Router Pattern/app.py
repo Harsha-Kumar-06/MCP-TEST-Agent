@@ -99,6 +99,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 class ChatMessage(BaseModel):
     message: str
     session_id: str = None
+    user_timezone: str = None
+    user_local_time: str = None
+    user_local_date: str = None
 
 
 class ChatResponse(BaseModel):
@@ -268,6 +271,15 @@ async def chat(
         if user and user.employee_id != "ANON":
             user_context = f"\n[User Context: {user.full_name}, {user.department}, {user.role}]\n"
         
+        # Add timezone context if provided
+        if message.user_timezone:
+            user_context += f"[User Timezone: {message.user_timezone}]"
+            if message.user_local_time:
+                user_context += f" [User's Local Time: {message.user_local_time}]"
+            if message.user_local_date:
+                user_context += f" [User's Local Date: {message.user_local_date}]"
+            user_context += "\n"
+        
         # Create user message
         content = types.Content(
             role="user",
@@ -407,6 +419,48 @@ async def health_check():
     return {"status": "healthy", "agent": "corpassist"}
 
 
+@app.get("/api/time")
+async def get_current_time(timezone: str = None):
+    """
+    Get current server time, optionally in a specific timezone.
+    
+    Args:
+        timezone: Optional timezone name (e.g., "America/New_York", "Europe/London")
+    
+    Returns:
+        dict: Current time information
+    """
+    try:
+        from zoneinfo import ZoneInfo
+    except ImportError:
+        from backports.zoneinfo import ZoneInfo
+    
+    # Get server time
+    server_time = datetime.now()
+    
+    result = {
+        "server_time": server_time.isoformat(),
+        "server_time_formatted": server_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "day_of_week": server_time.strftime("%A"),
+        "date": server_time.strftime("%B %d, %Y"),
+    }
+    
+    # If timezone provided, also return time in that timezone
+    if timezone:
+        try:
+            user_tz = ZoneInfo(timezone)
+            user_time = datetime.now(user_tz)
+            result["user_timezone"] = timezone
+            result["user_time"] = user_time.isoformat()
+            result["user_time_formatted"] = user_time.strftime("%Y-%m-%d %H:%M:%S")
+            result["user_day_of_week"] = user_time.strftime("%A")
+            result["user_date"] = user_time.strftime("%B %d, %Y")
+        except Exception as e:
+            result["timezone_error"] = f"Invalid timezone: {timezone}"
+    
+    return result
+
+
 @app.post("/api/session/new")
 async def new_session():
     """Create a new chat session."""
@@ -510,9 +564,13 @@ def create_escalation_session(
     user_session_id: str = None,
     user_info: dict = None,
     servicenow_incident: str = None,
+    servicenow_only: bool = False,
 ) -> dict:
     """
     Create an escalation session for specialist chat.
+    
+    Args:
+        servicenow_only: If True, this is a ServiceNow-only ticket without live chat capability
     
     Returns:
         dict: Session info including specialist_token and specialist_url
@@ -530,10 +588,14 @@ def create_escalation_session(
         "user_session_id": user_session_id,
         "user": user_info,
         "servicenow_incident": servicenow_incident,
+        "servicenow_only": servicenow_only,  # Track if this is ServiceNow-only
         "created_at": datetime.now().isoformat(),
-        "status": "open",
+        "status": "waiting_for_specialist" if not servicenow_only else "servicenow_only",
         "specialist_joined": False,
         "specialist_name": None,
+        "user_connected": False,
+        "user_disconnected": False,
+        "specialist_disconnected": False,
     }
     
     # Store session
@@ -546,13 +608,28 @@ def create_escalation_session(
     # Initialize chat history
     chat_histories[escalation_id] = []
     
-    # Generate specialist URL
-    specialist_url = f"{APP_BASE_URL}/specialist?escalation_id={escalation_id}&token={specialist_token}"
+    # Add initial system message about waiting state
+    if not servicenow_only:
+        chat_histories[escalation_id].append({
+            "role": "system",
+            "content": "Session created. Waiting for specialist to connect...",
+            "timestamp": datetime.now().isoformat(),
+        })
+    else:
+        chat_histories[escalation_id].append({
+            "role": "system",
+            "content": "ServiceNow ticket created. A specialist will respond via ServiceNow.",
+            "timestamp": datetime.now().isoformat(),
+        })
+    
+    # Generate specialist URL (only if not ServiceNow-only)
+    specialist_url = f"{APP_BASE_URL}/specialist?escalation_id={escalation_id}&token={specialist_token}" if not servicenow_only else None
     
     return {
         "escalation_id": escalation_id,
         "specialist_token": specialist_token,
         "specialist_url": specialist_url,
+        "servicenow_only": servicenow_only,
         "session_data": session_data,
     }
 
@@ -611,6 +688,53 @@ async def validate_specialist_session(data: SpecialistValidation):
         "servicenow_incident": session.get("servicenow_incident"),
         "servicenow_url": f"https://company.service-now.com/incident.do?sys_id={session.get('servicenow_incident')}" if session.get("servicenow_incident") else None,
         "user": session.get("user"),
+    }
+
+
+# =============================================================================
+# User Escalation API (for page refresh recovery)
+# =============================================================================
+
+@app.get("/api/escalation/{escalation_id}/status")
+async def get_escalation_status(escalation_id: str):
+    """
+    Get the status of an escalation session.
+    Used by the frontend to check if an escalation is still active after page refresh.
+    """
+    session = escalation_sessions.get(escalation_id)
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Escalation not found")
+    
+    return {
+        "escalation_id": escalation_id,
+        "status": session.get("status", "unknown"),
+        "department": session.get("department"),
+        "specialist_joined": session.get("specialist_joined", False),
+        "servicenow_incident": session.get("servicenow_incident"),
+        "servicenow_only": session.get("servicenow_only", False),
+        "created_at": session.get("created_at"),
+    }
+
+
+@app.get("/api/escalation/{escalation_id}/history")
+async def get_user_escalation_history(escalation_id: str):
+    """
+    Get chat history for a user's escalation session.
+    Does not require specialist token - used for reconnecting after page refresh.
+    """
+    session = escalation_sessions.get(escalation_id)
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Escalation not found")
+    
+    history = chat_histories.get(escalation_id, [])
+    
+    return {
+        "escalation_id": escalation_id,
+        "messages": history,
+        "status": session.get("status"),
+        "specialist_joined": session.get("specialist_joined", False),
     }
 
 
@@ -827,6 +951,9 @@ async def register_escalation_session(request: Request):
     if not escalation_id or not specialist_token:
         return {"error": "Missing escalation_id or specialist_token"}
     
+    # Determine if this is a ServiceNow-only session
+    servicenow_only = data.get("servicenow_only", False)
+    
     # Store session data
     session_data = {
         "escalation_id": escalation_id,
@@ -836,16 +963,33 @@ async def register_escalation_session(request: Request):
         "issue_summary": data.get("issue_summary", ""),
         "employee_id": data.get("employee_id", "unknown"),
         "servicenow_incident": data.get("servicenow_incident"),
+        "servicenow_only": servicenow_only,
         "created_at": datetime.now().isoformat(),
-        "status": "open",
+        "status": "servicenow_only" if servicenow_only else "waiting_for_specialist",
         "specialist_joined": False,
         "specialist_name": None,
+        "user_connected": False,
+        "user_disconnected": False,
+        "specialist_disconnected": False,
     }
     
     escalation_sessions[escalation_id] = session_data
-    chat_histories[escalation_id] = []
     
-    return {"status": "registered", "escalation_id": escalation_id}
+    # Initialize chat history with appropriate message
+    if servicenow_only:
+        chat_histories[escalation_id] = [{
+            "role": "system",
+            "content": "ServiceNow ticket created. Responses will be handled via ServiceNow.",
+            "timestamp": datetime.now().isoformat(),
+        }]
+    else:
+        chat_histories[escalation_id] = [{
+            "role": "system",
+            "content": "Session created. Waiting for specialist to connect...",
+            "timestamp": datetime.now().isoformat(),
+        }]
+    
+    return {"status": "registered", "escalation_id": escalation_id, "servicenow_only": servicenow_only}
 
 
 # =============================================================================
@@ -879,17 +1023,44 @@ async def specialist_websocket(
     if session:
         session["specialist_joined"] = True
         session["specialist_joined_at"] = datetime.now().isoformat()
+        session["status"] = "specialist_connected"
+        
+        # Add system message to chat history
+        chat_histories.setdefault(escalation_id, []).append({
+            "role": "system",
+            "content": "Specialist joined the chat",
+            "timestamp": datetime.now().isoformat(),
+        })
     
-    # Notify user that specialist joined
+    # Notify user that specialist joined - important for waiting state
     user_ws = active_connections.get(escalation_id, {}).get("user")
+    user_is_connected = False
+    
     if user_ws:
         try:
             await user_ws.send_json({
                 "type": "specialist_joined",
-                "message": "A specialist has joined the chat."
+                "message": "A specialist has joined the chat and is ready to help you.",
+                "specialist_name": session.get("specialist_name") if session else None
             })
-        except:
-            pass
+            user_is_connected = True
+        except Exception as e:
+            print(f"Error notifying user of specialist join (user may be disconnected): {e}")
+            # User WebSocket is stale, clean it up
+            if escalation_id in active_connections:
+                active_connections[escalation_id]["user"] = None
+    
+    # Always tell specialist about user's connection status
+    if user_is_connected:
+        await websocket.send_json({
+            "type": "user_connected",
+            "message": "User is online and ready to chat."
+        })
+    else:
+        await websocket.send_json({
+            "type": "waiting_for_user",
+            "message": "Waiting for user to connect..."
+        })
     
     try:
         while True:
@@ -948,6 +1119,30 @@ async def specialist_websocket(
     
     except WebSocketDisconnect:
         print(f"Specialist disconnected from {escalation_id}")
+        # Update session status
+        session = escalation_sessions.get(escalation_id)
+        if session:
+            session["specialist_disconnected"] = True
+            session["specialist_disconnected_at"] = datetime.now().isoformat()
+        
+        # Notify user that specialist disconnected and close the session
+        user_ws = active_connections.get(escalation_id, {}).get("user")
+        if user_ws:
+            try:
+                await user_ws.send_json({
+                    "type": "specialist_disconnected",
+                    "message": "The specialist has disconnected from the chat."
+                })
+                await user_ws.send_json({"type": "session_closed"})
+            except Exception as e:
+                print(f"Error notifying user of specialist disconnect: {e}")
+        
+        # Add to chat history
+        chat_histories.setdefault(escalation_id, []).append({
+            "role": "system",
+            "content": "Specialist disconnected from the chat",
+            "timestamp": datetime.now().isoformat(),
+        })
     finally:
         # Clean up connection
         if escalation_id in active_connections:
@@ -963,22 +1158,51 @@ async def user_escalation_websocket(websocket: WebSocket, escalation_id: str):
     await websocket.accept()
     print(f"[{escalation_id}] User WebSocket connected")
     
+    # Check if this is a ServiceNow-only session
+    session = escalation_sessions.get(escalation_id)
+    if session and session.get("servicenow_only"):
+        await websocket.send_json({
+            "type": "servicenow_only",
+            "message": "This ticket is being handled via ServiceNow. A specialist will respond through the ticketing system. Live chat is not available for this request.",
+            "servicenow_incident": session.get("servicenow_incident")
+        })
+        await websocket.close(code=4002, reason="ServiceNow-only ticket - no live chat available")
+        return
+    
     # Register user connection
     if escalation_id not in active_connections:
         active_connections[escalation_id] = {}
     active_connections[escalation_id]["user"] = websocket
     
-    # Notify specialist if connected
+    # Update session status
+    if session:
+        session["user_connected"] = True
+        session["user_connected_at"] = datetime.now().isoformat()
+    
+    # Send current status to user
     specialist_ws = active_connections.get(escalation_id, {}).get("specialist")
     if specialist_ws:
+        # Specialist is already connected
+        await websocket.send_json({
+            "type": "specialist_joined",
+            "message": "A specialist is connected and ready to assist you.",
+            "specialist_name": session.get("specialist_name") if session else None
+        })
+        # Notify specialist that user connected
         try:
             await specialist_ws.send_json({
                 "type": "user_connected",
                 "message": "User is online"
             })
             print(f"[{escalation_id}] Notified specialist that user connected")
-        except:
-            pass
+        except Exception as e:
+            print(f"Error notifying specialist: {e}")
+    else:
+        # User is waiting for specialist
+        await websocket.send_json({
+            "type": "waiting_for_specialist",
+            "message": "Waiting for a specialist to connect. You will be notified when they join."
+        })
     
     try:
         while True:
@@ -1023,16 +1247,31 @@ async def user_escalation_websocket(websocket: WebSocket, escalation_id: str):
     
     except WebSocketDisconnect:
         print(f"User disconnected from escalation {escalation_id}")
-        # Notify specialist
+        
+        # Update session status
+        session = escalation_sessions.get(escalation_id)
+        if session:
+            session["user_disconnected"] = True
+            session["user_disconnected_at"] = datetime.now().isoformat()
+        
+        # Add to chat history
+        chat_histories.setdefault(escalation_id, []).append({
+            "role": "system",
+            "content": "User disconnected from the chat",
+            "timestamp": datetime.now().isoformat(),
+        })
+        
+        # Notify specialist that user disconnected and end the session
         specialist_ws = active_connections.get(escalation_id, {}).get("specialist")
         if specialist_ws:
             try:
                 await specialist_ws.send_json({
                     "type": "user_disconnected",
-                    "message": "User went offline"
+                    "message": "User has disconnected from the chat. The live chat session has ended."
                 })
-            except:
-                pass
+                await specialist_ws.send_json({"type": "session_closed"})
+            except Exception as e:
+                print(f"Error notifying specialist of user disconnect: {e}")
     finally:
         # Clean up
         if escalation_id in active_connections:

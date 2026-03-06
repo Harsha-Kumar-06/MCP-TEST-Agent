@@ -1,0 +1,86 @@
+[
+    {
+        "id": "password_reset",
+        "title": "How to Reset Your Password",
+        "content": "To reset your password:\n1. Go to https://password.company.com\n2. Click 'Forgot Password'\n3. Enter your employee email\n4. Check your email for reset link\n5. Create a new password (min 12 chars, 1 uppercase, 1 number, 1 special)\n\nIf you're locked out, contact IT Support at ext. 4357.",
+        "category": "IT_Support",
+        "tags": ["password", "login", "access", "locked out", "forgot password"]
+    },
+    {
+        "id": "pto_policy",
+        "title": "PTO Policy Overview",
+        "content": "Annual PTO Allocation:\n- 0-2 years: 15 days\n- 3-5 years: 20 days\n- 6+ years: 25 days\n\nRequesting PTO:\n1. Submit via Workday at least 2 weeks in advance\n2. Manager approval required\n3. Blackout dates: Dec 20-Jan 2, Q4 close period\n\nCarryover: Max 5 days to next year. Use it or lose it!",
+        "category": "HR",
+        "tags": ["pto", "vacation", "time off", "leave", "days off"]
+    },
+    {
+        "id": "vpn_setup",
+        "title": "VPN Setup Guide",
+        "content": "Setting up VPN:\n1. Download GlobalProtect from software.company.com\n2. Install and launch the application\n3. Enter portal: vpn.company.com\n4. Login with your AD credentials\n5. Click 'Connect'\n\nTroubleshooting:\n- If connection fails, check your internet first\n- Clear credentials and re-enter\n- Restart the VPN client\n- Contact IT if issues persist",
+        "category": "IT_Support",
+        "tags": ["vpn", "remote", "connect", "work from home", "globalprotect"]
+    },
+    {
+        "id": "expense_policy",
+        "title": "Expense Reimbursement Policy",
+        "content": "Submitting Expenses:\n1. Use Concur at expenses.company.com\n2. Upload receipts within 30 days\n3. Categorize correctly (Travel, Meals, Supplies, etc.)\n\nLimits:\n- Meals: $50/day domestic, $75/day international\n- Hotels: Use corporate rate or $200/night max\n- Flights: Economy class, book 14+ days ahead\n\nManager approval required for expenses > $500.",
+        "category": "HR",
+        "tags": ["expense", "reimbursement", "receipt", "travel", "concur"]
+    },
+    {
+        "id": "laptop_slow",
+        "title": "Fixing a Slow Laptop",
+        "content": "Quick fixes for slow performance:\n1. Restart your laptop (seriously, it helps!)\n2. Close unused browser tabs and applications\n3. Run Disk Cleanup: Search 'Disk Cleanup' in Start\n4. Check for Windows updates\n5. Clear browser cache\n\nIf still slow after these steps:\n- Check Task Manager for high CPU/memory usage\n- Run antivirus scan\n- Submit IT ticket for hardware diagnostics",
+        "category": "IT_Support",
+        "tags": ["slow", "performance", "laptop", "computer", "speed"]
+    },
+    {
+        "id": "benefits_enrollment",
+        "title": "Benefits Enrollment Guide",
+        "content": "Open Enrollment: November 1-15 each year\n\nAvailable Benefits:\n- Medical: PPO, HMO, HDHP options\n- Dental: Basic and Premium plans\n- Vision: VSP coverage\n- 401k: Company matches up to 6%\n- Life Insurance: 1x salary free, additional available\n\nHow to Enroll:\n1. Login to Workday\n2. Go to Benefits > Change Benefits\n3. Review and select plans\n4. Add dependents if needed\n5. Confirm selections before deadline",
+        "category": "HR",
+        "tags": ["benefits", "health", "insurance", "401k", "enrollment", "medical", "dental"]
+    },
+    {
+        "id": "software_request",
+        "title": "How to Request Software",
+        "content": "To request new software:\n1. Go to ServiceNow portal: service.company.com\n2. Click 'Request Software'\n3. Search for the software you need\n4. Fill out business justification\n5. Submit for approval\n\nApproval timeline:\n- Free software: 1-2 business days\n- Paid software: 3-5 business days (requires manager + budget approval)\n- Enterprise software: 1-2 weeks (requires director approval)\n\nFor urgent requests, contact IT directly.",
+        "category": "IT_Support",
+        "tags": ["software", "install", "application", "license", "request"]
+    },
+    {
+        "id": "onboarding_checklist",
+        "title": "New Employee Onboarding Checklist",
+        "content": "Welcome! Complete these in your first week:\n\nDay 1:\n- Pick up laptop from IT (Room 101)\n- Complete I-9 verification with HR\n- Set up email and Slack\n\nWeek 1:\n- Complete security training (mandatory)\n- Set up direct deposit in Workday\n- Enroll in benefits\n- Meet with your manager for 30/60/90 plan\n- Join team channels in Slack\n\nResources:\n- IT Help: ext. 4357\n- HR Help: ext. 4200\n- Facilities: ext. 4100",
+        "category": "HR",
+        "tags": ["onboarding", "new hire", "first day", "setup", "checklist"]
+    },
+    {
+        "id": "wifi_connection",
+        "title": "How to Connect to Office WiFi",
+        "content": "Office WiFi Networks:\n\n1. Corporate Network (CorpWiFi):\n   - Use for work devices\n   - Requires AD credentials\n   - Auto-connects with domain-joined laptops\n\n2. Guest Network (GuestWiFi):\n   - For visitors and personal devices\n   - Password: Available at reception\n   - Limited bandwidth, no internal access\n\nTroubleshooting:\n- Forget network and reconnect\n- Ensure WiFi is enabled\n- Check if MAC address is registered (IT can help)\n- Try moving closer to access point",
+        "category": "IT_Support",
+        "tags": ["wifi", "wireless", "network", "connect", "internet"]
+    },
+    {
+        "id": "sales_discount_policy",
+        "title": "Sales Discount Authorization Policy",
+        "content": "Discount Authorization Levels:\n\n- Up to 10%: Sales Rep can approve\n- 11-20%: Sales Manager approval required\n- 21-30%: Regional Director approval\n- Over 30%: VP of Sales approval\n\nProcess:\n1. Document business justification in Salesforce\n2. Get verbal approval from appropriate level\n3. Add approval notes to opportunity\n4. Apply discount in quote tool\n\nNote: Educational and non-profit discounts follow separate guidelines.",
+        "category": "Sales",
+        "tags": ["discount", "pricing", "approval", "authorization", "sales"]
+    },
+    {
+        "id": "contract_review",
+        "title": "Contract Review Process",
+        "content": "When to Request Legal Review:\n- Any contract over $50,000\n- Contracts with liability clauses\n- Agreements with non-standard terms\n- All vendor NDAs and MSAs\n\nSubmission Process:\n1. Fill out Legal Request form in ServiceNow\n2. Attach draft contract (Word format preferred)\n3. Note deadline and business context\n4. Legal reviews within 5 business days\n\nUrgent Reviews:\n- Email legal@company.com with URGENT in subject\n- Include executive sponsor\n- 48-hour turnaround for critical deals",
+        "category": "Legal",
+        "tags": ["contract", "review", "legal", "agreement", "nda", "approval"]
+    },
+    {
+        "id": "printer_setup",
+        "title": "How to Set Up Office Printers",
+        "content": "Adding Office Printers:\n\nWindows:\n1. Open Settings > Devices > Printers\n2. Click 'Add a printer'\n3. Select from list or enter: \\\\printserver\\PrinterName\n4. Common printers:\n   - \\\\printserver\\Floor2-Color\n   - \\\\printserver\\Floor2-BW\n   - \\\\printserver\\Floor3-Color\n\nMac:\n1. System Preferences > Printers & Scanners\n2. Click '+' to add\n3. Select printer from list\n\nPrinting Issues? Submit IT ticket with printer name and error message.",
+        "category": "IT_Support",
+        "tags": ["printer", "print", "setup", "add printer", "printing"]
+    }
+]

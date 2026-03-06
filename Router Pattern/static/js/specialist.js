@@ -156,13 +156,26 @@ function handleWebSocketMessage(data) {
             
         case 'user_connected':
             updateChatStatus('User is online');
+            addSystemMessage('✓ User is now online and ready to chat.');
+            enableInput();
+            break;
+        
+        case 'waiting_for_user':
+            updateChatStatus('Waiting for user...');
+            addSystemMessage('⏳ Waiting for user to connect...');
             break;
             
         case 'user_disconnected':
-            updateChatStatus('User went offline');
+            updateChatStatus('User disconnected');
+            addSystemMessage(`⚠️ ${data.message || 'User has disconnected from the chat.'}`);
+            playNotificationSound();
+            // Disable input since user is gone
+            disableInput();
+            messageInput.placeholder = 'User has disconnected - chat session ended';
             break;
             
         case 'session_closed':
+            addSystemMessage('Chat session has been closed.');
             showSessionClosed();
             break;
             

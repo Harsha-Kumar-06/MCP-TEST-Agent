@@ -8,6 +8,7 @@ let isLoading = false;
 let escalationId = null;
 let escalationWebSocket = null;
 let isEscalated = false;
+let userTimezone = null;
 
 // Agent conversation memory state
 let agentConversations = {}; // {agent_name: [{role, content, timestamp}]}
@@ -24,21 +25,181 @@ const loadingOverlay = document.getElementById('loadingOverlay');
 document.addEventListener('DOMContentLoaded', () => {
     initSession();
     autoResizeTextarea();
+    detectUserTimezone();
 });
+
+// Detect user's timezone
+function detectUserTimezone() {
+    try {
+        userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        console.log('Detected user timezone:', userTimezone);
+    } catch (e) {
+        console.error('Failed to detect timezone:', e);
+        userTimezone = 'UTC';
+    }
+}
+
+// Get current date/time info for the user
+function getCurrentTimeInfo() {
+    const now = new Date();
+    return {
+        timezone: userTimezone,
+        localTime: now.toLocaleTimeString(),
+        localDate: now.toLocaleDateString(),
+        dayOfWeek: now.toLocaleDateString('en-US', { weekday: 'long' }),
+        isoTime: now.toISOString()
+    };
+}
 
 // Initialize session
 async function initSession() {
     try {
-        const response = await fetch('/api/session/new', { method: 'POST' });
-        const data = await response.json();
-        sessionId = data.session_id;
-        console.log('Session initialized:', sessionId);
+        // Check if we have a stored session ID
+        const storedSessionId = localStorage.getItem('corpassist_session_id');
+        
+        if (storedSessionId) {
+            sessionId = storedSessionId;
+            console.log('Restored session:', sessionId);
+        } else {
+            const response = await fetch('/api/session/new', { method: 'POST' });
+            const data = await response.json();
+            sessionId = data.session_id;
+            localStorage.setItem('corpassist_session_id', sessionId);
+            console.log('Session initialized:', sessionId);
+        }
+        
         // Initialize agent conversations
         agentConversations = {};
         currentAgent = null;
         lastRoutedAgent = null;
+        
+        // Check for active escalation and restore if exists
+        await restoreEscalationState();
+        
     } catch (error) {
         console.error('Failed to initialize session:', error);
+    }
+}
+
+// Save escalation state to localStorage
+function saveEscalationState(escId) {
+    if (escId) {
+        localStorage.setItem('corpassist_escalation_id', escId);
+        localStorage.setItem('corpassist_escalation_time', Date.now().toString());
+        console.log('Escalation state saved:', escId);
+    }
+}
+
+// Clear escalation state from localStorage
+function clearEscalationState() {
+    localStorage.removeItem('corpassist_escalation_id');
+    localStorage.removeItem('corpassist_escalation_time');
+    console.log('Escalation state cleared');
+}
+
+// Restore escalation state after page refresh
+async function restoreEscalationState() {
+    const storedEscalationId = localStorage.getItem('corpassist_escalation_id');
+    const storedTime = localStorage.getItem('corpassist_escalation_time');
+    
+    if (!storedEscalationId) {
+        return;
+    }
+    
+    console.log('Found stored escalation:', storedEscalationId);
+    
+    // Check if escalation is too old (24 hours)
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    const isExpired = storedTime && (Date.now() - parseInt(storedTime)) > maxAge;
+    
+    // Check escalation status on server
+    try {
+        const response = await fetch(`/api/escalation/${storedEscalationId}/status`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Always load chat history first
+            await loadEscalationHistory(storedEscalationId);
+            
+            if (data.status === 'closed' || data.status === 'resolved' || isExpired) {
+                // Session ended - show history in read-only mode
+                console.log('Escalation session ended, showing history');
+                const reason = isExpired ? 'expired' : data.status;
+                addSystemMessage(`Previous chat session (${reason}). Click "New Chat" to start fresh.`);
+                showChatEndedState();
+            } else {
+                // Active session - reconnect
+                console.log('Restoring active escalation:', storedEscalationId);
+                addSystemMessage(`Reconnecting to live chat session...`);
+                connectEscalationWebSocket(storedEscalationId);
+            }
+            
+        } else if (response.status === 404) {
+            // Escalation not found on server - show local history if available
+            console.log('Escalation not found on server');
+            addSystemMessage(`Previous session not found. Click "New Chat" to start fresh.`);
+            showChatEndedState();
+        }
+    } catch (error) {
+        console.error('Failed to check escalation status:', error);
+        // Network error - try to load history and reconnect
+        await loadEscalationHistory(storedEscalationId);
+        addSystemMessage(`Attempting to reconnect...`);
+        connectEscalationWebSocket(storedEscalationId);
+    }
+}
+
+// Show chat ended state (read-only mode)
+function showChatEndedState() {
+    isEscalated = false;
+    escalationId = null;
+    
+    // Disable input with message
+    const inputContainer = document.querySelector('.input-container');
+    if (inputContainer && !document.getElementById('chatEndedBanner')) {
+        const banner = document.createElement('div');
+        banner.id = 'chatEndedBanner';
+        banner.className = 'chat-ended-banner';
+        banner.innerHTML = `
+            <i class="fas fa-history"></i>
+            <span>This chat session has ended. </span>
+            <button onclick="startNewChat()" class="new-chat-inline-btn">Start New Chat</button>
+        `;
+        inputContainer.parentNode.insertBefore(banner, inputContainer);
+    }
+}
+
+// Load escalation chat history from server
+async function loadEscalationHistory(escId) {
+    try {
+        const response = await fetch(`/api/escalation/${escId}/history`);
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Hide welcome message
+            hideWelcome();
+            
+            // Display chat history
+            if (data.messages && data.messages.length > 0) {
+                data.messages.forEach(msg => {
+                    if (msg.role === 'user') {
+                        addMessageWithoutScroll(msg.content, 'user');
+                    } else if (msg.role === 'specialist') {
+                        addMessageWithoutScroll(msg.content, 'specialist', 'Human Specialist');
+                    } else if (msg.role === 'system') {
+                        // Add system message inline
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message system-message';
+                        msgDiv.innerHTML = `<div class="system-content"><i class="fas fa-info-circle"></i> ${msg.content}</div>`;
+                        messagesContainer.appendChild(msgDiv);
+                    }
+                });
+                scrollToBottom();
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load escalation history:', error);
     }
 }
 
@@ -277,6 +438,8 @@ function connectEscalationWebSocket(escId) {
     escalationWebSocket.onopen = () => {
         console.log('*** USER WEBSOCKET CONNECTED ***');
         isEscalated = true;
+        // Save escalation state for page refresh recovery
+        saveEscalationState(escalationId);
         updateChatHeader('Connected to Specialist');
         updateEscalationBanner(true, escalationId);
         showLiveChatSection(escId);
@@ -294,7 +457,22 @@ function connectEscalationWebSocket(escId) {
             // Play notification sound if available
             playNotificationSound();
         } else if (data.type === 'specialist_joined') {
-            addSystemMessage(`✓ ${data.specialist_name || 'A specialist'} has joined the chat and can see your messages.`);
+            const specialistName = data.specialist_name || 'A specialist';
+            addSystemMessage(`✓ ${specialistName} has joined the chat and can see your messages.`);
+            updateChatHeader('Connected to Specialist');
+            playNotificationSound();
+        } else if (data.type === 'waiting_for_specialist') {
+            addSystemMessage(`⏳ ${data.message || 'Waiting for a specialist to connect...'}`);
+            updateChatHeader('Waiting for Specialist');
+        } else if (data.type === 'servicenow_only') {
+            addSystemMessage(`📋 ${data.message}`);
+            if (data.servicenow_incident) {
+                addSystemMessage(`Your ServiceNow ticket: ${data.servicenow_incident}`);
+            }
+            disconnectEscalation();
+        } else if (data.type === 'specialist_disconnected') {
+            addSystemMessage(`⚠️ ${data.message || 'The specialist has disconnected.'}`);
+            playNotificationSound();
         } else if (data.type === 'specialist_typing') {
             showTypingIndicator();
         } else if (data.type === 'ticket_resolved') {
@@ -305,8 +483,11 @@ function connectEscalationWebSocket(escId) {
             addSystemMessage(`Resolution: ${notes}`);
             playNotificationSound();
         } else if (data.type === 'session_closed') {
-            addSystemMessage('The specialist has closed this session. You can continue chatting with the AI assistant.');
+            addSystemMessage('The chat session has ended. You can continue chatting with the AI assistant.');
             disconnectEscalation();
+        } else if (data.type === 'user_connected') {
+            // Confirmation that we're connected
+            console.log('User connection confirmed');
         }
     };
     
@@ -390,6 +571,10 @@ function disconnectEscalation() {
     isEscalated = false;
     const currentEscId = escalationId;
     escalationId = null;
+    
+    // Clear saved escalation state
+    clearEscalationState();
+    
     if (escalationWebSocket) {
         escalationWebSocket.close();
         escalationWebSocket = null;
@@ -465,10 +650,17 @@ async function sendMessage() {
     showTypingIndicator();
     
     try {
+        const timeInfo = getCurrentTimeInfo();
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, session_id: sessionId })
+            body: JSON.stringify({ 
+                message, 
+                session_id: sessionId,
+                user_timezone: userTimezone,
+                user_local_time: timeInfo.localTime,
+                user_local_date: timeInfo.localDate
+            })
         });
         
         const data = await response.json();
@@ -684,6 +876,20 @@ function scrollToBottom() {
 
 // Start new chat
 async function startNewChat() {
+    // Disconnect any active escalation
+    if (isEscalated || escalationId) {
+        disconnectEscalation();
+    }
+    
+    // Clear escalation state from localStorage
+    clearEscalationState();
+    
+    // Remove chat ended banner if present
+    const chatEndedBanner = document.getElementById('chatEndedBanner');
+    if (chatEndedBanner) {
+        chatEndedBanner.remove();
+    }
+    
     // Clear messages
     messagesContainer.innerHTML = '';
     
@@ -692,10 +898,24 @@ async function startNewChat() {
     currentAgent = null;
     lastRoutedAgent = null;
     
+    // Clear stored session to get a fresh one
+    localStorage.removeItem('corpassist_session_id');
+    
     // Hide agent tabs
     const tabsContainer = document.getElementById('agentTabsContainer');
     if (tabsContainer) {
         tabsContainer.style.display = 'none';
+    }
+    
+    // Get new session
+    try {
+        const response = await fetch('/api/session/new', { method: 'POST' });
+        const data = await response.json();
+        sessionId = data.session_id;
+        localStorage.setItem('corpassist_session_id', sessionId);
+        console.log('New session created:', sessionId);
+    } catch (error) {
+        console.error('Failed to create new session:', error);
     }
     
     // Show welcome

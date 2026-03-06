@@ -19,6 +19,54 @@ from typing import Optional
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+# For timezone handling
+try:
+    from zoneinfo import ZoneInfo  # Python 3.9+
+except ImportError:
+    from backports.zoneinfo import ZoneInfo  # For older Python versions
+
+import re
+
+
+def get_current_time_info(user_timezone: str = None) -> dict:
+    """
+    Get current date/time information, optionally in a specific timezone.
+    
+    Args:
+        user_timezone: User's timezone (e.g., "America/New_York", "Asia/Tokyo")
+    
+    Returns:
+        dict: Current time information with formatted strings
+    """
+    # Server time
+    server_now = datetime.now()
+    
+    result = {
+        "server_time": server_now.strftime("%Y-%m-%d %H:%M:%S"),
+        "server_date": server_now.strftime("%B %d, %Y"),
+        "server_day": server_now.strftime("%A"),
+    }
+    
+    # User's local time if timezone provided
+    if user_timezone:
+        try:
+            user_tz = ZoneInfo(user_timezone)
+            user_now = datetime.now(user_tz)
+            result["user_timezone"] = user_timezone
+            result["user_time"] = user_now.strftime("%I:%M %p")
+            result["user_time_24h"] = user_now.strftime("%H:%M")
+            result["user_date"] = user_now.strftime("%B %d, %Y")
+            result["user_day"] = user_now.strftime("%A")
+            result["user_datetime"] = user_now.strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Business hours check (8 AM - 6 PM)
+            result["is_business_hours"] = 8 <= user_now.hour < 18
+            result["is_weekend"] = user_now.weekday() >= 5
+        except Exception as e:
+            result["timezone_error"] = f"Invalid timezone: {user_timezone}"
+    
+    return result
+
 # Import specialist loader for dynamic specialist data
 from .specialist_loader import load_specialists, get_specialist_by_email, get_available_specialists, clear_cache as clear_specialist_cache
 
@@ -1108,41 +1156,153 @@ def schedule_callback(
     preferred_time: str,
     phone_number: str,
     issue_summary: str,
-    employee_id: str
+    employee_id: str,
+    user_timezone: str = None
 ) -> dict:
     """
     Schedule a callback from a specialist.
     
     Args:
         department: Department to callback from
-        preferred_time: Preferred callback time (e.g., "today 2pm", "tomorrow morning")
+        preferred_time: Preferred callback time (e.g., "today 2pm", "tomorrow morning", "3:30pm", "15:00")
         phone_number: Phone number to call
         issue_summary: Brief description of the issue
         employee_id: The employee's ID (use 'unknown' if not known)
+        user_timezone: User's timezone (e.g., "America/New_York", "Europe/London", "Asia/Tokyo"). 
+                       If not provided, will use server time.
     
     Returns:
         dict: Callback confirmation details
     """
     callback_id = f"CB-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
-    # Parse preferred time (simplified)
-    now = datetime.now()
-    if "today" in preferred_time.lower():
-        scheduled = now.replace(hour=14, minute=0)  # Default to 2 PM
-    elif "tomorrow" in preferred_time.lower():
-        scheduled = (now + timedelta(days=1)).replace(hour=10, minute=0)
+    # Set up timezone handling
+    try:
+        if user_timezone:
+            user_tz = ZoneInfo(user_timezone)
+        else:
+            user_tz = None  # Use server timezone
+    except Exception as e:
+        print(f"Invalid timezone '{user_timezone}', using server time: {e}")
+        user_tz = None
+    
+    # Get current time in user's timezone
+    if user_tz:
+        now = datetime.now(user_tz)
     else:
-        scheduled = now + timedelta(hours=4)  # Default to 4 hours from now
+        now = datetime.now()
+    
+    # Parse preferred time intelligently
+    preferred_lower = preferred_time.lower().strip()
+    scheduled = None
+    
+    # Extract time patterns
+    time_match = re.search(r'(\d{1,2}):?(\d{2})?\s*(am|pm)?', preferred_lower, re.IGNORECASE)
+    
+    if time_match:
+        hour = int(time_match.group(1))
+        minute = int(time_match.group(2)) if time_match.group(2) else 0
+        am_pm = time_match.group(3)
+        
+        # Convert to 24-hour format
+        if am_pm:
+            if am_pm.lower() == 'pm' and hour != 12:
+                hour += 12
+            elif am_pm.lower() == 'am' and hour == 12:
+                hour = 0
+        
+        # Determine the date
+        if 'tomorrow' in preferred_lower:
+            scheduled_date = now.date() + timedelta(days=1)
+        elif 'today' in preferred_lower or time_match:
+            scheduled_date = now.date()
+            # If the time has already passed today, schedule for tomorrow
+            if user_tz:
+                check_time = datetime(now.year, now.month, now.day, hour, minute, tzinfo=user_tz)
+            else:
+                check_time = datetime(now.year, now.month, now.day, hour, minute)
+            if check_time < now:
+                scheduled_date = now.date() + timedelta(days=1)
+        else:
+            scheduled_date = now.date()
+        
+        if user_tz:
+            scheduled = datetime(scheduled_date.year, scheduled_date.month, scheduled_date.day, 
+                               hour, minute, tzinfo=user_tz)
+        else:
+            scheduled = datetime(scheduled_date.year, scheduled_date.month, scheduled_date.day, 
+                               hour, minute)
+    
+    # Handle relative time expressions
+    elif 'morning' in preferred_lower:
+        target_hour = 10
+        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        if user_tz:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, 
+                               target_hour, 0, tzinfo=user_tz)
+        else:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, target_hour, 0)
+    
+    elif 'afternoon' in preferred_lower:
+        target_hour = 14
+        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        if user_tz:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, 
+                               target_hour, 0, tzinfo=user_tz)
+        else:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, target_hour, 0)
+    
+    elif 'evening' in preferred_lower:
+        target_hour = 17
+        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        if user_tz:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, 
+                               target_hour, 0, tzinfo=user_tz)
+        else:
+            scheduled = datetime(target_date.year, target_date.month, target_date.day, target_hour, 0)
+    
+    # Default fallback
+    if not scheduled:
+        if 'today' in preferred_lower:
+            if user_tz:
+                scheduled = now.replace(hour=14, minute=0, second=0, microsecond=0)
+            else:
+                scheduled = now.replace(hour=14, minute=0, second=0, microsecond=0)
+            # If 2 PM has passed, go to 4 hours from now
+            if scheduled < now:
+                scheduled = now + timedelta(hours=4)
+        elif 'tomorrow' in preferred_lower:
+            next_day = now + timedelta(days=1)
+            if user_tz:
+                scheduled = next_day.replace(hour=10, minute=0, second=0, microsecond=0)
+            else:
+                scheduled = next_day.replace(hour=10, minute=0, second=0, microsecond=0)
+        else:
+            # Default to 4 hours from now
+            scheduled = now + timedelta(hours=4)
+    
+    # Ensure scheduled time is during business hours (8 AM - 6 PM in user's timezone)
+    if scheduled.hour < 8:
+        scheduled = scheduled.replace(hour=8, minute=0)
+    elif scheduled.hour >= 18:
+        # Move to next business day at 9 AM
+        scheduled = (scheduled + timedelta(days=1)).replace(hour=9, minute=0)
+    
+    # Format the time nicely for the user
+    time_format_str = scheduled.strftime('%I:%M %p on %B %d, %Y')
+    timezone_info = f" ({user_timezone})" if user_timezone else " (server time)"
     
     return {
         "callback_id": callback_id,
         "status": "scheduled",
         "department": department,
         "scheduled_time": scheduled.strftime("%Y-%m-%d %H:%M"),
+        "scheduled_time_display": time_format_str,
+        "timezone": user_timezone or "server",
         "phone_number": phone_number,
         "employee_id": employee_id,
         "issue_summary": issue_summary,
-        "confirmation": f"A {department} specialist will call you at {scheduled.strftime('%I:%M %p on %B %d')}",
+        "confirmation": f"A {department} specialist will call you at {time_format_str}{timezone_info}",
         "notes": [
             "Please ensure your phone is available at the scheduled time",
             "If you miss the call, we'll try again within 30 minutes",
@@ -1154,7 +1314,8 @@ def schedule_callback(
 def start_live_chat(
     department: str,
     initial_message: str,
-    employee_id: str
+    employee_id: str,
+    servicenow_only: bool = False
 ) -> dict:
     """
     Initiate a live chat session with a human agent.
@@ -1163,6 +1324,8 @@ def start_live_chat(
         department: Department for live chat
         initial_message: The user's initial message/issue
         employee_id: The employee's ID (use 'unknown' if not known)
+        servicenow_only: If True, only creates a ServiceNow ticket without live chat capability.
+                        Use this when no specialists are configured for live chat.
     
     Returns:
         dict: Live chat session details
@@ -1193,6 +1356,25 @@ def start_live_chat(
     else:
         print(f"ServiceNow ticket not created: {servicenow_result.get('reason', 'Unknown error')}")
     
+    # If ServiceNow-only mode, return without live chat capability
+    if servicenow_only or (SERVICENOW_CONFIG.get("enabled") and not available):
+        return {
+            "escalation_id": escalation_id,
+            "session_id": escalation_id,
+            "servicenow_incident": servicenow_incident,
+            "status": "servicenow_only",
+            "servicenow_only": True,
+            "chat_url": None,
+            "department": department,
+            "message": f"ServiceNow ticket {servicenow_incident or 'pending'} has been created. A specialist will respond to your request through the ticketing system. Live chat is not available for this request - all responses will be handled via ServiceNow.",
+            "estimated_wait": "Response via ServiceNow within 4-8 hours",
+            "notes": [
+                "Your ticket has been logged in ServiceNow",
+                "You will receive email updates on your ticket status",
+                "Live chat is not available - specialists will respond via ServiceNow"
+            ]
+        }
+    
     # Register session with the server (non-blocking)
     session_data = {
         "escalation_id": escalation_id,
@@ -1202,6 +1384,7 @@ def start_live_chat(
         "issue_summary": initial_message,
         "employee_id": employee_id,
         "servicenow_incident": servicenow_incident,
+        "servicenow_only": False,
     }
     
     def register_session():
@@ -1245,26 +1428,38 @@ def start_live_chat(
             "escalation_id": escalation_id,
             "session_id": escalation_id,
             "servicenow_incident": servicenow_incident,
-            "status": "connected",
+            "servicenow_only": False,
+            "status": "waiting_for_specialist",
             "chat_url": specialist_url,
             "agent_name": assigned["name"],
             "department": department,
-            "message": f"Live chat session {escalation_id} started. You're now connected with {assigned['name']} from {department}. They can see your conversation history and will respond shortly.",
-            "estimated_wait": "0 minutes"
+            "message": f"Live chat session {escalation_id} started. Waiting for {assigned['name']} from {department} to connect. You will be notified when they join the chat.",
+            "estimated_wait": "1-5 minutes",
+            "notes": [
+                "A specialist has been notified and will join shortly",
+                "You can send messages while waiting",
+                "You will see a notification when the specialist connects"
+            ]
         }
     else:
-        # Queue position simulation
+        # Queue position simulation - no one available but live chat is possible
         queue_position = 3
         return {
             "escalation_id": escalation_id,
             "session_id": escalation_id,
             "servicenow_incident": servicenow_incident,
+            "servicenow_only": False,
             "status": "queued",
             "chat_url": specialist_url,
             "queue_position": queue_position,
             "department": department,
-            "message": f"Session {escalation_id} created. All agents are currently busy. You're #{queue_position} in queue.",
-            "estimated_wait": f"{queue_position * 5} minutes"
+            "message": f"Session {escalation_id} created. All agents are currently busy. You're #{queue_position} in queue. You will be notified when a specialist becomes available.",
+            "estimated_wait": f"{queue_position * 5} minutes",
+            "notes": [
+                f"You are #{queue_position} in the queue",
+                "You can send messages while waiting",
+                "You will be notified when a specialist joins"
+            ]
         }
 
 

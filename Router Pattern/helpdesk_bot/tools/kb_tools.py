@@ -2,10 +2,19 @@
 Knowledge Base Tools - RAG Implementation with Vector Search.
 
 Uses ChromaDB for vector storage and Gemini for embeddings.
+
+Knowledge Base can be loaded from:
+- In-code sample data (default)
+- JSON file (data/knowledge_base.json)
+- CSV file (data/knowledge_base.csv)
+
+Configure via .env: KB_SOURCE=json and KB_JSON_PATH=data/knowledge_base.json
 """
 
 import os
-from typing import Optional
+import json
+import csv
+from typing import Optional, List
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -20,6 +29,121 @@ except ImportError:
     genai = None
 
 load_dotenv()
+
+# ============================================================
+# KB CONFIGURATION
+# ============================================================
+# Source options: static, json, csv
+KB_SOURCE = os.getenv("KB_SOURCE", "static")
+KB_JSON_PATH = os.getenv("KB_JSON_PATH", "data/knowledge_base.json")
+KB_CSV_PATH = os.getenv("KB_CSV_PATH", "data/knowledge_base.csv")
+
+# ============================================================
+# KB LOADER FUNCTIONS
+# ============================================================
+
+def load_kb_from_json(file_path: str = None) -> List[dict]:
+    """
+    Load knowledge base articles from a JSON file.
+    
+    Expected JSON format:
+    [
+        {
+            "id": "article_id",
+            "title": "Article Title",
+            "content": "Full article content...",
+            "category": "IT_Support",
+            "tags": ["tag1", "tag2"]
+        }
+    ]
+    """
+    file_path = file_path or KB_JSON_PATH
+    
+    try:
+        # Handle relative paths
+        if not os.path.isabs(file_path):
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            full_path = os.path.join(project_root, file_path)
+            if not os.path.exists(full_path):
+                full_path = file_path
+        else:
+            full_path = file_path
+        
+        with open(full_path, 'r', encoding='utf-8') as f:
+            articles = json.load(f)
+        
+        print(f"Loaded {len(articles)} KB articles from JSON: {full_path}")
+        return articles
+    
+    except FileNotFoundError:
+        print(f"KB JSON file not found: {file_path}, using sample data")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON in KB file: {e}")
+        return None
+
+
+def load_kb_from_csv(file_path: str = None) -> List[dict]:
+    """
+    Load knowledge base articles from a CSV file.
+    
+    Expected CSV format:
+    id,title,content,category,tags
+    password_reset,"Password Reset Guide","Full content...",IT_Support,"password,login,access"
+    """
+    file_path = file_path or KB_CSV_PATH
+    articles = []
+    
+    try:
+        # Handle relative paths
+        if not os.path.isabs(file_path):
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            full_path = os.path.join(project_root, file_path)
+            if not os.path.exists(full_path):
+                full_path = file_path
+        else:
+            full_path = file_path
+        
+        with open(full_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                tags_str = row.get('tags', '')
+                tags = [t.strip() for t in tags_str.split(',') if t.strip()]
+                
+                articles.append({
+                    "id": row.get('id', '').strip(),
+                    "title": row.get('title', '').strip(),
+                    "content": row.get('content', '').strip(),
+                    "category": row.get('category', '').strip(),
+                    "tags": tags
+                })
+        
+        print(f"Loaded {len(articles)} KB articles from CSV: {full_path}")
+        return articles
+    
+    except FileNotFoundError:
+        print(f"KB CSV file not found: {file_path}, using sample data")
+        return None
+
+
+def get_kb_documents() -> List[dict]:
+    """
+    Get KB documents from the configured source.
+    """
+    source = KB_SOURCE.lower()
+    
+    if source == "json":
+        articles = load_kb_from_json()
+        if articles:
+            return articles
+    
+    elif source == "csv":
+        articles = load_kb_from_csv()
+        if articles:
+            return articles
+    
+    # Default to sample data
+    return SAMPLE_KB_DOCUMENTS
 
 # ============================================================
 # SAMPLE KB DATA (Replace with your actual KB content)
@@ -235,7 +359,8 @@ def _populate_collection(collection):
     ids = []
     embeddings = []
     
-    for doc in SAMPLE_KB_DOCUMENTS:
+    kb_docs = get_kb_documents()
+    for doc in kb_docs:
         # Combine title and content for embedding
         full_text = f"{doc['title']}\n\n{doc['content']}"
         documents.append(full_text)
@@ -371,7 +496,8 @@ def _keyword_search(query: str, category: str, max_results: int) -> dict:
     query_lower = query.lower()
     results = []
     
-    for doc in SAMPLE_KB_DOCUMENTS:
+    kb_docs = get_kb_documents()
+    for doc in kb_docs:
         if category and doc["category"] != category:
             continue
         
@@ -414,7 +540,8 @@ def get_kb_article(article_id: str) -> dict:
     Returns:
         dict: The full article content
     """
-    for doc in SAMPLE_KB_DOCUMENTS:
+    kb_docs = get_kb_documents()
+    for doc in kb_docs:
         if doc["id"] == article_id:
             return {
                 "found": True,
@@ -435,12 +562,13 @@ def get_kb_article(article_id: str) -> dict:
 
 def _find_related(article_id: str) -> list:
     """Find related articles based on category and tags."""
-    current = next((d for d in SAMPLE_KB_DOCUMENTS if d["id"] == article_id), None)
+    kb_docs = get_kb_documents()
+    current = next((d for d in kb_docs if d["id"] == article_id), None)
     if not current:
         return []
     
     related = []
-    for doc in SAMPLE_KB_DOCUMENTS:
+    for doc in kb_docs:
         if doc["id"] == article_id:
             continue
         if doc["category"] == current["category"]:

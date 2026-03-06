@@ -751,10 +751,186 @@ SNOW_GROUP_LEGAL=Legal
 
 Once everything is working:
 
-1. **Customize specialists** - Update `SPECIALISTS` dict in `escalation_tools.py` with real people
-2. **Adjust categories** - Modify `SERVICENOW_CATEGORIES` to match your ServiceNow setup
-3. **Add authentication** - Set `REQUIRE_AUTH=true` and configure SSO/LDAP
-4. **Deploy** - See `DEPLOYMENT_GUIDE.md` for production deployment
+1. **Customize Knowledge Base** - See section below for adding your company's KB articles
+2. **Update Specialists** - Edit `data/specialists.csv` with your real team members
+3. **Tweak Categories** - Modify `SERVICENOW_CATEGORIES` in escalation_tools.py
+4. **Enable Authentication** - Set `REQUIRE_AUTH=true` and configure SSO
+5. **Deploy** - See `DEPLOYMENT_GUIDE.md` for production deployment
+
+---
+
+## 13. Knowledge Base Customization
+
+The HelpDesk Bot includes a Knowledge Base (KB) that provides instant answers to common questions using AI-powered semantic search.
+
+### KB Data Sources
+
+Configure where KB articles are loaded from in your `.env` file:
+
+```env
+# Knowledge Base Source: static, json, csv
+KB_SOURCE=json
+
+# File paths (for json/csv sources)
+KB_JSON_PATH=data/knowledge_base.json
+KB_CSV_PATH=data/knowledge_base.csv
+```
+
+### Option A: JSON File (Recommended)
+
+**Step 1:** Edit `data/knowledge_base.json`:
+
+```json
+[
+    {
+        "id": "unique_article_id",
+        "title": "Article Title",
+        "content": "Full article content with instructions...",
+        "category": "IT_Support",
+        "tags": ["keyword1", "keyword2", "keyword3"]
+    },
+    {
+        "id": "pto_request",
+        "title": "How to Request PTO",
+        "content": "To request PTO:\n1. Login to Workday\n2. Click Time Off\n3. Submit request...",
+        "category": "HR",
+        "tags": ["pto", "vacation", "time off", "leave"]
+    }
+]
+```
+
+**Step 2:** Update `.env`:
+
+```env
+KB_SOURCE=json
+KB_JSON_PATH=data/knowledge_base.json
+```
+
+### Option B: CSV File
+
+**Step 1:** Create `data/knowledge_base.csv`:
+
+```csv
+id,title,content,category,tags
+password_reset,"Password Reset","To reset: 1. Go to password.company.com...",IT_Support,"password,login,access"
+pto_policy,"PTO Policy","Annual PTO: 15-25 days based on tenure...",HR,"pto,vacation,leave"
+```
+
+**Step 2:** Update `.env`:
+
+```env
+KB_SOURCE=csv
+KB_CSV_PATH=data/knowledge_base.csv
+```
+
+### KB Categories
+
+Use these standard categories (matching your sub-agents):
+
+| Category | For Articles About |
+|----------|-------------------|
+| `IT_Support` | Hardware, software, passwords, network, VPN |
+| `HR` | PTO, benefits, policies, payroll, onboarding |
+| `Sales` | Pricing, discounts, CRM, quotes, customers |
+| `Legal` | Contracts, NDAs, compliance, legal processes |
+
+### Adding New KB Articles
+
+1. **Gather content** from existing wikis, FAQs, documentation
+2. **Structure each article** with:
+   - Clear `title` (question format works well)
+   - Detailed `content` with steps
+   - Relevant `tags` for searchability
+3. **Test search** by asking questions in the bot
+
+### KB Best Practices
+
+- **Be specific**: "How to reset VPN password" > "Password reset"
+- **Include steps**: Numbered lists work best
+- **Add contact info**: Who to contact if self-service fails
+- **Use keywords**: Add synonyms in tags (e.g., "laptop,computer,PC")
+- **Keep updated**: Review quarterly for outdated info
+
+---
+
+## 14. Specialist Directory Setup
+
+Specialists are the human experts who can take over when AI can't help. Configure them carefully!
+
+### Quick Start: CSV File
+
+Edit `data/specialists.csv`:
+
+```csv
+department,name,email,expertise,available,phone,teams_id,servicenow_user
+IT_Support,Alex Chen,alex.chen@company.com,"hardware,network,security",true,+1-555-0101,alex.chen@company.com,alex.chen
+IT_Support,Maria Garcia,maria.garcia@company.com,"software,licenses,cloud",true,+1-555-0102,maria.garcia@company.com,maria.garcia
+HR,Sarah Johnson,sarah.johnson@company.com,"benefits,payroll,leave",true,+1-555-0201,sarah.johnson@company.com,sarah.johnson
+HR,James Wilson,james.wilson@company.com,"onboarding,policies,compliance",false,+1-555-0202,james.wilson@company.com,james.wilson
+Sales,David Lee,david.lee@company.com,"enterprise,contracts,pricing",true,+1-555-0301,david.lee@company.com,david.lee
+Legal,Lisa Anderson,lisa.anderson@company.com,"employment_law,contracts,ndas",true,+1-555-0401,lisa.anderson@company.com,lisa.anderson
+```
+
+### CSV Column Reference
+
+| Column | Required | Description |
+|--------|----------|-------------|
+| `department` | Yes | IT_Support, HR, Sales, or Legal |
+| `name` | Yes | Full name for display |
+| `email` | Yes | Email for notifications |
+| `expertise` | Yes | Comma-separated skills |
+| `available` | Yes | true/false - Is this person available? |
+| `phone` | No | Phone for callbacks |
+| `teams_id` | No | Microsoft Teams user ID |
+| `servicenow_user` | No | ServiceNow username for assignment |
+
+### Expertise Keywords
+
+Match expertise to common user requests:
+
+**IT_Support:**
+- hardware, laptop, computer, desktop
+- software, application, license, install
+- network, wifi, internet, vpn
+- password, login, access, account
+- email, outlook, calendar
+- security, antivirus, malware
+
+**HR:**
+- pto, vacation, leave, time off
+- benefits, health, insurance, dental
+- payroll, salary, compensation
+- onboarding, new hire
+- policies, handbook
+- performance, review
+
+**Sales:**
+- pricing, discount, quote
+- crm, salesforce
+- contracts, agreements
+- customers, accounts
+- commissions, territory
+
+**Legal:**
+- contracts, agreements, terms
+- nda, confidentiality
+- compliance, regulations
+- employment law, hr issues
+- intellectual property, ip
+
+### Testing Specialist Setup
+
+```bash
+# Verify specialists load correctly
+python -c "from helpdesk_bot.tools.specialist_loader import load_specialists; print(load_specialists())"
+```
+
+### Multiple Sources
+
+See Section 9 for advanced options:
+- Database (SQLite/PostgreSQL)
+- ServiceNow assignment groups
+- Active Directory/LDAP
 
 ---
 
