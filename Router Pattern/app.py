@@ -674,6 +674,14 @@ async def validate_specialist_session(data: SpecialistValidation):
     
     session = escalation_sessions[data.escalation_id]
     
+    # Check if session is already closed or resolved
+    session_status = session.get("status", "")
+    if session_status in ("closed", "resolved"):
+        raise HTTPException(
+            status_code=410,  # 410 Gone - resource no longer available
+            detail=f"This escalation session has already ended (status: {session_status}). Please wait for a new escalation request."
+        )
+    
     # Mark specialist as joined
     session["specialist_joined"] = True
     
@@ -1011,6 +1019,14 @@ async def specialist_websocket(
         await websocket.close(code=4001, reason="Invalid token")
         return
     
+    # Check if session is already closed or resolved BEFORE accepting connection
+    session = escalation_sessions.get(escalation_id)
+    if session:
+        session_status = session.get("status", "")
+        if session_status in ("closed", "resolved"):
+            await websocket.close(code=4002, reason=f"Session already ended ({session_status})")
+            return
+    
     await websocket.accept()
     
     # Register specialist connection
@@ -1019,7 +1035,6 @@ async def specialist_websocket(
     active_connections[escalation_id]["specialist"] = websocket
     
     # Update session
-    session = escalation_sessions.get(escalation_id)
     if session:
         session["specialist_joined"] = True
         session["specialist_joined_at"] = datetime.now().isoformat()
@@ -1155,12 +1170,33 @@ async def user_escalation_websocket(websocket: WebSocket, escalation_id: str):
     WebSocket endpoint for user during escalated chat.
     Allows user to continue chatting while waiting for/talking to specialist.
     """
+    # Check if session exists and its status BEFORE accepting connection
+    session = escalation_sessions.get(escalation_id)
+    if not session:
+        await websocket.accept()
+        await websocket.send_json({
+            "type": "error",
+            "message": "Escalation session not found."
+        })
+        await websocket.close(code=4004, reason="Escalation not found")
+        return
+    
+    # Check if session is already closed or resolved
+    session_status = session.get("status", "")
+    if session_status in ("closed", "resolved"):
+        await websocket.accept()
+        await websocket.send_json({
+            "type": "session_closed",
+            "message": f"This escalation session has ended (status: {session_status})."
+        })
+        await websocket.close(code=4003, reason=f"Session already ended ({session_status})")
+        return
+    
     await websocket.accept()
     print(f"[{escalation_id}] User WebSocket connected")
     
     # Check if this is a ServiceNow-only session
-    session = escalation_sessions.get(escalation_id)
-    if session and session.get("servicenow_only"):
+    if session.get("servicenow_only"):
         await websocket.send_json({
             "type": "servicenow_only",
             "message": "This ticket is being handled via ServiceNow. A specialist will respond through the ticketing system. Live chat is not available for this request.",

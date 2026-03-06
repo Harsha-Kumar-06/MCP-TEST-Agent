@@ -69,11 +69,32 @@
             </nav>
             
             <div class="sidebar-footer">
+                <button class="history-btn" onclick="toggleChatHistory()">
+                    <i class="fas fa-history"></i> Chat History
+                </button>
                 <button class="new-chat-btn" onclick="startNewChat()">
                     <i class="fas fa-plus"></i> New Conversation
                 </button>
             </div>
         </aside>
+
+        <!-- Chat History Panel -->
+        <div class="chat-history-panel" id="chatHistoryPanel">
+            <div class="history-panel-header">
+                <h3><i class="fas fa-history"></i> Chat History</h3>
+                <button class="close-history-btn" onclick="toggleChatHistory()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="history-panel-content" id="historyPanelContent">
+                <!-- Chat sessions will be populated here -->
+            </div>
+            <div class="history-panel-footer">
+                <button class="clear-history-btn" onclick="clearAllSessions()">
+                    <i class="fas fa-trash"></i> Clear All History
+                </button>
+            </div>
+        </div>
 
         <!-- Main Chat Area -->
         <main class="chat-container">

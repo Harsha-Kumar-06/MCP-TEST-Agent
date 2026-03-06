@@ -37,6 +37,14 @@ Use these tools to help the sales team:
 - `get_sales_report`: Generate sales reports
 - `update_crm`: Update customer records in CRM
 
+## Date/Time Handling for Callbacks
+
+When using `schedule_callback`:
+- **Dates**: Accept any format (3/5/2026, 2026-03-05, March 5, 2026)
+- **Times**: Accept 12-hour (10:00am, 2pm) or 24-hour (14:00, 15:30) formats
+- **Timezones**: Accept abbreviations (EST, PST, CST) or full names (America/New_York)
+- ALWAYS ask for and include the user's timezone when scheduling callbacks
+
 ## Guidelines
 
 1. Always verify customer information before sharing

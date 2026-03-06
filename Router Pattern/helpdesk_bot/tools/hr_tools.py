@@ -5,8 +5,95 @@ These are mock implementations demonstrating the tool pattern.
 In production, these would connect to your HRIS system.
 """
 
+import re
 from datetime import datetime, timedelta
 from typing import Optional
+
+
+def parse_flexible_date(date_str: str) -> str:
+    """
+    Parse a date string in various formats and return YYYY-MM-DD format.
+    
+    Supported formats:
+    - MM/DD/YYYY or M/D/YYYY (e.g., "3/5/2026", "03/05/2026")
+    - YYYY-MM-DD (e.g., "2026-03-05")
+    - Month DD, YYYY (e.g., "March 5, 2026", "Mar 5, 2026")
+    - DD Month YYYY (e.g., "5 March 2026")
+    
+    Args:
+        date_str: Date string in any supported format
+    
+    Returns:
+        str: Date in YYYY-MM-DD format, or original string if parsing fails
+    """
+    date_str = date_str.strip()
+    
+    # Month name mapping
+    month_names = {
+        'jan': 1, 'january': 1,
+        'feb': 2, 'february': 2,
+        'mar': 3, 'march': 3,
+        'apr': 4, 'april': 4,
+        'may': 5,
+        'jun': 6, 'june': 6,
+        'jul': 7, 'july': 7,
+        'aug': 8, 'august': 8,
+        'sep': 9, 'sept': 9, 'september': 9,
+        'oct': 10, 'october': 10,
+        'nov': 11, 'november': 11,
+        'dec': 12, 'december': 12
+    }
+    
+    # Try YYYY-MM-DD format first (already correct format)
+    if re.match(r'^\d{4}-\d{1,2}-\d{1,2}$', date_str):
+        try:
+            parts = date_str.split('-')
+            year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
+            datetime(year, month, day)  # Validate
+            return f"{year:04d}-{month:02d}-{day:02d}"
+        except ValueError:
+            pass
+    
+    # Try MM/DD/YYYY or M/D/YYYY format
+    match_mdy = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', date_str)
+    if match_mdy:
+        try:
+            month, day, year = int(match_mdy.group(1)), int(match_mdy.group(2)), int(match_mdy.group(3))
+            datetime(year, month, day)  # Validate
+            return f"{year:04d}-{month:02d}-{day:02d}"
+        except ValueError:
+            pass
+    
+    # Try "Month DD, YYYY" or "Month DD YYYY" format
+    match_month_text = re.match(r'^([a-zA-Z]+)\.?\s+(\d{1,2}),?\s*(\d{4})$', date_str)
+    if match_month_text:
+        try:
+            month_str = match_month_text.group(1).lower()
+            day = int(match_month_text.group(2))
+            year = int(match_month_text.group(3))
+            month = month_names.get(month_str)
+            if month:
+                datetime(year, month, day)  # Validate
+                return f"{year:04d}-{month:02d}-{day:02d}"
+        except ValueError:
+            pass
+    
+    # Try "DD Month YYYY" format
+    match_day_month = re.match(r'^(\d{1,2})\s+([a-zA-Z]+)\.?\s*,?\s*(\d{4})$', date_str)
+    if match_day_month:
+        try:
+            day = int(match_day_month.group(1))
+            month_str = match_day_month.group(2).lower()
+            year = int(match_day_month.group(3))
+            month = month_names.get(month_str)
+            if month:
+                datetime(year, month, day)  # Validate
+                return f"{year:04d}-{month:02d}-{day:02d}"
+        except ValueError:
+            pass
+    
+    # If no pattern matches, return original (let the caller handle invalid input)
+    return date_str
 
 
 def submit_pto_request(
@@ -21,14 +108,34 @@ def submit_pto_request(
     
     Args:
         employee_id: The employee's ID number
-        start_date: Start date of leave (YYYY-MM-DD format)
-        end_date: End date of leave (YYYY-MM-DD format)
+        start_date: Start date of leave (flexible formats: YYYY-MM-DD, MM/DD/YYYY, "March 5, 2026", etc.)
+        end_date: End date of leave (flexible formats: YYYY-MM-DD, MM/DD/YYYY, "March 5, 2026", etc.)
         leave_type: Type of leave (PTO, Sick, Personal, Vacation)
         reason: Optional reason for the leave request
     
     Returns:
         dict: Request confirmation with ticket number and status
     """
+    # Parse dates to standard format
+    parsed_start = parse_flexible_date(start_date)
+    parsed_end = parse_flexible_date(end_date)
+    
+    # Validate dates
+    try:
+        start_dt = datetime.strptime(parsed_start, "%Y-%m-%d")
+        end_dt = datetime.strptime(parsed_end, "%Y-%m-%d")
+        
+        if end_dt < start_dt:
+            return {
+                "status": "error",
+                "message": f"End date ({parsed_end}) cannot be before start date ({parsed_start})"
+            }
+    except ValueError as e:
+        return {
+            "status": "error",
+            "message": f"Invalid date format. Please use formats like 'YYYY-MM-DD', 'MM/DD/YYYY', or 'March 5, 2026'. Error: {e}"
+        }
+    
     # Mock implementation
     request_id = f"PTO-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
@@ -37,8 +144,8 @@ def submit_pto_request(
         "request_id": request_id,
         "employee_id": employee_id,
         "leave_type": leave_type,
-        "start_date": start_date,
-        "end_date": end_date,
+        "start_date": parsed_start,
+        "end_date": parsed_end,
         "message": f"PTO request {request_id} submitted successfully. Your manager will be notified for approval.",
         "estimated_response": "Within 2 business days"
     }

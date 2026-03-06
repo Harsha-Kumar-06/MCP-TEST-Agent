@@ -28,12 +28,67 @@ except ImportError:
 import re
 
 
+# Timezone abbreviation to IANA timezone mapping
+TIMEZONE_ABBREVIATIONS = {
+    # US timezones
+    "est": "America/New_York",
+    "eastern": "America/New_York",
+    "edt": "America/New_York",
+    "cst": "America/Chicago",
+    "central": "America/Chicago",
+    "cdt": "America/Chicago",
+    "mst": "America/Denver",
+    "mountain": "America/Denver",
+    "mdt": "America/Denver",
+    "pst": "America/Los_Angeles",
+    "pacific": "America/Los_Angeles",
+    "pdt": "America/Los_Angeles",
+    "akst": "America/Anchorage",
+    "alaska": "America/Anchorage",
+    "hst": "Pacific/Honolulu",
+    "hawaii": "Pacific/Honolulu",
+    # International
+    "gmt": "Europe/London",
+    "utc": "UTC",
+    "bst": "Europe/London",
+    "cet": "Europe/Paris",
+    "cest": "Europe/Paris",
+    "ist": "Asia/Kolkata",
+    "jst": "Asia/Tokyo",
+    "aest": "Australia/Sydney",
+    "aedt": "Australia/Sydney",
+}
+
+
+def normalize_timezone(timezone_str: str) -> str:
+    """
+    Normalize timezone string - convert abbreviations to IANA timezone names.
+    
+    Args:
+        timezone_str: Timezone as abbreviation (e.g., "EST", "PST") or IANA name
+    
+    Returns:
+        str: IANA timezone name (e.g., "America/New_York")
+    """
+    if not timezone_str:
+        return None
+    
+    tz_lower = timezone_str.strip().lower()
+    
+    # Check if it's an abbreviation
+    if tz_lower in TIMEZONE_ABBREVIATIONS:
+        return TIMEZONE_ABBREVIATIONS[tz_lower]
+    
+    # Otherwise return as-is (assume it's already IANA format)
+    return timezone_str.strip()
+
+
 def get_current_time_info(user_timezone: str = None) -> dict:
     """
     Get current date/time information, optionally in a specific timezone.
     
     Args:
-        user_timezone: User's timezone (e.g., "America/New_York", "Asia/Tokyo")
+        user_timezone: User's timezone (e.g., "America/New_York", "EST", "Pacific")
     
     Returns:
         dict: Current time information with formatted strings
@@ -49,10 +104,13 @@ def get_current_time_info(user_timezone: str = None) -> dict:
     
     # User's local time if timezone provided
     if user_timezone:
+        # Normalize timezone abbreviations to IANA names
+        normalized_tz = normalize_timezone(user_timezone)
         try:
-            user_tz = ZoneInfo(user_timezone)
+            user_tz = ZoneInfo(normalized_tz)
             user_now = datetime.now(user_tz)
-            result["user_timezone"] = user_timezone
+            result["user_timezone"] = normalized_tz
+            result["user_timezone_input"] = user_timezone  # Keep original input
             result["user_time"] = user_now.strftime("%I:%M %p")
             result["user_time_24h"] = user_now.strftime("%H:%M")
             result["user_date"] = user_now.strftime("%B %d, %Y")
@@ -1164,11 +1222,11 @@ def schedule_callback(
     
     Args:
         department: Department to callback from
-        preferred_time: Preferred callback time (e.g., "today 2pm", "tomorrow morning", "3:30pm", "15:00")
+        preferred_time: Preferred callback time (e.g., "today 2pm", "tomorrow morning", "3/5/2026 10:00am")
         phone_number: Phone number to call
         issue_summary: Brief description of the issue
         employee_id: The employee's ID (use 'unknown' if not known)
-        user_timezone: User's timezone (e.g., "America/New_York", "Europe/London", "Asia/Tokyo"). 
+        user_timezone: User's timezone (e.g., "America/New_York", "EST", "Pacific"). 
                        If not provided, will use server time.
     
     Returns:
@@ -1176,14 +1234,16 @@ def schedule_callback(
     """
     callback_id = f"CB-{datetime.now().strftime('%Y%m%d%H%M%S')}"
     
+    # Normalize timezone abbreviations to IANA names
+    normalized_tz = normalize_timezone(user_timezone) if user_timezone else None
+    
     # Set up timezone handling
+    user_tz = None
     try:
-        if user_timezone:
-            user_tz = ZoneInfo(user_timezone)
-        else:
-            user_tz = None  # Use server timezone
+        if normalized_tz:
+            user_tz = ZoneInfo(normalized_tz)
     except Exception as e:
-        print(f"Invalid timezone '{user_timezone}', using server time: {e}")
+        print(f"Invalid timezone '{user_timezone}' (normalized: '{normalized_tz}'), using server time: {e}")
         user_tz = None
     
     # Get current time in user's timezone
@@ -1196,25 +1256,80 @@ def schedule_callback(
     preferred_lower = preferred_time.lower().strip()
     scheduled = None
     
-    # Extract time patterns
-    time_match = re.search(r'(\d{1,2}):?(\d{2})?\s*(am|pm)?', preferred_lower, re.IGNORECASE)
+    # First, try to extract an explicit date (e.g., "3/5/2026", "2026-03-05", "March 5, 2026")
+    explicit_date = None
+    
+    # Match MM/DD/YYYY or M/D/YYYY format
+    date_match_mdy = re.search(r'(\d{1,2})/(\d{1,2})/(\d{4})', preferred_time)
+    # Match YYYY-MM-DD format
+    date_match_ymd = re.search(r'(\d{4})-(\d{1,2})-(\d{1,2})', preferred_time)
+    # Match "March 5, 2026" or "Mar 5 2026" style
+    date_match_text = re.search(r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2}),?\s*(\d{4})', preferred_lower)
+    
+    if date_match_mdy:
+        month = int(date_match_mdy.group(1))
+        day = int(date_match_mdy.group(2))
+        year = int(date_match_mdy.group(3))
+        try:
+            explicit_date = datetime(year, month, day).date()
+        except ValueError:
+            pass  # Invalid date, will fall through to other parsing
+    elif date_match_ymd:
+        year = int(date_match_ymd.group(1))
+        month = int(date_match_ymd.group(2))
+        day = int(date_match_ymd.group(3))
+        try:
+            explicit_date = datetime(year, month, day).date()
+        except ValueError:
+            pass
+    elif date_match_text:
+        month_names = {'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
+                       'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12}
+        month = month_names.get(date_match_text.group(1)[:3], 1)
+        day = int(date_match_text.group(2))
+        year = int(date_match_text.group(3))
+        try:
+            explicit_date = datetime(year, month, day).date()
+        except ValueError:
+            pass
+    
+    # Extract time patterns - look for time after any date pattern or standalone
+    # Supports: "10:00", "14:00", "10:00am", "2pm", "14" (24-hour standalone)
+    # Pattern 1: HH:MM with optional am/pm (e.g., "10:00", "14:30", "10:00am")
+    # Pattern 2: H/HH followed by am/pm (e.g., "2pm", "10am")  
+    # Pattern 3: Standalone 24-hour format (13-23 range, since 1-12 is ambiguous)
+    time_match = re.search(r'(\d{1,2}):(\d{2})\s*(am|pm)?|(\d{1,2})\s*(am|pm)', preferred_lower, re.IGNORECASE)
+    
+    # Also check for standalone 24-hour time (13-23) without am/pm
+    standalone_24h = re.search(r'\b(1[3-9]|2[0-3])\b(?![\d:/])', preferred_time)
     
     if time_match:
-        hour = int(time_match.group(1))
-        minute = int(time_match.group(2)) if time_match.group(2) else 0
-        am_pm = time_match.group(3)
+        if time_match.group(4):  # Format like "10am" or "2pm"
+            hour = int(time_match.group(4))
+            minute = 0
+            am_pm = time_match.group(5)
+        else:  # Format like "10:00", "14:00", or "10:00am"
+            hour = int(time_match.group(1))
+            minute = int(time_match.group(2))
+            am_pm = time_match.group(3)
         
-        # Convert to 24-hour format
+        # Convert to 24-hour format (only if am/pm specified)
         if am_pm:
             if am_pm.lower() == 'pm' and hour != 12:
                 hour += 12
             elif am_pm.lower() == 'am' and hour == 12:
                 hour = 0
         
+        # Validate hour is in valid range
+        if hour > 23:
+            hour = 23  # Cap at 23:xx
+        
         # Determine the date
-        if 'tomorrow' in preferred_lower:
+        if explicit_date:
+            scheduled_date = explicit_date
+        elif 'tomorrow' in preferred_lower:
             scheduled_date = now.date() + timedelta(days=1)
-        elif 'today' in preferred_lower or time_match:
+        elif 'today' in preferred_lower:
             scheduled_date = now.date()
             # If the time has already passed today, schedule for tomorrow
             if user_tz:
@@ -1224,7 +1339,27 @@ def schedule_callback(
             if check_time < now:
                 scheduled_date = now.date() + timedelta(days=1)
         else:
+            # No explicit date, assume today but bump to tomorrow if time passed
             scheduled_date = now.date()
+            if user_tz:
+                check_time = datetime(now.year, now.month, now.day, hour, minute, tzinfo=user_tz)
+            else:
+                check_time = datetime(now.year, now.month, now.day, hour, minute)
+            if check_time < now:
+                scheduled_date = now.date() + timedelta(days=1)
+        
+        if user_tz:
+            scheduled = datetime(scheduled_date.year, scheduled_date.month, scheduled_date.day, 
+                               hour, minute, tzinfo=user_tz)
+        else:
+            scheduled = datetime(scheduled_date.year, scheduled_date.month, scheduled_date.day, 
+                               hour, minute)
+    
+    # Handle standalone 24-hour format without minutes (e.g., "3/5/2026 14")
+    elif standalone_24h:
+        hour = int(standalone_24h.group(1))
+        minute = 0
+        scheduled_date = explicit_date if explicit_date else now.date()
         
         if user_tz:
             scheduled = datetime(scheduled_date.year, scheduled_date.month, scheduled_date.day, 
@@ -1236,7 +1371,7 @@ def schedule_callback(
     # Handle relative time expressions
     elif 'morning' in preferred_lower:
         target_hour = 10
-        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        target_date = explicit_date if explicit_date else (now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date())
         if user_tz:
             scheduled = datetime(target_date.year, target_date.month, target_date.day, 
                                target_hour, 0, tzinfo=user_tz)
@@ -1245,7 +1380,7 @@ def schedule_callback(
     
     elif 'afternoon' in preferred_lower:
         target_hour = 14
-        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        target_date = explicit_date if explicit_date else (now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date())
         if user_tz:
             scheduled = datetime(target_date.year, target_date.month, target_date.day, 
                                target_hour, 0, tzinfo=user_tz)
@@ -1254,7 +1389,7 @@ def schedule_callback(
     
     elif 'evening' in preferred_lower:
         target_hour = 17
-        target_date = now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date()
+        target_date = explicit_date if explicit_date else (now.date() + timedelta(days=1) if 'tomorrow' in preferred_lower else now.date())
         if user_tz:
             scheduled = datetime(target_date.year, target_date.month, target_date.day, 
                                target_hour, 0, tzinfo=user_tz)
@@ -1263,7 +1398,14 @@ def schedule_callback(
     
     # Default fallback
     if not scheduled:
-        if 'today' in preferred_lower:
+        if explicit_date:
+            # Explicit date given but no time - default to 10 AM on that date
+            if user_tz:
+                scheduled = datetime(explicit_date.year, explicit_date.month, explicit_date.day, 
+                                   10, 0, tzinfo=user_tz)
+            else:
+                scheduled = datetime(explicit_date.year, explicit_date.month, explicit_date.day, 10, 0)
+        elif 'today' in preferred_lower:
             if user_tz:
                 scheduled = now.replace(hour=14, minute=0, second=0, microsecond=0)
             else:
@@ -1290,7 +1432,8 @@ def schedule_callback(
     
     # Format the time nicely for the user
     time_format_str = scheduled.strftime('%I:%M %p on %B %d, %Y')
-    timezone_info = f" ({user_timezone})" if user_timezone else " (server time)"
+    display_tz = normalized_tz or "server time"
+    timezone_info = f" ({display_tz})"
     
     return {
         "callback_id": callback_id,
@@ -1298,7 +1441,8 @@ def schedule_callback(
         "department": department,
         "scheduled_time": scheduled.strftime("%Y-%m-%d %H:%M"),
         "scheduled_time_display": time_format_str,
-        "timezone": user_timezone or "server",
+        "timezone": normalized_tz or "server",
+        "timezone_input": user_timezone,  # Original input for reference
         "phone_number": phone_number,
         "employee_id": employee_id,
         "issue_summary": issue_summary,

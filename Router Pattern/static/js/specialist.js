@@ -58,6 +58,16 @@ async function validateAndConnect() {
         });
         
         if (!response.ok) {
+            // Handle specific error codes
+            if (response.status === 410) {
+                // Session has ended
+                const errorData = await response.json().catch(() => ({}));
+                showSessionEnded(errorData.detail || 'This escalation session has already ended.');
+                return;
+            } else if (response.status === 401) {
+                showInvalidSession('Invalid or expired session token.');
+                return;
+            }
             throw new Error('Invalid session');
         }
         
@@ -114,7 +124,20 @@ function connectWebSocket() {
         updateConnectionStatus('disconnected', 'Disconnected');
         disableInput();
         
-        // Attempt to reconnect
+        // Handle specific close codes
+        if (event.code === 4001) {
+            // Invalid token - don't reconnect
+            showInvalidSession('Invalid or expired session token.');
+            return;
+        }
+        
+        if (event.code === 4002) {
+            // Session already ended - don't reconnect
+            showSessionEnded(event.reason || 'This escalation session has already ended.');
+            return;
+        }
+        
+        // Attempt to reconnect for other disconnects
         if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             reconnectAttempts++;
             updateConnectionStatus('connecting', `Reconnecting (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
@@ -431,8 +454,38 @@ function playNotificationSound() {
 }
 
 // Show invalid session modal
-function showInvalidSession() {
-    document.getElementById('invalidSessionModal').style.display = 'flex';
+function showInvalidSession(message) {
+    const modal = document.getElementById('invalidSessionModal');
+    if (modal) {
+        // Update message if provided
+        if (message) {
+            const msgElement = modal.querySelector('p');
+            if (msgElement) {
+                msgElement.textContent = message;
+            }
+        }
+        modal.style.display = 'flex';
+    }
+    updateConnectionStatus('error', 'Session invalid');
+}
+
+// Show session ended (already closed/resolved)
+function showSessionEnded(message) {
+    const modal = document.getElementById('sessionClosedModal');
+    if (modal) {
+        // Update title and message
+        const titleElement = modal.querySelector('h2');
+        const msgElement = modal.querySelector('p');
+        if (titleElement) {
+            titleElement.innerHTML = '<i class="fas fa-check-circle"></i> Session Already Ended';
+        }
+        if (msgElement) {
+            msgElement.textContent = message || 'This escalation session has already been resolved. Please wait for a new escalation request.';
+        }
+        modal.style.display = 'flex';
+    }
+    updateConnectionStatus('disconnected', 'Session ended');
+    disableInput();
 }
 
 // Show session closed modal

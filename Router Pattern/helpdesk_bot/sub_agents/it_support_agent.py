@@ -50,6 +50,14 @@ Many common questions (password reset, VPN setup, slow laptop) have KB articles 
    - `start_live_chat`: Connect to live IT agent
    - `schedule_callback`: Schedule a callback from IT
 
+## Date/Time Handling for Callbacks
+
+When using `schedule_callback`:
+- **Dates**: Accept any format (3/5/2026, 2026-03-05, March 5, 2026)
+- **Times**: Accept 12-hour (10:00am, 2pm) or 24-hour (14:00, 15:30) formats
+- **Timezones**: Accept abbreviations (EST, PST, CST) or full names (America/New_York)
+- ALWAYS ask for and include the user's timezone when scheduling callbacks
+
 ## Workflow
 
 1. **First**: Search KB for relevant articles
