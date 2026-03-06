@@ -22,7 +22,7 @@ This guide explains how to deploy your AI agents to Streamlit Cloud and get demo
 
 ## 🛠️ Quick Setup
 
-### 1. Push to GitHub
+### 1. Push to Bitbucket
 
 ```bash
 cd drayvn_agents
@@ -35,9 +35,10 @@ git push origin main
 
 1. Go to [share.streamlit.io](https://share.streamlit.io)
 2. Click **"New app"**
-3. Select your repository: `your-username/drayvn_agents`
-4. Choose branch: `main`
-5. Enter the main file path for each agent
+3. Click **"Connect to Bitbucket"** and authorize
+4. Select your workspace and repository: `drayvn_agents`
+5. Choose branch: `main`
+6. Enter the main file path for each agent
 
 ### 3. Deploy Each Agent
 

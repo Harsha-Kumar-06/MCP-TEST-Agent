@@ -220,24 +220,26 @@ def register_all_agents():
 
 def generate_streamlit_deployment_guide():
     """Generate deployment commands for each agent."""
-    print("\n📖 Streamlit Cloud Deployment Guide\n" + "=" * 50)
+    print("\n📖 Streamlit Cloud Deployment Guide (Bitbucket)\n" + "=" * 50)
     
     print("""
-Step 1: Push your repo to GitHub
+Step 1: Push your repo to Bitbucket (if not already)
    git add .
    git commit -m "Add Streamlit demos for all agents"
    git push origin main
 
 Step 2: Go to https://share.streamlit.io
 
-Step 3: Deploy each agent:
+Step 3: Click "New app" → Connect Bitbucket account
+
+Step 4: Deploy each agent:
 """)
     
     for agent in AGENTS:
         main_file = agent.get('main_file', 'streamlit_app.py')
         print(f"""
 {agent['icon']} {agent['display_name']}
-   Repository: your-github-user/drayvn_agents
+   Repository: bitbucket.org/your-workspace/drayvn_agents
    Branch: main
    Main file path: {agent['folder']}/{main_file}
    
