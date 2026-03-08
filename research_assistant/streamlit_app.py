@@ -1,9 +1,17 @@
-"""Research Assistant Agent - Streamlit Demo
+"""Research Assistant Agent - Streamlit Demo (Self-Contained)
 AI-powered document analysis with 5-agent sequential pipeline.
+Runs the Google ADK agent directly - no separate backend needed.
 """
 import streamlit as st
-import requests
 import os
+import io
+import asyncio
+import uuid
+
+# Configure environment before imports
+os.environ['REQUESTS_CA_BUNDLE'] = ''
+os.environ['CURL_CA_BUNDLE'] = ''
+os.environ['SSL_CERT_FILE'] = ''
 
 st.set_page_config(
     page_title="Research Assistant",
@@ -11,7 +19,118 @@ st.set_page_config(
     layout="wide"
 )
 
-DRAYVN_API = os.getenv("DRAYVN_API_URL", "https://your-drayvn-server.com/api/v1/prediction/FLOW_ID")
+# Initialize Google ADK components (cached)
+@st.cache_resource
+def init_agent():
+    """Initialize the ADK agent and runner (cached for performance)"""
+    try:
+        from google.adk import Runner
+        from google.adk.sessions import InMemorySessionService
+        from research_assistant import root_agent
+        
+        session_service = InMemorySessionService()
+        runner = Runner(
+            agent=root_agent,
+            app_name="research_assistant",
+            session_service=session_service
+        )
+        return runner, session_service, True, None
+    except Exception as e:
+        return None, None, False, str(e)
+
+# File parsing functions
+def extract_text_from_file(uploaded_file) -> tuple[str, str]:
+    """Extract text from uploaded file"""
+    import PyPDF2
+    from docx import Document as DocxDocument
+    
+    filename = uploaded_file.name.lower()
+    content = uploaded_file.read()
+    uploaded_file.seek(0)  # Reset for potential re-read
+    
+    ext = os.path.splitext(filename)[1]
+    
+    if ext == '.pdf':
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+        text = "\n\n".join([page.extract_text() or "" for page in pdf_reader.pages])
+        return text, "PDF"
+    elif ext in ['.docx', '.doc']:
+        doc = DocxDocument(io.BytesIO(content))
+        text = "\n\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+        return text, "Word"
+    elif ext in ['.txt', '.md', '.py', '.js', '.json', '.csv', '.xml', '.html']:
+        text = content.decode('utf-8', errors='ignore')
+        return text, ext.upper().replace('.', '')
+    else:
+        text = content.decode('utf-8', errors='ignore')
+        return text, "Text"
+
+async def run_agent_pipeline(question: str, document: str, progress_callback=None) -> str:
+    """Run the 5-agent pipeline directly"""
+    from google.genai import types
+    
+    runner, session_service, success, error = init_agent()
+    
+    if not success:
+        return f"⚠️ Agent initialization failed: {error}"
+    
+    # Check API key
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        return "⚠️ GOOGLE_API_KEY not configured. Add it to Streamlit secrets."
+    
+    session_id = str(uuid.uuid4())
+    user_id = "streamlit_user"
+    
+    # Create session
+    await session_service.create_session(
+        app_name="research_assistant",
+        user_id=user_id,
+        session_id=session_id
+    )
+    
+    # Prepare message
+    user_message = f"""RESEARCH QUESTION: {question}
+
+DOCUMENT TO ANALYZE:
+{document[:50000]}
+
+Analyze this document and provide comprehensive findings with specific citations."""
+    
+    new_message = types.Content(
+        role="user",
+        parts=[types.Part(text=user_message)]
+    )
+    
+    # Run pipeline
+    final_response = ""
+    agent_names = ['IntentDetectorAgent', 'DataProcessorAgent', 'AnalyzerAgent', 'ExtractorAgent', 'ReportGeneratorAgent']
+    
+    async for event in runner.run_async(
+        user_id=user_id,
+        session_id=session_id,
+        new_message=new_message
+    ):
+        if hasattr(event, 'author') and hasattr(event, 'content'):
+            if event.author == 'ReportGeneratorAgent' and event.content:
+                if hasattr(event.content, 'parts'):
+                    final_response = "".join([p.text for p in event.content.parts if hasattr(p, 'text')])
+            
+            # Update progress
+            if progress_callback and event.author in agent_names:
+                idx = agent_names.index(event.author)
+                progress_callback(idx + 1, len(agent_names), event.author)
+    
+    return final_response if final_response else "Analysis complete. No detailed report generated."
+
+def run_sync(coro):
+    """Run async code in sync context"""
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    return loop.run_until_complete(coro)
 
 st.title("🔬 Research Assistant")
 st.markdown("""
@@ -90,24 +209,22 @@ with tab1:
                 progress = st.progress(0)
                 status = st.empty()
                 
-                for i, (_, name, _) in enumerate(pipeline_stages):
-                    status.markdown(f"**Running: {name}...**")
-                    progress.progress((i + 1) / len(pipeline_stages))
+                def update_progress(step, total, agent_name):
+                    progress.progress(step / total)
+                    status.markdown(f"**Running: {agent_name}...**")
                 
                 try:
-                    response = requests.post(
-                        DRAYVN_API,
-                        json={"question": prompt},
-                        headers={"Content-Type": "application/json"},
-                        timeout=120
-                    )
-                    if response.status_code == 200:
-                        answer = response.json().get("text", "Analysis complete!")
-                    else:
-                        answer = f"⚠️ Error (Status: {response.status_code})"
-                except requests.exceptions.RequestException as e:
-                    answer = f"⚠️ Connection error: {str(e)}"
+                    # Run agent directly (no HTTP request)
+                    answer = run_sync(run_agent_pipeline(
+                        question=prompt,
+                        document="No document provided - answer from general knowledge.",
+                        progress_callback=update_progress
+                    ))
+                except Exception as e:
+                    answer = f"⚠️ Error: {str(e)}"
                 
+                progress.progress(1.0)
+                status.empty()
                 st.markdown(answer)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
@@ -125,21 +242,18 @@ with tab2:
         if st.button("🔍 Analyze Document", type="primary"):
             with st.spinner("Processing document..."):
                 try:
-                    # In production, you'd upload the file
-                    response = requests.post(
-                        DRAYVN_API,
-                        json={
-                            "question": f"Analyze document '{uploaded_file.name}': {analysis_prompt}",
-                        },
-                        headers={"Content-Type": "application/json"},
-                        timeout=120
-                    )
-                    if response.status_code == 200:
-                        answer = response.json().get("text", "Analysis complete!")
-                    else:
-                        answer = f"⚠️ Error (Status: {response.status_code})"
-                except requests.exceptions.RequestException as e:
-                    answer = f"⚠️ Connection error: {str(e)}"
+                    # Extract text from uploaded file
+                    doc_text, doc_type = extract_text_from_file(uploaded_file)
+                    st.caption(f"📄 Extracted {len(doc_text)} characters from {doc_type} file")
+                    
+                    # Run agent directly
+                    question = analysis_prompt if analysis_prompt else f"Analyze and summarize this {doc_type} document"
+                    answer = run_sync(run_agent_pipeline(
+                        question=question,
+                        document=doc_text
+                    ))
+                except Exception as e:
+                    answer = f"⚠️ Error: {str(e)}"
                 
                 st.markdown("### 📋 Analysis Results")
                 st.markdown(answer)
@@ -161,18 +275,13 @@ with tab3:
         if research_query:
             with st.spinner(f"Researching: {research_query}"):
                 try:
-                    response = requests.post(
-                        DRAYVN_API,
-                        json={"question": f"Research: {research_query}"},
-                        headers={"Content-Type": "application/json"},
-                        timeout=120
-                    )
-                    if response.status_code == 200:
-                        answer = response.json().get("text", "Research complete!")
-                    else:
-                        answer = f"⚠️ Error (Status: {response.status_code})"
-                except requests.exceptions.RequestException as e:
-                    answer = f"⚠️ Connection error: {str(e)}"
+                    # Run agent directly for research
+                    answer = run_sync(run_agent_pipeline(
+                        question=f"Research and provide comprehensive information about: {research_query}",
+                        document=f"Web research request for: {research_query}\nSearch depth: {search_depth}\nSources: {', '.join(sources)}"
+                    ))
+                except Exception as e:
+                    answer = f"⚠️ Error: {str(e)}"
                 
                 st.markdown("### 📋 Research Findings")
                 st.markdown(answer)
