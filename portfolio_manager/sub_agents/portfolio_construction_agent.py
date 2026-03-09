@@ -108,11 +108,20 @@ actual_weight = (actual_value / total_capital) * 100
 - Each allocated_amount = 0.20 * $9300 = $1860
 - For a $165 stock: shares = floor($1860 / $165) = 11, actual_value = 11 * $165 = $1815
 
+### Step 5: Recalculate Actual Cash Reserve
+After computing all positions, recalculate cash to absorb rounding leftovers:
+```
+actual_total_invested = sum(actual_value for all positions)
+actual_cash_reserve = total_capital - actual_total_invested
+```
+Use `actual_cash_reserve` (not `cash_reserve_amount`) in the output. This ensures:
+**stocks + cash = total_capital exactly**
+
 **VERIFY before output:**
-- sum(actual_value for all positions) + cash_reserve_amount <= total_capital
+- actual_total_invested + actual_cash_reserve == total_capital  (must be exact)
 - Each weight in output = actual_value / total_capital * 100
 
-### Step 5: Correlation Check
+### Step 6: Correlation Check
 Use `calculate_correlation_matrix` to verify diversification:
 - Flag any pair with correlation > 0.8
 - Consider reducing allocation to highly correlated pairs
@@ -131,10 +140,10 @@ Use `calculate_correlation_matrix` to verify diversification:
     "total_capital": <number>,
     "currency": "USD",
     "cash_reserve": {
-      "amount": <number>,
-      "percentage": <number>
+      "amount": <actual_cash_reserve = total_capital - sum(actual position values)>,
+      "percentage": <actual_cash_reserve / total_capital * 100>
     },
-    "invested_capital": <number>,
+    "invested_capital": <sum of all actual position values>,
     "positions": [
       {
         "symbol": "<ticker>",
