@@ -8,6 +8,13 @@ import io
 import asyncio
 import uuid
 
+# Fix async event loop for Streamlit Cloud
+try:
+    import nest_asyncio
+    nest_asyncio.apply()
+except ImportError:
+    pass  # Will be handled later
+
 # Configure environment before imports
 os.environ['REQUESTS_CA_BUNDLE'] = ''
 os.environ['CURL_CA_BUNDLE'] = ''
@@ -35,6 +42,10 @@ def init_agent():
             session_service=session_service
         )
         return runner, session_service, True, None
+    except ImportError as e:
+        return None, None, False, f"Missing dependency: {e}. Check requirements.txt"
+    except ModuleNotFoundError as e:
+        return None, None, False, f"Module not found: {e}. Ensure research_assistant.py is deployed."
     except Exception as e:
         return None, None, False, str(e)
 
@@ -124,18 +135,35 @@ Analyze this document and provide comprehensive findings with specific citations
     return final_response if final_response else "Analysis complete. No detailed report generated."
 
 def run_sync(coro):
-    """Run async code in sync context"""
+    """Run async code in sync context - Streamlit Cloud compatible"""
     try:
+        # nest_asyncio allows nested event loops (required for Streamlit Cloud)
         loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If loop is already running, create a new thread
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                return pool.submit(lambda: asyncio.run(coro)).result()
+        return loop.run_until_complete(coro)
     except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    return loop.run_until_complete(coro)
+        # No event loop exists, create one
+        return asyncio.run(coro)
 
 st.title("🔬 Research Assistant")
 st.markdown("""
 **AI Research Analyst** with 5-agent sequential pipeline for comprehensive document analysis.
 """)
+
+# Early initialization check to prevent redirect loops
+_runner, _session, _init_success, _init_error = init_agent()
+if not _init_success:
+    st.error(f"⚠️ Agent initialization failed: {_init_error}")
+    st.info("""**Troubleshooting:**
+1. Ensure `research_assistant.py` with `root_agent` is in your repo
+2. Add `GOOGLE_API_KEY` to Streamlit secrets (Settings → Secrets)
+3. Check `requirements.txt` includes: `google-adk`, `google-genai`, `nest_asyncio`
+""")
+    st.stop()  # Prevents further execution and redirect loops
 
 # Display pipeline stages
 st.markdown("### 📊 Agent Pipeline")

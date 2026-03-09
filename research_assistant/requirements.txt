@@ -6,6 +6,10 @@ pydantic>=2.0.0
 python-dotenv>=1.0.0
 python-multipart>=0.0.6
 
+# Streamlit app
+streamlit>=1.30.0
+nest_asyncio>=1.6.0
+
 # Document parsing
 PyPDF2>=3.0.0
 python-docx>=0.8.11
