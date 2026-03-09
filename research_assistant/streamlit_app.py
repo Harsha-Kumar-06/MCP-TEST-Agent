@@ -13,7 +13,7 @@ try:
     import nest_asyncio
     nest_asyncio.apply()
 except ImportError:
-    pass  # Will be handled later
+    pass
 
 # Configure environment before imports
 os.environ['REQUESTS_CA_BUNDLE'] = ''
@@ -26,10 +26,15 @@ st.set_page_config(
     layout="wide"
 )
 
+# Global flag to track if agent is available
+AGENT_AVAILABLE = False
+AGENT_ERROR = None
+
 # Initialize Google ADK components (cached)
 @st.cache_resource
 def init_agent():
     """Initialize the ADK agent and runner (cached for performance)"""
+    global AGENT_AVAILABLE, AGENT_ERROR
     try:
         from google.adk import Runner
         from google.adk.sessions import InMemorySessionService
@@ -41,13 +46,14 @@ def init_agent():
             app_name="research_assistant",
             session_service=session_service
         )
+        AGENT_AVAILABLE = True
         return runner, session_service, True, None
     except ImportError as e:
-        return None, None, False, f"Missing dependency: {e}. Check requirements.txt"
-    except ModuleNotFoundError as e:
-        return None, None, False, f"Module not found: {e}. Ensure research_assistant.py is deployed."
+        AGENT_ERROR = f"Missing package: {e}"
+        return None, None, False, AGENT_ERROR
     except Exception as e:
-        return None, None, False, str(e)
+        AGENT_ERROR = str(e)
+        return None, None, False, AGENT_ERROR
 
 # File parsing functions
 def extract_text_from_file(uploaded_file) -> tuple[str, str]:
@@ -137,33 +143,34 @@ Analyze this document and provide comprehensive findings with specific citations
 def run_sync(coro):
     """Run async code in sync context - Streamlit Cloud compatible"""
     try:
-        # nest_asyncio allows nested event loops (required for Streamlit Cloud)
         loop = asyncio.get_event_loop()
         if loop.is_running():
-            # If loop is already running, create a new thread
             import concurrent.futures
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 return pool.submit(lambda: asyncio.run(coro)).result()
         return loop.run_until_complete(coro)
     except RuntimeError:
-        # No event loop exists, create one
         return asyncio.run(coro)
 
+# Try to initialize agent early (but don't crash if it fails)
+_runner, _session, _agent_ok, _agent_err = init_agent()
+
 st.title("🔬 Research Assistant")
+
+# Show warning if agent not available (but keep UI working)
+if not _agent_ok:
+    st.warning(f"""⚠️ **Agent not fully initialized**: {_agent_err}
+
+**To fix:** Ensure these are in `requirements.txt`:
+- `google-adk>=0.5.0`
+- `google-generativeai>=0.3.0`
+- `nest_asyncio>=1.6.0`
+
+And add `GOOGLE_API_KEY` to Streamlit Secrets.""")
+
 st.markdown("""
 **AI Research Analyst** with 5-agent sequential pipeline for comprehensive document analysis.
 """)
-
-# Early initialization check to prevent redirect loops
-_runner, _session, _init_success, _init_error = init_agent()
-if not _init_success:
-    st.error(f"⚠️ Agent initialization failed: {_init_error}")
-    st.info("""**Troubleshooting:**
-1. Ensure `research_assistant.py` with `root_agent` is in your repo
-2. Add `GOOGLE_API_KEY` to Streamlit secrets (Settings → Secrets)
-3. Check `requirements.txt` includes: `google-adk`, `google-genai`, `nest_asyncio`
-""")
-    st.stop()  # Prevents further execution and redirect loops
 
 # Display pipeline stages
 st.markdown("### 📊 Agent Pipeline")
