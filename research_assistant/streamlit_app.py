@@ -1,24 +1,10 @@
-"""Research Assistant Agent - Streamlit Demo (Self-Contained)
-AI-powered document analysis with 5-agent sequential pipeline.
-Runs the Google ADK agent directly - no separate backend needed.
+"""Research Assistant Agent - Streamlit Demo
+AI-powered document analysis using Google Gemini.
+Simplified version for Streamlit Cloud deployment.
 """
 import streamlit as st
 import os
 import io
-import asyncio
-import uuid
-
-# Fix async event loop for Streamlit Cloud
-try:
-    import nest_asyncio
-    nest_asyncio.apply()
-except ImportError:
-    pass
-
-# Configure environment before imports
-os.environ['REQUESTS_CA_BUNDLE'] = ''
-os.environ['CURL_CA_BUNDLE'] = ''
-os.environ['SSL_CERT_FILE'] = ''
 
 st.set_page_config(
     page_title="Research Assistant",
@@ -26,151 +12,62 @@ st.set_page_config(
     layout="wide"
 )
 
-# Global flag to track if agent is available
-AGENT_AVAILABLE = False
-AGENT_ERROR = None
-
-# Initialize Google ADK components (cached)
-@st.cache_resource
-def init_agent():
-    """Initialize the ADK agent and runner (cached for performance)"""
-    global AGENT_AVAILABLE, AGENT_ERROR
+def get_gemini_response(question: str, document: str = "") -> str:
+    """Get response from Google Gemini API directly"""
     try:
-        from google.adk import Runner
-        from google.adk.sessions import InMemorySessionService
-        from research_assistant import root_agent
+        import google.generativeai as genai
         
-        session_service = InMemorySessionService()
-        runner = Runner(
-            agent=root_agent,
-            app_name="research_assistant",
-            session_service=session_service
-        )
-        AGENT_AVAILABLE = True
-        return runner, session_service, True, None
-    except ImportError as e:
-        AGENT_ERROR = f"Missing package: {e}"
-        return None, None, False, AGENT_ERROR
-    except Exception as e:
-        AGENT_ERROR = str(e)
-        return None, None, False, AGENT_ERROR
+        api_key = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if not api_key:
+            return "⚠️ GOOGLE_API_KEY not configured. Add it to Streamlit Secrets."
+        
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        prompt = f"""You are a Research Assistant AI. Analyze the following and provide comprehensive findings.
 
-# File parsing functions
+QUESTION: {question}
+
+{"DOCUMENT TO ANALYZE:" + chr(10) + document[:30000] if document else ""}
+
+Provide a detailed, well-structured response with:
+1. Key findings
+2. Important insights
+3. Recommendations (if applicable)
+"""
+        
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"⚠️ Error: {str(e)}"
+
 def extract_text_from_file(uploaded_file) -> tuple[str, str]:
     """Extract text from uploaded file"""
-    import PyPDF2
-    from docx import Document as DocxDocument
-    
     filename = uploaded_file.name.lower()
     content = uploaded_file.read()
-    uploaded_file.seek(0)  # Reset for potential re-read
+    uploaded_file.seek(0)
     
     ext = os.path.splitext(filename)[1]
     
-    if ext == '.pdf':
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
-        text = "\n\n".join([page.extract_text() or "" for page in pdf_reader.pages])
-        return text, "PDF"
-    elif ext in ['.docx', '.doc']:
-        doc = DocxDocument(io.BytesIO(content))
-        text = "\n\n".join([p.text for p in doc.paragraphs if p.text.strip()])
-        return text, "Word"
-    elif ext in ['.txt', '.md', '.py', '.js', '.json', '.csv', '.xml', '.html']:
-        text = content.decode('utf-8', errors='ignore')
-        return text, ext.upper().replace('.', '')
-    else:
-        text = content.decode('utf-8', errors='ignore')
-        return text, "Text"
-
-async def run_agent_pipeline(question: str, document: str, progress_callback=None) -> str:
-    """Run the 5-agent pipeline directly"""
-    from google.genai import types
-    
-    runner, session_service, success, error = init_agent()
-    
-    if not success:
-        return f"⚠️ Agent initialization failed: {error}"
-    
-    # Check API key
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        return "⚠️ GOOGLE_API_KEY not configured. Add it to Streamlit secrets."
-    
-    session_id = str(uuid.uuid4())
-    user_id = "streamlit_user"
-    
-    # Create session
-    await session_service.create_session(
-        app_name="research_assistant",
-        user_id=user_id,
-        session_id=session_id
-    )
-    
-    # Prepare message
-    user_message = f"""RESEARCH QUESTION: {question}
-
-DOCUMENT TO ANALYZE:
-{document[:50000]}
-
-Analyze this document and provide comprehensive findings with specific citations."""
-    
-    new_message = types.Content(
-        role="user",
-        parts=[types.Part(text=user_message)]
-    )
-    
-    # Run pipeline
-    final_response = ""
-    agent_names = ['IntentDetectorAgent', 'DataProcessorAgent', 'AnalyzerAgent', 'ExtractorAgent', 'ReportGeneratorAgent']
-    
-    async for event in runner.run_async(
-        user_id=user_id,
-        session_id=session_id,
-        new_message=new_message
-    ):
-        if hasattr(event, 'author') and hasattr(event, 'content'):
-            if event.author == 'ReportGeneratorAgent' and event.content:
-                if hasattr(event.content, 'parts'):
-                    final_response = "".join([p.text for p in event.content.parts if hasattr(p, 'text')])
-            
-            # Update progress
-            if progress_callback and event.author in agent_names:
-                idx = agent_names.index(event.author)
-                progress_callback(idx + 1, len(agent_names), event.author)
-    
-    return final_response if final_response else "Analysis complete. No detailed report generated."
-
-def run_sync(coro):
-    """Run async code in sync context - Streamlit Cloud compatible"""
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor() as pool:
-                return pool.submit(lambda: asyncio.run(coro)).result()
-        return loop.run_until_complete(coro)
-    except RuntimeError:
-        return asyncio.run(coro)
-
-# Try to initialize agent early (but don't crash if it fails)
-_runner, _session, _agent_ok, _agent_err = init_agent()
+        if ext == '.pdf':
+            import PyPDF2
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+            text = "\n\n".join([page.extract_text() or "" for page in pdf_reader.pages])
+            return text, "PDF"
+        elif ext in ['.docx', '.doc']:
+            from docx import Document as DocxDocument
+            doc = DocxDocument(io.BytesIO(content))
+            text = "\n\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+            return text, "Word"
+        else:
+            text = content.decode('utf-8', errors='ignore')
+            return text, ext.upper().replace('.', '') or "Text"
+    except Exception as e:
+        return content.decode('utf-8', errors='ignore'), "Text"
 
 st.title("🔬 Research Assistant")
-
-# Show warning if agent not available (but keep UI working)
-if not _agent_ok:
-    st.warning(f"""⚠️ **Agent not fully initialized**: {_agent_err}
-
-**To fix:** Ensure these are in `requirements.txt`:
-- `google-adk>=0.5.0`
-- `google-generativeai>=0.3.0`
-- `nest_asyncio>=1.6.0`
-
-And add `GOOGLE_API_KEY` to Streamlit Secrets.""")
-
-st.markdown("""
-**AI Research Analyst** with 5-agent sequential pipeline for comprehensive document analysis.
-""")
+st.markdown("**AI Research Analyst** powered by Google Gemini")
 
 # Display pipeline stages
 st.markdown("### 📊 Agent Pipeline")
@@ -240,26 +137,8 @@ with tab1:
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
-            with st.spinner("Running 5-agent pipeline..."):
-                progress = st.progress(0)
-                status = st.empty()
-                
-                def update_progress(step, total, agent_name):
-                    progress.progress(step / total)
-                    status.markdown(f"**Running: {agent_name}...**")
-                
-                try:
-                    # Run agent directly (no HTTP request)
-                    answer = run_sync(run_agent_pipeline(
-                        question=prompt,
-                        document="No document provided - answer from general knowledge.",
-                        progress_callback=update_progress
-                    ))
-                except Exception as e:
-                    answer = f"⚠️ Error: {str(e)}"
-                
-                progress.progress(1.0)
-                status.empty()
+            with st.spinner("Analyzing..."):
+                answer = get_gemini_response(question=prompt)
                 st.markdown(answer)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
@@ -276,19 +155,11 @@ with tab2:
         
         if st.button("🔍 Analyze Document", type="primary"):
             with st.spinner("Processing document..."):
-                try:
-                    # Extract text from uploaded file
-                    doc_text, doc_type = extract_text_from_file(uploaded_file)
-                    st.caption(f"📄 Extracted {len(doc_text)} characters from {doc_type} file")
-                    
-                    # Run agent directly
-                    question = analysis_prompt if analysis_prompt else f"Analyze and summarize this {doc_type} document"
-                    answer = run_sync(run_agent_pipeline(
-                        question=question,
-                        document=doc_text
-                    ))
-                except Exception as e:
-                    answer = f"⚠️ Error: {str(e)}"
+                doc_text, doc_type = extract_text_from_file(uploaded_file)
+                st.caption(f"📄 Extracted {len(doc_text)} characters from {doc_type} file")
+                
+                question = analysis_prompt if analysis_prompt else f"Analyze and summarize this {doc_type} document"
+                answer = get_gemini_response(question=question, document=doc_text)
                 
                 st.markdown("### 📋 Analysis Results")
                 st.markdown(answer)
@@ -300,24 +171,12 @@ with tab3:
     
     research_query = st.text_input("Research Topic", placeholder="Latest trends in AI agents...")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        search_depth = st.selectbox("Search Depth", ["Quick", "Standard", "Deep"])
-    with col2:
-        sources = st.multiselect("Sources", ["Google", "DuckDuckGo", "Academic"], default=["Google"])
-    
     if st.button("🔍 Research", type="primary"):
         if research_query:
             with st.spinner(f"Researching: {research_query}"):
-                try:
-                    # Run agent directly for research
-                    answer = run_sync(run_agent_pipeline(
-                        question=f"Research and provide comprehensive information about: {research_query}",
-                        document=f"Web research request for: {research_query}\nSearch depth: {search_depth}\nSources: {', '.join(sources)}"
-                    ))
-                except Exception as e:
-                    answer = f"⚠️ Error: {str(e)}"
-                
+                answer = get_gemini_response(
+                    question=f"Research and provide comprehensive information about: {research_query}"
+                )
                 st.markdown("### 📋 Research Findings")
                 st.markdown(answer)
         else:
@@ -325,10 +184,4 @@ with tab3:
 
 # Footer
 st.divider()
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Pipeline Agents", "5")
-with col2:
-    st.metric("File Formats", "20+")
-with col3:
-    st.metric("Search Engines", "Google + DDG")
+st.caption("Powered by Google Gemini AI")
