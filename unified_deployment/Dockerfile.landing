@@ -1,0 +1,16 @@
+# Landing Page Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir streamlit>=1.28.0
+
+COPY landing_page.py .
+
+EXPOSE 8501
+
+ENV STREAMLIT_SERVER_PORT=8501
+ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
+ENV STREAMLIT_SERVER_HEADLESS=true
+
+CMD ["streamlit", "run", "landing_page.py", "--server.port=8501", "--server.address=0.0.0.0"]

@@ -5,13 +5,23 @@ REM Example: deploy_cloud_run.bat portfolio_manager portfolio-manager
 
 setlocal enabledelayedexpansion
 
-set PROJECT_ID=YOUR_GCP_PROJECT_ID
+REM ============================================
+REM CONFIGURE THESE VALUES
+REM ============================================
+set PROJECT_ID=gcp-drayvn-etoc
 set REGION=us-central1
+set SERVICE_PREFIX=demo-agents-
+REM ^ This prefix keeps all demo agents separate!
+REM   Your services will be named: demo-agents-portfolio-manager, demo-agents-access-controller, etc.
+REM   Set to empty (SERVICE_PREFIX=) if you don't want a prefix
 
 if "%1"=="" (
     echo.
     echo ========================================
     echo  Drayvn Agents - Cloud Run Deployment
+    echo ========================================
+    echo  Project: %PROJECT_ID%
+    echo  Prefix:  %SERVICE_PREFIX%
     echo ========================================
     echo.
     echo Usage: deploy_cloud_run.bat [agent-folder] [service-name]
@@ -31,12 +41,12 @@ if "%1"=="" (
     echo Example:
     echo   deploy_cloud_run.bat portfolio_manager portfolio-manager
     echo.
-    echo First, set your PROJECT_ID in this script!
+    echo Services will be deployed as: %SERVICE_PREFIX%[service-name]
     exit /b 1
 )
 
 set AGENT_FOLDER=%1
-set SERVICE_NAME=%2
+set SERVICE_NAME=%SERVICE_PREFIX%%2
 
 echo.
 echo Deploying %SERVICE_NAME% from %AGENT_FOLDER%...
@@ -59,11 +69,20 @@ gcloud run deploy %SERVICE_NAME% ^
     --allow-unauthenticated ^
     --set-env-vars "GOOGLE_API_KEY=YOUR_API_KEY" ^
     --memory 1Gi ^
-    --timeout 300
+    --timeout 300 ^
+    --labels "app=drayvn-demo,team=agents,env=demo"
 
 echo.
-echo Deployment complete!
-echo Your app URL: https://%SERVICE_NAME%-%PROJECT_ID%.%REGION%.run.app
+echo ============================================
+echo  Deployment complete!
+echo ============================================
+echo  Service: %SERVICE_NAME%
+echo  URL: https://%SERVICE_NAME%-%PROJECT_ID%.%REGION%.run.app
+echo.
+echo  To view all demo agents in GCP Console:
+echo  https://console.cloud.google.com/run?project=%PROJECT_ID%
+echo  Filter by label: app=drayvn-demo
+echo ============================================
 echo.
 
 cd /d "%~dp0"

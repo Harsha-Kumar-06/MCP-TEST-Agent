@@ -1,0 +1,156 @@
+# Docker Compose - All Drayvn Agents as Separate Services
+# Usage: docker-compose up --build
+#
+# This runs each agent as a separate container with nginx reverse proxy
+# Access at: http://localhost:8080
+# Routes: /access-controller, /portfolio-manager, etc.
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Nginx Reverse Proxy (Routes to all agents)
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./unified_deployment/nginx-compose.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - landing
+      - access-controller
+      - portfolio-manager
+      - campaign-validator
+      - pr-code-reviewer
+      - research-assistant
+      - loan-underwriter
+      - content-moderator
+      - helpdesk-bot
+      - social-media-trends
+      - portfolio-swarm
+    restart: unless-stopped
+
+  # ============================================
+  # Landing Page
+  # ============================================
+  landing:
+    build:
+      context: ./unified_deployment
+      dockerfile: Dockerfile.landing
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  # ============================================
+  # Agent Services
+  # ============================================
+  
+  access-controller:
+    build:
+      context: ./access_controller_agent
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  portfolio-manager:
+    build:
+      context: ./portfolio_manager
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  campaign-validator:
+    build:
+      context: ./campaign_validator_agent
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  pr-code-reviewer:
+    build:
+      context: ./pr_code_reviewer
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  research-assistant:
+    build:
+      context: ./research_assistant
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  loan-underwriter:
+    build:
+      context: "./FAN out-FAN in"
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  content-moderator:
+    build:
+      context: ./social_media_content_moderation
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  helpdesk-bot:
+    build:
+      context: "./Router Pattern"
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  social-media-trends:
+    build:
+      context: ./social_media_marketing
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+  portfolio-swarm:
+    build:
+      context: "./Swarm Pattern"
+      dockerfile: Dockerfile
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    expose:
+      - "8501"
+    restart: unless-stopped
+
+# ============================================
+# Network
+# ============================================
+networks:
+  default:
+    name: drayvn-agents-network

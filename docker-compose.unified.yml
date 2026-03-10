@@ -1,0 +1,42 @@
+# Docker Compose - Run All Drayvn Agents Locally
+# Usage: docker-compose -f docker-compose.unified.yml up --build
+#
+# Access at: http://localhost:8080
+# Routes: /access-controller, /portfolio-manager, etc.
+
+services:
+  # ============================================
+  # OPTION 1: Unified Container (All-in-One)
+  # ============================================
+  drayvn-agents-unified:
+    build:
+      context: .
+      dockerfile: Dockerfile.unified
+    ports:
+      - "8080:8080"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key}
+    volumes:
+      - ./access_controller_agent:/app/access_controller_agent:ro
+      - ./portfolio_manager:/app/portfolio_manager:ro
+      - ./campaign_validator_agent:/app/campaign_validator_agent:ro
+      - ./pr_code_reviewer:/app/pr_code_reviewer:ro
+      - ./research_assistant:/app/research_assistant:ro
+      - "./FAN out-FAN in:/app/loan_underwriter:ro"
+      - ./social_media_content_moderation:/app/content_moderator:ro
+      - "./Router Pattern:/app/helpdesk_bot:ro"
+      - ./social_media_marketing:/app/social_media_trends:ro
+      - "./Swarm Pattern:/app/portfolio_swarm:ro"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ============================================
+# Network for container communication
+# ============================================
+networks:
+  default:
+    name: drayvn-agents-network
