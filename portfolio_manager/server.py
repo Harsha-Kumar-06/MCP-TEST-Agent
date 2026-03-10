@@ -132,23 +132,26 @@ class PortfolioResponse(BaseModel):
     raw_response: Optional[str] = None
 
 
-def calculate_risk_score(goal: str, max_loss: int, experience: str, horizon: str) -> Dict[str, Any]:
-    """Calculate risk profile from user inputs."""
+def calculate_risk_score(goal: str, max_loss: int, experience: str, horizon: str, income_stability: str = "stable") -> Dict[str, Any]:
+    """Calculate risk profile from user inputs.
+
+    Formula matches user_profile_agent: average of 5 factors, each scored 1-10.
+    """
     goal_scores = {
-        "preserve_capital": 2,
-        "income": 4,
-        "balanced_growth": 6,
+        "preserve_capital": 1,
+        "income": 3,
+        "balanced_growth": 5,
         "aggressive_growth": 8
     }
-    
+
     horizon_scores = {
-        "less_than_1_year": 2,
-        "1_3_years": 4,
-        "3_5_years": 6,
-        "5_10_years": 8,
+        "less_than_1_year": 1,
+        "1_3_years": 3,
+        "3_5_years": 5,
+        "5_10_years": 7,
         "10_plus_years": 9
     }
-    
+
     exp_scores = {
         "none": 2,
         "beginner": 4,
@@ -156,13 +159,33 @@ def calculate_risk_score(goal: str, max_loss: int, experience: str, horizon: str
         "advanced": 8,
         "expert": 10
     }
-    
+
+    # Breakpoints match user_profile_agent: none=1, 5%=3, 10%=5, 20%=7, 30%+=10
+    if max_loss >= 30:
+        loss_score = 10
+    elif max_loss >= 20:
+        loss_score = 7
+    elif max_loss >= 10:
+        loss_score = 5
+    elif max_loss >= 5:
+        loss_score = 3
+    else:
+        loss_score = 1
+
+    income_scores = {
+        "very_unstable": 2,
+        "unstable": 4,
+        "somewhat_unstable": 4,
+        "stable": 6,
+        "very_stable": 8
+    }
+
     goal_score = goal_scores.get(goal, 5)
     horizon_score = horizon_scores.get(horizon, 5)
-    loss_score = min(max_loss / 5, 6)  # 5%→1, 30%→6
-    exp_score = exp_scores.get(experience, 5)
-    
-    avg_score = (goal_score + horizon_score + loss_score + exp_score) / 4
+    exp_score = exp_scores.get(experience, 6)
+    income_score = income_scores.get(income_stability, 6)
+
+    avg_score = (goal_score + horizon_score + loss_score + exp_score + income_score) / 5
     risk_score = max(1, min(10, round(avg_score)))
     
     categories = [
@@ -444,10 +467,11 @@ async def generate_portfolio(request: PortfolioRequest):
     try:
         # Calculate risk profile
         risk_data = calculate_risk_score(
-            request.goal, 
-            request.max_loss, 
+            request.goal,
+            request.max_loss,
             request.experience,
-            request.horizon
+            request.horizon,
+            request.income_stability
         )
         
         # Build complete profile for agent

@@ -29,6 +29,22 @@ RATE_LIMIT_PERIOD = 60  # seconds
 _call_timestamps: list[float] = []
 
 
+def _safe_float(value, default: float = 0.0) -> float:
+    """Convert value to float, returning default for None / empty / non-numeric strings."""
+    try:
+        return float(value) if value not in (None, "", "None", "N/A", "-") else default
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_int(value, default: int = 0) -> int:
+    """Convert value to int, returning default for None / empty / non-numeric strings."""
+    try:
+        return int(float(value)) if value not in (None, "", "None", "N/A", "-") else default
+    except (ValueError, TypeError):
+        return default
+
+
 def _rate_limit(func):
     """
     Decorator to enforce rate limiting (5 calls per minute for Alpha Vantage free tier).
@@ -123,15 +139,15 @@ def get_stock_quote(symbol: str) -> dict:
     
     return {
         "symbol": quote.get("01. symbol", symbol),
-        "price": float(quote.get("05. price", 0)),
-        "change": float(quote.get("09. change", 0)),
+        "price": _safe_float(quote.get("05. price")),
+        "change": _safe_float(quote.get("09. change")),
         "change_percent": quote.get("10. change percent", "0%").replace("%", ""),
-        "volume": int(quote.get("06. volume", 0)),
+        "volume": _safe_int(quote.get("06. volume")),
         "latest_trading_day": quote.get("07. latest trading day", ""),
-        "previous_close": float(quote.get("08. previous close", 0)),
-        "open": float(quote.get("02. open", 0)),
-        "high": float(quote.get("03. high", 0)),
-        "low": float(quote.get("04. low", 0))
+        "previous_close": _safe_float(quote.get("08. previous close")),
+        "open": _safe_float(quote.get("02. open")),
+        "high": _safe_float(quote.get("03. high")),
+        "low": _safe_float(quote.get("04. low"))
     }
 
 
@@ -538,7 +554,7 @@ def get_sector_performance() -> dict:
                 "sector": sector_name,
                 "etf_symbol": etf_symbol,
                 "price": quote.get("price", 0),
-                "change_percent": float(quote.get("change_percent", "0").replace("%", "")),
+                "change_percent": _safe_float(str(quote.get("change_percent", "0")).replace("%", "")),
                 "volume": quote.get("volume", 0)
             })
         
@@ -597,15 +613,18 @@ def search_stocks(keywords: str) -> dict:
     
     results = []
     for match in matches:
+        score = _safe_float(match.get("9. matchScore"))
+        if score < 0.3:  # Skip low-quality matches
+            continue
         results.append({
             "symbol": match.get("1. symbol", ""),
             "name": match.get("2. name", ""),
             "type": match.get("3. type", ""),
             "region": match.get("4. region", ""),
             "currency": match.get("8. currency", ""),
-            "match_score": float(match.get("9. matchScore", 0))
+            "match_score": score
         })
-    
+
     return {
         "query": keywords,
         "results": results,
